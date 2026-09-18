@@ -14,11 +14,14 @@ faostat_trade/pepper_filtered.csv,19DX0KKwAVJBiJTuvsCz-lLKjro9GL6Sc,03 - FAOSTAT
 tcl/rubber.csv,1FQkXJmT7BjdqDt33Bj5eEIB0extDjpxW,04 - TCL,04-TCL-cao su.csv
 tcl/coffee.csv,1KKMAhqk3ZDEe7fvDHDnidmQspmQd83PS,04 - TCL,04-TCL-coffee.csv
 tcl/pepper.csv,1DtBmR7mbSJ_tU54m0HJhNG9qwCLwiFw1,04 - TCL,04-TCL-hồ tiêu.csv
-supplemental/available_agriculture_observations.csv,1I-HyT5M_seLDiJ_6GuYXRXoTnO9EQeSl,DATA bổ sung,available_agriculture_observations.csv
-supplemental/nasa_power_weather.csv,1kL2GQM64nhTLOfZdLGOcb1oYc87b4d8B,DATA bổ sung,nasa_power_weather.csv
-supplemental/risk_events.csv,1onquxULskQ-ZbSTfqu3opBIB4hLkxjec,DATA bổ sung,risk_events.csv
-supplemental/un_comtrade_annual.csv,1b3HAU-tWRjsPW-700QJ3HK-KsqoQqZ1w,DATA bổ sung,un_comtrade_annual.csv
-supplemental/un_comtrade_live_update.csv,1B9V-R6coAgvEzia9iOyeMd7uadKmLrJh,DATA bổ sung,un_comtrade_live_update.csv
-supplemental/un_comtrade_monthly.csv,1MzJMpB1gWuO2uJoo5faUvY-SEZ8MpkHm,DATA bổ sung,un_comtrade_monthly.csv
-supplemental/world_bank_pink_sheet_raw.csv,190bBoWkGfrI5xDbv7aW74Zr7txPQagts,DATA bổ sung,world_bank_pink_sheet_raw.csv
-supplemental/world_bank_wdi.csv,1Qi3d_qucyD8FvYkaolGqjFsmyrRPrmk8,DATA bổ sung,world_bank_wdi.csv
+supplemental/un_comtrade/annual.csv,1b3HAU-tWRjsPW-700QJ3HK-KsqoQqZ1w,DATA bổ sung/05 - UN Contrade,un_comtrade_annual.csv
+supplemental/un_comtrade/monthly.csv,1MzJMpB1gWuO2uJoo5faUvY-SEZ8MpkHm,DATA bổ sung/05 - UN Contrade,un_comtrade_monthly.csv
+supplemental/world_bank/pink_sheet_raw.csv,190bBoWkGfrI5xDbv7aW74Zr7txPQagts,DATA bổ sung/06 - WordldBank,world_bank_pink_sheet_raw.csv
+supplemental/world_bank/wdi.csv,1Qi3d_qucyD8FvYkaolGqjFsmyrRPrmk8,DATA bổ sung/06 - WordldBank,world_bank_wdi.csv
+supplemental/weather/nasa_power_weather_daily_63.csv,1mUV338wt3MV9yfjV7N4_71CpEg09ANqG,DATA bổ sung/07-Thời tiết,nasa_power_weather_daily_63.csv
+supplemental/province_agriculture/three_commodities.csv,1I-HyT5M_seLDiJ_6GuYXRXoTnO9EQeSl,DATA bổ sung/08 - Dữ liệu nông nghiệp cấp tỉnh/8.2 Nông nghiệp cấp tỉnh cho 3 loại cây,Nông nghiệp cấp tỉnh cho 3 loại cây
+supplemental/province_agriculture/coffee/area_by_province.xlsx,1kwxSJIditv4lXjKVOL9WMsFrTeA5S4Vn,DATA bổ sung/08 - Dữ liệu nông nghiệp cấp tỉnh/8.1 Nông nghiệp cấp tỉnh của cây cà phê/Sản xuất cà phê cấp tỉnh,dien_tich_trong_ca_phe_cac_tinh_VN.xlsx
+supplemental/province_agriculture/coffee/production_by_province.xlsx,19iu_pJmC8N3lSGNYlBZSRJh_W6JYEBKG,DATA bổ sung/08 - Dữ liệu nông nghiệp cấp tỉnh/8.1 Nông nghiệp cấp tỉnh của cây cà phê/Sản xuất cà phê cấp tỉnh,san_luong_ca_phe_cac_tinh_VN.xlsx
+supplemental/province_agriculture/coffee/average_price_central_highlands.xlsx,1b11VEdSUcfX3LXj02MRtrbUZZmBTnoJD,DATA bổ sung/08 - Dữ liệu nông nghiệp cấp tỉnh/8.1 Nông nghiệp cấp tỉnh của cây cà phê/Thương mại coffee,Giá cà phê nhân xô trung bình khu vực Tây nguyên.xlsx
+supplemental/province_agriculture/coffee/vietnam_export_volume_value.xlsx,1CyGH74MxLno_Pg4y0bJ96ftJUvnf-BQt,DATA bổ sung/08 - Dữ liệu nông nghiệp cấp tỉnh/8.1 Nông nghiệp cấp tỉnh của cây cà phê/Thương mại coffee,Lượng và giá trị xuất khẩu cà phê Việt Nam.xlsx
+supplemental/province_agriculture/coffee/world_ending_stocks.xlsx,1UKZpY8-kcvOaW1FJHj4fGcM9cc23cPai,DATA bổ sung/08 - Dữ liệu nông nghiệp cấp tỉnh/8.1 Nông nghiệp cấp tỉnh của cây cà phê/Thương mại coffee,Tồn kho cà phê cuối kỳ tại các nước trên thế giới.xlsx

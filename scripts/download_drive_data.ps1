@@ -68,7 +68,7 @@ foreach ($row in $rows) {
 }
 
 if ($Prune) {
-    Get-ChildItem -LiteralPath $rawRoot -Recurse -File -Filter "*.csv" | ForEach-Object {
+    Get-ChildItem -LiteralPath $rawRoot -Recurse -File | Where-Object { $_.Name -ne ".gitkeep" } | ForEach-Object {
         $localRelativePath = $_.FullName.Substring($rawRootFull.Length).Replace("\", "/")
         if (-not $manifestPaths.Contains($localRelativePath)) {
             Write-Host "REMOVE $localRelativePath"

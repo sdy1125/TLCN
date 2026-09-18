@@ -8,6 +8,7 @@ spark/notebooks/.ipynb_checkpoints/
 __pycache__/
 *.py[cod]
 data/raw/**/*.csv
+data/raw/**/*.xlsx
 data/.drive-download-state.json
 .drive_*.html
 .drive_inventory.py
