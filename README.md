@@ -60,10 +60,16 @@ docker compose logs -f airflow-init airflow-apiserver airflow-scheduler airflow-
 
 ## Dữ liệu thu thập từ Google Drive
 
-Danh sách file nguồn và Google Drive ID nằm trong `data/drive_manifest.csv`. Tải các file raw về máy bằng:
+Danh sách file nguồn và Google Drive ID nằm trong `data/drive_manifest.csv`. Script lưu trạng thái tải theo file ID, vì vậy file sẽ được tải lại khi chủ sở hữu thay thế file trên Drive dù tên file không đổi. Tải và đồng bộ các file raw về máy bằng:
 
 ```powershell
-.\scripts\download_drive_data.ps1
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\download_drive_data.ps1
+```
+
+Khi Drive đã xóa bớt dữ liệu, dùng `-Prune` để xóa các file CSV local không còn trong manifest:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\download_drive_data.ps1 -Prune
 ```
 
 Dữ liệu được giữ nguyên tại `data/raw` và không commit vào Git. Cấu trúc gồm `production`, `prices`, `faostat_trade`, `tcl` và `supplemental`. Đồng bộ chúng lên MinIO Bronze bằng:
@@ -72,7 +78,7 @@ Dữ liệu được giữ nguyên tại `data/raw` và không commit vào Git. 
 docker compose run --rm minio-init
 ```
 
-Sau đó xem dữ liệu tại MinIO Console trong bucket `bronze`. Các thư mục đã xử lý sẵn như `not null` và thư mục `cũ` không nằm trong manifest mặc định để bảo toàn nguyên tắc Bronze lấy dữ liệu nguồn ban đầu.
+Sau đó xem dữ liệu tại MinIO Console trong bucket `bronze`. Lệnh đồng bộ MinIO cũng xóa các object cũ không còn trong `data/raw`, để nội dung Bronze luôn khớp với manifest. Các thư mục đã xử lý sẵn như `not null` và thư mục `cũ` không nằm trong manifest mặc định để bảo toàn nguyên tắc Bronze lấy dữ liệu nguồn ban đầu.
 
 ## Chạy thử Bronze → Silver → Gold
 

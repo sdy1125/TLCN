@@ -1,19 +1,16 @@
 relative_path,file_id,source_folder,source_name
-production/rubber.csv,10e562n9F3H2M-MvyhnAnmc7dksPYZuYR,01 - Sản xuất,01-cao su.csv
-production/coffee.csv,1nCikPskgIEcegqD80V76IrC_EOUOgoNy,01 - Sản xuất,01-coffee.csv
-production/pepper.csv,1fMFaTwWNc2s8_99uYES_vgJ9yo11KYG9,01 - Sản xuất,01-pepper (hồ tiêu).csv
-prices/annual/rubber.csv,1Vyd0_vLHPIGyyRUTXVXs9013flJorith,02 - giá/năm,02-năm-caosu.csv
-prices/annual/coffee.csv,18RWSf3ZWH-8aGx-14ecShoq670Vx_W89,02 - giá/năm,02-năm-coffee.csv
-prices/annual/pepper.csv,1AuBanGeM8ZqRoh9D_YKZXPUtHsuSDOgG,02 - giá/năm,02-năm-hồ tiêu.csv
+production/rubber.csv,12kEXL_M95CuqSWr5sdbNT6TOOig6ZuKv,01 - Sản xuất,01-cao su.csv
+production/coffee.csv,1jw-Osjt2RKZflmBhmide7tOF2r7sKbCH,01 - Sản xuất,01-coffee.csv
+production/pepper.csv,11YjXn89YEFuc5Q1WkVORHZfgJvdbcM0L,01 - Sản xuất,01-pepper(hồ tiêu).csv
+prices/annual/rubber.csv,1tZZMk_EM5OK6OqF4hKFm-9v3CWDVivRD,02 - giá/năm,02-năm-caosu.csv
+prices/annual/coffee.csv,13rKL7-LV-ByKHjApgTQ5C8sOfFnYL-Io,02 - giá/năm,02-năm-coffee.csv
+prices/annual/pepper.csv,1AUbZKbgs_t-n9Cz5wvSus9hb48Hm6VZ5,02 - giá/năm,02-năm-hồ tiêu.csv
 prices/monthly/rubber.csv,1DBVwmG6FArdyjlgrXmaKO0VQeOsFne8j,02 - giá/tháng,02-month-caosu.csv
 prices/monthly/coffee.csv,1Qvovo4dT2Xn3VBCkpTsoQncD_OGlcGcq,02 - giá/tháng,02-month-coffee.csv
 prices/monthly/pepper.csv,1DFULjYwE28rBCenYvFD1A6Ter_8Y7GzP,02 - giá/tháng,02-month-pepper.csv
 faostat_trade/rubber_filtered.csv,1-4uMg2SAHbl1feUQfwv4ibApOT-FGr3m,03 - FAOSTAT Trade,03-caosu.csv
 faostat_trade/coffee_filtered.csv,1b3nk1-iGk2owIIJZW70CDNn8cgcX164D,03 - FAOSTAT Trade,03-coffee.csv
 faostat_trade/pepper_filtered.csv,19DX0KKwAVJBiJTuvsCz-lLKjro9GL6Sc,03 - FAOSTAT Trade,03-pepper.csv
-faostat_trade/coffee_green.csv,1WuAk7vDAKYXIAxA0LVQ2FXWyAnqsGDee,03 - FAOSTAT Trade,"Coffee,green"
-faostat_trade/pepper_raw.csv,19cdpBXobUOCf9J96GnkK68WtYedLZ5fn,03 - FAOSTAT Trade,pepper - hồ tiêu
-faostat_trade/rubber_raw.csv,1irD0XuxE0dJZr57AsCYk5dL6AtILlcTX,03 - FAOSTAT Trade,Rubber
 tcl/rubber.csv,1FQkXJmT7BjdqDt33Bj5eEIB0extDjpxW,04 - TCL,04-TCL-cao su.csv
 tcl/coffee.csv,1KKMAhqk3ZDEe7fvDHDnidmQspmQd83PS,04 - TCL,04-TCL-coffee.csv
 tcl/pepper.csv,1DtBmR7mbSJ_tU54m0HJhNG9qwCLwiFw1,04 - TCL,04-TCL-hồ tiêu.csv

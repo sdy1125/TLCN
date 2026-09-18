@@ -79,7 +79,17 @@ services:
         mc mb --ignore-existing local/silver
         mc mb --ignore-existing local/gold
         mc mb --ignore-existing local/warehouse
-        mc mirror --overwrite /seed/raw local/bronze
+        mc mirror --overwrite --remove /seed/raw local/bronze
+        for marker in \
+          .drive-download-state.json \
+          faostat_trade/.gitkeep \
+          prices/annual/.gitkeep \
+          prices/monthly/.gitkeep \
+          production/.gitkeep \
+          supplemental/.gitkeep \
+          tcl/.gitkeep; do
+          mc rm --force "local/bronze/$${marker}" >/dev/null 2>&1 || true
+        done
         echo "MinIO buckets are ready."
     restart: "no"
     networks:
