@@ -1,0 +1,10 @@
+.env
+.docx_work/
+airflow/logs/
+dbt/logs/
+dbt/target/
+ml/.ipynb_checkpoints/
+spark/notebooks/.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+

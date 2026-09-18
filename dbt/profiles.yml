@@ -1,0 +1,16 @@
+tlcn_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: trino
+      method: none
+      host: "{{ env_var('DBT_TRINO_HOST', 'trino') }}"
+      port: 8080
+      user: "{{ env_var('DBT_TRINO_USER', 'dbt') }}"
+      catalog: iceberg
+      schema: gold
+      http_scheme: http
+      threads: 2
+      session_properties:
+        query_max_run_time: 5m
+

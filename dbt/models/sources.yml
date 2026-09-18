@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: silver
+    catalog: iceberg
+    schema: silver
+    tables:
+      - name: agri_trade
+

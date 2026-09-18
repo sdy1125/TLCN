@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: commodity_year_summary
+    description: Annual export summary by agricultural commodity.
+    columns:
+      - name: year
+        tests: [not_null]
+      - name: commodity
+        tests: [not_null]
+

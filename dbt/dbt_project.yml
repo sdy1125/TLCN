@@ -1,0 +1,12 @@
+name: tlcn_lakehouse
+version: "1.0.0"
+config-version: 2
+profile: tlcn_lakehouse
+
+model-paths: ["models"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  tlcn_lakehouse:
+    +materialized: table
+
