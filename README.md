@@ -58,6 +58,22 @@ docker compose logs -f minio-init iceberg-rest trino
 docker compose logs -f airflow-init airflow-apiserver airflow-scheduler airflow-dag-processor
 ```
 
+## Dữ liệu thu thập từ Google Drive
+
+Danh sách file nguồn và Google Drive ID nằm trong `data/drive_manifest.csv`. Tải các file raw về máy bằng:
+
+```powershell
+.\scripts\download_drive_data.ps1
+```
+
+Dữ liệu được giữ nguyên tại `data/raw` và không commit vào Git. Cấu trúc gồm `production`, `prices`, `faostat_trade`, `tcl` và `supplemental`. Đồng bộ chúng lên MinIO Bronze bằng:
+
+```powershell
+docker compose run --rm minio-init
+```
+
+Sau đó xem dữ liệu tại MinIO Console trong bucket `bronze`. Các thư mục đã xử lý sẵn như `not null` và thư mục `cũ` không nằm trong manifest mặc định để bảo toàn nguyên tắc Bronze lấy dữ liệu nguồn ban đầu.
+
 ## Chạy thử Bronze → Silver → Gold
 
 Job mẫu tạo ba bảng Iceberg trên MinIO:
