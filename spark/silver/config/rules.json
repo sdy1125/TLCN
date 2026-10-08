@@ -1,0 +1,397 @@
+{
+  "version": "2",
+  "missing": [
+    "",
+    "…",
+    "...",
+    "..",
+    "NA",
+    "N/A",
+    "null"
+  ],
+  "quarantine_ratio": 0.01,
+  "null_warning_ratio": 0.25,
+  "duplicate_policy": "exact_payload_hash_first",
+  "conflict_resolution": {
+    "provincial_coffee_average_price": {
+      "version": "domestic-coffee-price-v1",
+      "strategy": "maximum_value_within_tolerance",
+      "measure_code": "domestic_coffee_price",
+      "unit_standard": "VND/kg",
+      "max_absolute_delta": "1",
+      "winner_reason": "source_conflict_resolved_max_value_delta_lte_1_vnd_per_kg"
+    }
+  },
+  "source_priority": {},
+  "geography_default": "as_published",
+  "edition_default": "unspecified",
+  "status": {
+    "A": "official",
+    "E": "estimated",
+    "I": "estimated",
+    "X": "estimated",
+    "M": "missing",
+    "": "official"
+  },
+  "commodity": {
+    "656": "coffee",
+    "836": "rubber",
+    "687": "pepper",
+    "0901": "coffee",
+    "0904": "pepper",
+    "coffee": "coffee",
+    "natural_rubber": "rubber",
+    "pepper": "pepper"
+  },
+  "units": {
+    "ha": [
+      "ha",
+      "1"
+    ],
+    "Nghìn ha": [
+      "ha",
+      "1000"
+    ],
+    "t": [
+      "tonne",
+      "1"
+    ],
+    "tonnes": [
+      "tonne",
+      "1"
+    ],
+    "Tấn": [
+      "tonne",
+      "1"
+    ],
+    "nghìn tấn": [
+      "tonne",
+      "1000"
+    ],
+    "kg": [
+      "tonne",
+      "0.001"
+    ],
+    "kg/ha": [
+      "kg/ha",
+      "1"
+    ],
+    "100 mg/ha": [
+      "kg/ha",
+      "0.0001"
+    ],
+    "1000 USD": [
+      "USD",
+      "1000"
+    ],
+    "triệu USD": [
+      "USD",
+      "1000000"
+    ],
+    "USD": [
+      "USD",
+      "1"
+    ],
+    "nghìn bao (60kg/bao)": [
+      "tonne",
+      "60"
+    ],
+    "Đồng/kg": [
+      "VND/kg",
+      "1"
+    ],
+    "($/kg)": [
+      "USD/kg",
+      "1"
+    ],
+    "LCU/tonne": [
+      "LCU/tonne",
+      "1"
+    ],
+    "SLC/tonne": [
+      "SLC/tonne",
+      "1"
+    ],
+    "USD/tonne": [
+      "USD/tonne",
+      "1"
+    ],
+    "index_2014_2016": [
+      "index_2014_2016",
+      "1"
+    ],
+    "%": [
+      "%",
+      "1"
+    ],
+    "persons": [
+      "persons",
+      "1"
+    ],
+    "LCU/USD": [
+      "LCU/USD",
+      "1"
+    ]
+  },
+  "elements": {
+    "5312": [
+      "area_harvested",
+      "ha",
+      null
+    ],
+    "5510": [
+      "production",
+      "tonne",
+      null
+    ],
+    "5412": [
+      "yield",
+      "kg/ha",
+      null
+    ],
+    "5530": [
+      "producer_price_lcu",
+      "LCU/tonne",
+      null
+    ],
+    "5531": [
+      "producer_price_slc",
+      "SLC/tonne",
+      null
+    ],
+    "5532": [
+      "producer_price_usd",
+      "USD/tonne",
+      null
+    ],
+    "5539": [
+      "producer_price_index",
+      "index_2014_2016",
+      null
+    ],
+    "5910": [
+      "trade_quantity",
+      "tonne",
+      "export"
+    ],
+    "5922": [
+      "trade_value",
+      "USD",
+      "export"
+    ],
+    "5610": [
+      "trade_quantity",
+      "tonne",
+      "import"
+    ],
+    "5622": [
+      "trade_value",
+      "USD",
+      "import"
+    ]
+  },
+  "wdi": {
+    "FP.CPI.TOTL.ZG": [
+      "%",
+      true
+    ],
+    "NE.TRD.GNFS.ZS": [
+      "%",
+      false
+    ],
+    "NY.GDP.MKTP.CD": [
+      "USD",
+      false
+    ],
+    "NY.GDP.MKTP.KD.ZG": [
+      "%",
+      true
+    ],
+    "PA.NUS.FCRF": [
+      "LCU/USD",
+      false
+    ],
+    "SP.POP.TOTL": [
+      "persons",
+      false
+    ]
+  },
+  "pink": {
+    "column_12": [
+      "Coffee, Arabica",
+      "coffee",
+      "coffee_arabica_price"
+    ],
+    "column_13": [
+      "Coffee, Robusta",
+      "coffee",
+      "coffee_robusta_price"
+    ],
+    "column_55": [
+      "Rubber, TSR20 **",
+      "rubber",
+      "rubber_tsr20_price"
+    ],
+    "column_56": [
+      "Rubber, RSS3",
+      "rubber",
+      "rubber_rss3_price"
+    ]
+  },
+  "weather": {
+    "T2M": [
+      "temperature_avg_c",
+      -100,
+      70
+    ],
+    "T2M_MAX": [
+      "temperature_max_c",
+      -100,
+      70
+    ],
+    "T2M_MIN": [
+      "temperature_min_c",
+      -100,
+      70
+    ],
+    "RH2M": [
+      "relative_humidity_pct",
+      0,
+      100
+    ],
+    "WS10M": [
+      "wind_speed_m_s",
+      0,
+      150
+    ],
+    "PRECTOTCORR": [
+      "precipitation_mm",
+      0,
+      3000
+    ],
+    "ALLSKY_SFC_SW_DWN": [
+      "solar_radiation",
+      0,
+      100
+    ]
+  },
+  "comtrade": {
+    "flow": {
+      "X": "export",
+      "M": "import"
+    },
+    "value_preference": [
+      "fobvalue",
+      "primaryValue"
+    ],
+    "partner2": "0",
+    "customs": "C00",
+    "total_transport": "0",
+    "exclude_transport_breakdowns_when_total_present": true
+  },
+  "country_aliases": {
+    "Vietnam": "VNM",
+    "Viet Nam": "VNM",
+    "World": "WORLD",
+    "EU": "EU",
+    "European Union": "EU",
+    "Others": "OTHER",
+    "Other": "OTHER",
+    "Cote d'Ivoire": "CIV",
+    "Congo (Kinshasa)": "COD"
+  },
+  "country_special": {
+    "001": {
+      "code": "001",
+      "m49": "001",
+      "iso3": null,
+      "kind": "world"
+    },
+    "159": {
+      "code": "FAO:159",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "058": {
+      "code": "058",
+      "m49": "058",
+      "iso3": null,
+      "kind": "historical"
+    },
+    "230": {
+      "code": "230",
+      "m49": "230",
+      "iso3": null,
+      "kind": "historical"
+    },
+    "891": {
+      "code": "891",
+      "m49": "891",
+      "iso3": null,
+      "kind": "historical"
+    },
+    "736": {
+      "code": "736",
+      "m49": "736",
+      "iso3": null,
+      "kind": "historical"
+    },
+    "810": {
+      "code": "810",
+      "m49": "810",
+      "iso3": null,
+      "kind": "historical"
+    },
+    "890": {
+      "code": "890",
+      "m49": "890",
+      "iso3": null,
+      "kind": "historical"
+    }
+  },
+  "comtrade_special": {
+    "251": {
+      "code": "UN:251",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "490": {
+      "code": "UN:490",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "579": {
+      "code": "UN:579",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "699": {
+      "code": "UN:699",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "757": {
+      "code": "UN:757",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "842": {
+      "code": "UN:842",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    },
+    "899": {
+      "code": "UN:899",
+      "m49": null,
+      "iso3": null,
+      "kind": "aggregate"
+    }
+  }
+}

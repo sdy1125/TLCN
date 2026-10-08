@@ -1,0 +1,1334 @@
+{
+  "faostat_production_rubber": {
+    "sha256": "b94e61fce3a69a121bb9454edb5a3d16bf57d444a617685071beab6c112a167b",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description",
+      "Note"
+    ],
+    "schema_hash": "f4ec42f94ca4e267e3ded3f81b7e43f78ca4bd3af516b5bdfdcadfe17c04646d",
+    "counts": {
+      "input_rows": 5911,
+      "null:Value": 575,
+      "null:Note": 5543,
+      "candidate_rows": 5911
+    },
+    "observed": {
+      "Element Code": {
+        "5312": 1940,
+        "5510": 2316,
+        "5412": 1655
+      },
+      "Unit": {
+        "ha": 1940,
+        "t": 2316,
+        "kg/ha": 1655
+      },
+      "Flag": {
+        "M": 575,
+        "E": 1653,
+        "X": 391,
+        "I": 470,
+        "A": 2822
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1961-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "faostat_production_coffee": {
+    "sha256": "78813b5c7b6dfaf8348e5d9fd5669382db761a4adc68c3ec9f90b2dee26658db",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description",
+      "Note"
+    ],
+    "schema_hash": "f4ec42f94ca4e267e3ded3f81b7e43f78ca4bd3af516b5bdfdcadfe17c04646d",
+    "counts": {
+      "input_rows": 15622,
+      "null:Note": 15006,
+      "candidate_rows": 15622,
+      "null:Value": 267
+    },
+    "observed": {
+      "Element Code": {
+        "5312": 5279,
+        "5412": 5007,
+        "5510": 5336
+      },
+      "Unit": {
+        "ha": 5279,
+        "kg/ha": 5007,
+        "t": 5336
+      },
+      "Flag": {
+        "A": 8082,
+        "E": 5365,
+        "X": 655,
+        "I": 1253,
+        "M": 267
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1961-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "faostat_production_pepper": {
+    "sha256": "5ddabe8c8da5da265d36e902313fee63be197eeff5d74d3f93ee2c66e4569c54",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description",
+      "Note"
+    ],
+    "schema_hash": "f4ec42f94ca4e267e3ded3f81b7e43f78ca4bd3af516b5bdfdcadfe17c04646d",
+    "counts": {
+      "input_rows": 6876,
+      "null:Note": 6797,
+      "candidate_rows": 6876,
+      "null:Value": 461
+    },
+    "observed": {
+      "Element Code": {
+        "5312": 2319,
+        "5412": 2081,
+        "5510": 2476
+      },
+      "Unit": {
+        "ha": 2319,
+        "kg/ha": 2081,
+        "t": 2476
+      },
+      "Flag": {
+        "E": 3281,
+        "A": 2050,
+        "I": 1001,
+        "M": 461,
+        "X": 83
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1961-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "faostat_producer_prices_annual_rubber": {
+    "sha256": "2cd842f978b8727b78c0bfa315d652d11f3222fb71c788f51b5a3538dc2ca8bc",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Months Code",
+      "Months",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "ec37fef94c68d2f6b5b2ab2d97b4e301101e2c6734e017e599d0dd91f5383b68",
+    "counts": {
+      "input_rows": 1767,
+      "null:Unit": 770,
+      "candidate_rows": 1767
+    },
+    "observed": {
+      "Element Code": {
+        "5539": 770,
+        "5530": 341,
+        "5531": 341,
+        "5532": 315
+      },
+      "Unit": {
+        "": 770,
+        "LCU": 341,
+        "SLC": 341,
+        "USD": 315
+      },
+      "Flag": {
+        "E": 770,
+        "A": 964,
+        "X": 33
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1991-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "faostat_producer_prices_annual_coffee": {
+    "sha256": "a8a41e96e10a627a7e2fc53a6415048133324ced6028a8eb6cd8c75f42a30bac",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Months Code",
+      "Months",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "ec37fef94c68d2f6b5b2ab2d97b4e301101e2c6734e017e599d0dd91f5383b68",
+    "counts": {
+      "input_rows": 4877,
+      "candidate_rows": 4877,
+      "null:Unit": 1818
+    },
+    "observed": {
+      "Element Code": {
+        "5530": 1041,
+        "5531": 1041,
+        "5532": 977,
+        "5539": 1818
+      },
+      "Unit": {
+        "LCU": 1041,
+        "SLC": 1041,
+        "USD": 977,
+        "": 1818
+      },
+      "Flag": {
+        "A": 2984,
+        "E": 1818,
+        "X": 75
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1991-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "faostat_producer_prices_annual_pepper": {
+    "sha256": "4b9d31c2def2bd6b69f5559fb41225b8084a43aac564b5a1138af54a7f42b1e0",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Months Code",
+      "Months",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "ec37fef94c68d2f6b5b2ab2d97b4e301101e2c6734e017e599d0dd91f5383b68",
+    "counts": {
+      "input_rows": 2285,
+      "candidate_rows": 2285,
+      "null:Unit": 1097
+    },
+    "observed": {
+      "Element Code": {
+        "5530": 396,
+        "5531": 396,
+        "5532": 396,
+        "5539": 1097
+      },
+      "Unit": {
+        "LCU": 396,
+        "SLC": 396,
+        "USD": 396,
+        "": 1097
+      },
+      "Flag": {
+        "A": 1155,
+        "E": 1097,
+        "X": 33
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1991-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "faostat_producer_prices_monthly_rubber": {
+    "sha256": "807c0e6e95d68d08d70be1d59d82dfa7a13e840a51377b2c74191d25280bf2c1",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Months Code",
+      "Months",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "ec37fef94c68d2f6b5b2ab2d97b4e301101e2c6734e017e599d0dd91f5383b68",
+    "counts": {
+      "input_rows": 928,
+      "candidate_rows": 928
+    },
+    "observed": {
+      "Element Code": {
+        "5530": 928
+      },
+      "Unit": {
+        "LCU": 928
+      },
+      "Flag": {
+        "A": 928
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2010-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "faostat_producer_prices_monthly_coffee": {
+    "sha256": "0b62059568f755fa3b8faa1b6546fb3e129d97ba7f1f1be1459fda699ca2f485",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Months Code",
+      "Months",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "ec37fef94c68d2f6b5b2ab2d97b4e301101e2c6734e017e599d0dd91f5383b68",
+    "counts": {
+      "input_rows": 1414,
+      "candidate_rows": 1414
+    },
+    "observed": {
+      "Element Code": {
+        "5530": 1414
+      },
+      "Unit": {
+        "LCU": 1414
+      },
+      "Flag": {
+        "A": 1414
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2010-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "faostat_producer_prices_monthly_pepper": {
+    "sha256": "718ea63ad871962199b7c7e6d8d2bb7efc011710b7c23f5b0d78c8c3eec53954",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Months Code",
+      "Months",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "ec37fef94c68d2f6b5b2ab2d97b4e301101e2c6734e017e599d0dd91f5383b68",
+    "counts": {
+      "input_rows": 1256,
+      "candidate_rows": 1256
+    },
+    "observed": {
+      "Element Code": {
+        "5530": 1256
+      },
+      "Unit": {
+        "LCU": 1256
+      },
+      "Flag": {
+        "A": 1256
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2010-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "faostat_detailed_trade_matrix_rubber": {
+    "sha256": "670fa71b855beaaf47c998ed38bdf908bc3ccfe2ba8a9ba1d5b31b9fc211cb04",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Reporter Country Code (M49)",
+      "Reporter Countries",
+      "Partner Country Code (M49)",
+      "Partner Countries",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "b15549aa84ee0b053cdc6cbf8355b84780b850d8b97ced5a8d001537c1261650",
+    "counts": {
+      "input_rows": 1206,
+      "candidate_rows": 1206
+    },
+    "observed": {
+      "Element Code": {
+        "5910": 519,
+        "5922": 519,
+        "5610": 84,
+        "5622": 84
+      },
+      "Unit": {
+        "t": 603,
+        "1000 USD": 603
+      },
+      "Flag": {
+        "A": 1149,
+        "I": 57
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2012-01-01",
+    "period_start_max": "2023-01-01"
+  },
+  "faostat_detailed_trade_matrix_coffee": {
+    "sha256": "3c413a623ae6dafc660df95082cf3c30e73f9fa6d6794b3fdf7e83015df5a513",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Reporter Country Code (M49)",
+      "Reporter Countries",
+      "Partner Country Code (M49)",
+      "Partner Countries",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "b15549aa84ee0b053cdc6cbf8355b84780b850d8b97ced5a8d001537c1261650",
+    "counts": {
+      "input_rows": 2164,
+      "candidate_rows": 2164
+    },
+    "observed": {
+      "Element Code": {
+        "5910": 851,
+        "5922": 851,
+        "5610": 231,
+        "5622": 231
+      },
+      "Unit": {
+        "t": 1082,
+        "1000 USD": 1082
+      },
+      "Flag": {
+        "A": 2039,
+        "I": 125
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2012-01-01",
+    "period_start_max": "2023-01-01"
+  },
+  "faostat_detailed_trade_matrix_pepper": {
+    "sha256": "5a9ff7ea9791f32e8cb95eff0b3e7eafd7649451743b3b65bc03aa358ff8ad72",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Reporter Country Code (M49)",
+      "Reporter Countries",
+      "Partner Country Code (M49)",
+      "Partner Countries",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description"
+    ],
+    "schema_hash": "b15549aa84ee0b053cdc6cbf8355b84780b850d8b97ced5a8d001537c1261650",
+    "counts": {
+      "input_rows": 2550,
+      "candidate_rows": 2550
+    },
+    "observed": {
+      "Element Code": {
+        "5910": 1070,
+        "5922": 1070,
+        "5610": 205,
+        "5622": 205
+      },
+      "Unit": {
+        "t": 1275,
+        "1000 USD": 1275
+      },
+      "Flag": {
+        "A": 2394,
+        "I": 156
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2012-01-01",
+    "period_start_max": "2023-01-01"
+  },
+  "faostat_tcl_trade_rubber": {
+    "sha256": "e0d63b44a5278d17d9aa9dbdf3bcf8c443f8b5a7b38afbcb051b6973e9241f3f",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description",
+      "Note"
+    ],
+    "schema_hash": "f4ec42f94ca4e267e3ded3f81b7e43f78ca4bd3af516b5bdfdcadfe17c04646d",
+    "counts": {
+      "input_rows": 9719,
+      "candidate_rows": 9719,
+      "null:Note": 8974
+    },
+    "observed": {
+      "Element Code": {
+        "5910": 4847,
+        "5922": 4872
+      },
+      "Unit": {
+        "t": 4847,
+        "1000 USD": 4872
+      },
+      "Flag": {
+        "X": 745,
+        "A": 7949,
+        "E": 885,
+        "I": 140
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1961-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "faostat_tcl_trade_coffee": {
+    "sha256": "3ca0e9e7f26375a660581ee397cbc0b2bbb2c298c3d064cfbabdfb6b9b1eb7ff",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description",
+      "Note"
+    ],
+    "schema_hash": "f4ec42f94ca4e267e3ded3f81b7e43f78ca4bd3af516b5bdfdcadfe17c04646d",
+    "counts": {
+      "input_rows": 18647,
+      "candidate_rows": 18647,
+      "null:Note": 16644
+    },
+    "observed": {
+      "Element Code": {
+        "5910": 9304,
+        "5922": 9343
+      },
+      "Unit": {
+        "t": 9304,
+        "1000 USD": 9343
+      },
+      "Flag": {
+        "X": 2008,
+        "A": 15385,
+        "E": 873,
+        "I": 381
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1961-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "faostat_tcl_trade_pepper": {
+    "sha256": "ca03a9394c8fae567d74d983e210410923750443f0c8d4f853a61ae32192448c",
+    "headers": [
+      "Domain Code",
+      "Domain",
+      "Area Code (M49)",
+      "Area",
+      "Element Code",
+      "Element",
+      "Item Code (FAO)",
+      "Item",
+      "Year Code",
+      "Year",
+      "Unit",
+      "Value",
+      "Flag",
+      "Flag Description",
+      "Note"
+    ],
+    "schema_hash": "f4ec42f94ca4e267e3ded3f81b7e43f78ca4bd3af516b5bdfdcadfe17c04646d",
+    "counts": {
+      "input_rows": 15979,
+      "null:Note": 14739,
+      "candidate_rows": 15979
+    },
+    "observed": {
+      "Element Code": {
+        "5910": 7994,
+        "5922": 7985
+      },
+      "Unit": {
+        "t": 7994,
+        "1000 USD": 7985
+      },
+      "Flag": {
+        "A": 13657,
+        "E": 810,
+        "X": 1240,
+        "I": 272
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1961-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "un_comtrade_annual": {
+    "sha256": "6c5393426bef139c493184d524a549a17c218bb3198dfca8ee8a831679921d09",
+    "headers": [
+      "typeCode",
+      "freqCode",
+      "refPeriodId",
+      "refYear",
+      "refMonth",
+      "period",
+      "reporterCode",
+      "reporterISO",
+      "reporterDesc",
+      "flowCode",
+      "flowDesc",
+      "partnerCode",
+      "partnerISO",
+      "partnerDesc",
+      "partner2Code",
+      "partner2ISO",
+      "partner2Desc",
+      "classificationCode",
+      "classificationSearchCode",
+      "isOriginalClassification",
+      "cmdCode",
+      "cmdDesc",
+      "aggrLevel",
+      "isLeaf",
+      "customsCode",
+      "customsDesc",
+      "mosCode",
+      "motCode",
+      "motDesc",
+      "qtyUnitCode",
+      "qtyUnitAbbr",
+      "qty",
+      "isQtyEstimated",
+      "altQtyUnitCode",
+      "altQtyUnitAbbr",
+      "altQty",
+      "isAltQtyEstimated",
+      "netWgt",
+      "isNetWgtEstimated",
+      "grossWgt",
+      "isGrossWgtEstimated",
+      "cifvalue",
+      "fobvalue",
+      "primaryValue",
+      "legacyEstimationFlag",
+      "isReported",
+      "isAggregate",
+      "source_file"
+    ],
+    "schema_hash": "ca0dbb6504e4d32edec195148c122c1605f9e2dd2ffdd75dd0149472e3e2c37a",
+    "counts": {
+      "input_rows": 2807,
+      "null:reporterISO": 2807,
+      "null:reporterDesc": 2807,
+      "null:flowDesc": 2807,
+      "null:partnerISO": 2807,
+      "null:partnerDesc": 2807,
+      "null:partner2ISO": 2807,
+      "null:partner2Desc": 2807,
+      "null:cmdDesc": 2807,
+      "null:aggrLevel": 2807,
+      "null:isLeaf": 2807,
+      "null:customsDesc": 2807,
+      "null:motDesc": 2807,
+      "null:qtyUnitAbbr": 2807,
+      "null:altQtyUnitAbbr": 2807,
+      "null:altQty": 1042,
+      "null:grossWgt": 1427,
+      "null:cifvalue": 2488,
+      "candidate_rows": 4742,
+      "excluded_rows": 436,
+      "null:qty": 93,
+      "null:netWgt": 31
+    },
+    "observed": {
+      "cmdCode": {
+        "0901": 1324,
+        "0904": 1483
+      },
+      "motCode": {
+        "0": 2371,
+        "2100": 312,
+        "1000": 95,
+        "3200": 23,
+        "9900": 6
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2010-01-01",
+    "period_start_max": "2023-01-01"
+  },
+  "un_comtrade_monthly": {
+    "sha256": "2eb354ca8f32f49ac8d6809a4ebaad217f445d946970b0cb42de95bb91307175",
+    "headers": [
+      "typeCode",
+      "freqCode",
+      "refPeriodId",
+      "refYear",
+      "refMonth",
+      "period",
+      "reporterCode",
+      "reporterISO",
+      "reporterDesc",
+      "flowCode",
+      "flowDesc",
+      "partnerCode",
+      "partnerISO",
+      "partnerDesc",
+      "partner2Code",
+      "partner2ISO",
+      "partner2Desc",
+      "classificationCode",
+      "classificationSearchCode",
+      "isOriginalClassification",
+      "cmdCode",
+      "cmdDesc",
+      "aggrLevel",
+      "isLeaf",
+      "customsCode",
+      "customsDesc",
+      "mosCode",
+      "motCode",
+      "motDesc",
+      "qtyUnitCode",
+      "qtyUnitAbbr",
+      "qty",
+      "isQtyEstimated",
+      "altQtyUnitCode",
+      "altQtyUnitAbbr",
+      "altQty",
+      "isAltQtyEstimated",
+      "netWgt",
+      "isNetWgtEstimated",
+      "grossWgt",
+      "isGrossWgtEstimated",
+      "cifvalue",
+      "fobvalue",
+      "primaryValue",
+      "legacyEstimationFlag",
+      "isReported",
+      "isAggregate",
+      "source_file"
+    ],
+    "schema_hash": "ca0dbb6504e4d32edec195148c122c1605f9e2dd2ffdd75dd0149472e3e2c37a",
+    "counts": {
+      "input_rows": 7824,
+      "null:reporterISO": 7824,
+      "null:reporterDesc": 7824,
+      "null:flowDesc": 7824,
+      "null:partnerISO": 7824,
+      "null:partnerDesc": 7824,
+      "null:partner2ISO": 7824,
+      "null:partner2Desc": 7824,
+      "null:cmdDesc": 7824,
+      "null:aggrLevel": 7824,
+      "null:isLeaf": 7824,
+      "null:customsDesc": 7824,
+      "null:motDesc": 7824,
+      "null:qtyUnitAbbr": 7824,
+      "null:altQtyUnitAbbr": 7824,
+      "candidate_rows": 12376,
+      "null:cifvalue": 2985,
+      "excluded_rows": 1636
+    },
+    "observed": {
+      "cmdCode": {
+        "0901": 7824
+      },
+      "motCode": {
+        "0": 6188,
+        "2100": 1304,
+        "3200": 103,
+        "1000": 216,
+        "9900": 13
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2015-01-01",
+    "period_start_max": "2023-12-01"
+  },
+  "world_bank_pink_sheet": {
+    "sha256": "6d19685d70f8cf2aecb46c0a50294e84f63e88c63e7af86b6a511d3cfde45729",
+    "headers": [
+      "source_sheet",
+      "column_0",
+      "column_1",
+      "column_2",
+      "column_3",
+      "column_4",
+      "column_5",
+      "column_6",
+      "column_7",
+      "column_8",
+      "column_9",
+      "column_10",
+      "column_11",
+      "column_12",
+      "column_13",
+      "column_14",
+      "column_15",
+      "column_16",
+      "column_17",
+      "column_18",
+      "column_19",
+      "column_20",
+      "column_21",
+      "column_22",
+      "column_23",
+      "column_24",
+      "column_25",
+      "column_26",
+      "column_27",
+      "column_28",
+      "column_29",
+      "column_30",
+      "column_31",
+      "column_32",
+      "column_33",
+      "column_34",
+      "column_35",
+      "column_36",
+      "column_37",
+      "column_38",
+      "column_39",
+      "column_40",
+      "column_41",
+      "column_42",
+      "column_43",
+      "column_44",
+      "column_45",
+      "column_46",
+      "column_47",
+      "column_48",
+      "column_49",
+      "column_50",
+      "column_51",
+      "column_52",
+      "column_53",
+      "column_54",
+      "column_55",
+      "column_56",
+      "column_57",
+      "column_58",
+      "column_59",
+      "column_60",
+      "column_61",
+      "column_62",
+      "column_63",
+      "column_64",
+      "column_65",
+      "column_66",
+      "column_67",
+      "column_68",
+      "column_69",
+      "column_70",
+      "column_71"
+    ],
+    "schema_hash": "90735f4e3d35a483fb7b7b99ff211e8eaf1b518324be4289912f4f2a4bed6a06",
+    "counts": {
+      "input_rows": 1963,
+      "null:column_1": 100,
+      "null:column_2": 195,
+      "null:column_3": 198,
+      "null:column_4": 184,
+      "null:column_5": 187,
+      "null:column_6": 206,
+      "null:column_7": 360,
+      "null:column_8": 306,
+      "null:column_9": 360,
+      "null:column_10": 359,
+      "null:column_11": 309,
+      "null:column_12": 360,
+      "null:column_13": 359,
+      "null:column_14": 340,
+      "null:column_15": 360,
+      "null:column_16": 359,
+      "null:column_17": 1161,
+      "null:column_18": 1160,
+      "null:column_19": 1079,
+      "null:column_20": 1161,
+      "null:column_21": 1161,
+      "null:column_22": 1161,
+      "null:column_23": 1161,
+      "null:column_24": 1161,
+      "null:column_25": 1161,
+      "null:column_26": 1161,
+      "null:column_27": 1161,
+      "null:column_28": 1161,
+      "null:column_29": 1161,
+      "null:column_30": 1161,
+      "null:column_31": 1161,
+      "null:column_32": 1161,
+      "null:column_33": 1165,
+      "null:column_34": 1161,
+      "null:column_35": 1161,
+      "null:column_36": 1161,
+      "null:column_37": 1161,
+      "null:column_38": 1161,
+      "null:column_39": 1161,
+      "null:column_40": 1161,
+      "null:column_41": 1161,
+      "null:column_42": 1161,
+      "null:column_43": 1161,
+      "null:column_44": 1161,
+      "null:column_45": 1161,
+      "null:column_46": 1161,
+      "null:column_47": 1161,
+      "null:column_48": 1161,
+      "null:column_49": 1161,
+      "null:column_50": 1161,
+      "null:column_51": 1161,
+      "null:column_52": 1161,
+      "null:column_53": 1161,
+      "null:column_54": 1161,
+      "null:column_55": 1161,
+      "null:column_56": 1161,
+      "null:column_57": 1161,
+      "null:column_58": 1161,
+      "null:column_59": 1161,
+      "null:column_60": 1161,
+      "null:column_61": 1161,
+      "null:column_62": 1161,
+      "null:column_63": 1161,
+      "null:column_64": 1161,
+      "null:column_65": 1161,
+      "null:column_66": 1161,
+      "null:column_67": 1161,
+      "null:column_68": 1161,
+      "null:column_69": 1161,
+      "null:column_70": 1161,
+      "null:column_71": 1161,
+      "excluded_rows": 1163,
+      "null:column_0": 123,
+      "candidate_rows": 3200
+    },
+    "observed": {},
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1960-01-01",
+    "period_start_max": "2026-08-01"
+  },
+  "world_bank_wdi": {
+    "sha256": "a42b083ef94f182b3c8a50ce79620e188d6d933e0bdf7634b66799895de4336a",
+    "headers": [
+      "countryiso3code",
+      "date",
+      "value",
+      "unit",
+      "obs_status",
+      "decimal",
+      "source_file",
+      "indicator.id",
+      "indicator.value",
+      "country.id",
+      "country.value"
+    ],
+    "schema_hash": "85f1a6c6d636ac7889fbda2be192b7063b5deb416bfa2543b404401e1a042d21",
+    "counts": {
+      "input_rows": 396,
+      "null:unit": 396,
+      "null:obs_status": 396,
+      "candidate_rows": 396,
+      "null:value": 138
+    },
+    "observed": {
+      "unit": {
+        "": 396
+      },
+      "indicator.id": {
+        "FP.CPI.TOTL.ZG": 66,
+        "NE.TRD.GNFS.ZS": 66,
+        "NY.GDP.MKTP.CD": 66,
+        "NY.GDP.MKTP.KD.ZG": 66,
+        "PA.NUS.FCRF": 66,
+        "SP.POP.TOTL": 66
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1960-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "nasa_power_weather_daily_63": {
+    "sha256": "d863fa92dcbbc4d217521dda5c69d39121ec2accb2f45d140880a0cceffbf5dc",
+    "headers": [
+      "YEAR",
+      "DOY",
+      "T2M",
+      "T2M_MAX",
+      "T2M_MIN",
+      "RH2M",
+      "WS10M",
+      "PRECTOTCORR",
+      "ALLSKY_SFC_SW_DWN",
+      "weather_frequency",
+      "weather_point",
+      "province_code_63",
+      "province_name",
+      "latitude",
+      "longitude",
+      "record_time_key",
+      "source_file"
+    ],
+    "schema_hash": "52f30a51d1744650c5dc467fb0c76ddbff05d51667fb66e212c5864c9c34fa39",
+    "counts": {
+      "input_rows": 614754,
+      "sentinel:ALLSKY_SFC_SW_DWN": 5040,
+      "sentinel:T2M": 126,
+      "sentinel:T2M_MAX": 126,
+      "sentinel:T2M_MIN": 126,
+      "sentinel:RH2M": 126,
+      "sentinel:WS10M": 126,
+      "sentinel:PRECTOTCORR": 126
+    },
+    "observed": {},
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2000-01-01",
+    "period_start_max": "2026-09-18"
+  },
+  "provincial_agriculture_three_commodities": {
+    "sha256": "e7d86565d2d9fc0d3cee6e543a92463f1342310d43c6f49e61bee859d071455c",
+    "headers": [
+      "year",
+      "province_name_raw",
+      "province_name_normalized",
+      "commodity",
+      "metric",
+      "value",
+      "unit",
+      "source_name",
+      "source_scope",
+      "source_file",
+      "parse_status",
+      "source_period",
+      "source_url",
+      "geographic_level",
+      "district",
+      "raw_value",
+      "source_page",
+      "edition",
+      "geography_version"
+    ],
+    "schema_hash": "f83d611614bcd1e88abb576cae02690a60848b0bde2ae056bd7ded094bc722ce",
+    "counts": {
+      "input_rows": 2473,
+      "null:source_url": 84,
+      "null:district": 331,
+      "null:raw_value": 88,
+      "null:source_page": 88,
+      "null:edition": 88,
+      "null:geography_version": 88,
+      "candidate_rows": 2473,
+      "null:value": 239
+    },
+    "observed": {
+      "province_name_normalized": {
+        "Lào Cai": 3,
+        "Điện Biên": 3,
+        "Lai Châu": 3,
+        "Thanh Hóa": 3,
+        "Nghệ An": 3,
+        "Hà Tĩnh": 3,
+        "Quảng Bình": 3,
+        "Quảng Trị": 3,
+        "Thừa Thiên Huế": 3,
+        "Quảng Nam": 3,
+        "Quảng Ngãi": 3,
+        "Bình Định": 3,
+        "Phú Yên": 3,
+        "Khánh Hòa": 3,
+        "Ninh Thuận": 3,
+        "Bình Thuận": 3,
+        "Kon Tum": 3,
+        "Gia Lai": 3,
+        "Đắk Lắk": 3,
+        "Đắk Nông": 3,
+        "Lâm Đồng": 3,
+        "Bình Phước": 3,
+        "Tây Ninh": 3,
+        "Bình Dương": 3,
+        "Đồng Nai": 3,
+        "Bà Rịa – Vũng Tàu": 3,
+        "TP. Hồ Chí Minh": 3,
+        "Long An": 3,
+        "Son La": 4,
+        "Dak Nong": 568,
+        "Dak Lak": 1008,
+        "Lam Dong": 719,
+        "Binh Thuan": 90
+      },
+      "commodity": {
+        "natural_rubber": 957,
+        "coffee": 746,
+        "pepper": 770
+      },
+      "metric": {
+        "area_planted": 864,
+        "area_harvested": 782,
+        "production": 827
+      },
+      "unit": {
+        "ha": 1646,
+        "tonnes": 827
+      },
+      "geographic_level": {
+        "province": 331,
+        "district": 2142
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2015-01-01",
+    "period_start_max": "2025-01-01"
+  },
+  "provincial_coffee_area": {
+    "sha256": "9658cc95e5bd3e98c02239f85afaed0df5b73b714d87b3220b7df551557f7ce5",
+    "headers": [
+      "Năm",
+      "Địa phương",
+      "Giá_trị",
+      "ĐVT"
+    ],
+    "schema_hash": "dab2313afdc218574fc15874616004fc3186fb4ef4371f3350ebf551c46e90b6",
+    "counts": {
+      "input_rows": 533,
+      "candidate_rows": 533
+    },
+    "observed": {
+      "ĐVT": {
+        "Nghìn ha": 533
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "1995-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "provincial_coffee_production": {
+    "sha256": "08bfad68288d7c5a8dff60fda5791c1ac53f8a7db9c75b7f6eea76756bc1cdcf",
+    "headers": [
+      "Năm",
+      "Địa phương",
+      "Giá_trị",
+      "ĐVT"
+    ],
+    "schema_hash": "dab2313afdc218574fc15874616004fc3186fb4ef4371f3350ebf551c46e90b6",
+    "counts": {
+      "input_rows": 292,
+      "candidate_rows": 292
+    },
+    "observed": {
+      "ĐVT": {
+        "Tấn": 292
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2005-01-01",
+    "period_start_max": "2024-01-01"
+  },
+  "provincial_coffee_average_price": {
+    "sha256": "01c2ca267e09611e6bc6ff12497af7685488a43a54de9cf4420a1a14bbf8bd11",
+    "headers": [
+      "Năm",
+      "Tháng",
+      "Giá Đăk Lăk",
+      "Giá Lâm Đồng",
+      "ĐVT"
+    ],
+    "schema_hash": "81e16ccf0c95203668b6936eb33f93591f9157b42041fd8c7d1602fbc0634ada",
+    "counts": {
+      "input_rows": 240,
+      "candidate_rows": 480,
+      "duplicate_rows": 24
+    },
+    "observed": {
+      "ĐVT": {
+        "Đồng/kg": 240
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 6,
+    "period_start_min": "2007-01-01",
+    "period_start_max": "2025-12-01"
+  },
+  "provincial_coffee_export_volume_value": {
+    "sha256": "350808dc4e3293370f39b80766ac2ab6774675df1653a4bb9c58289bc6e40078",
+    "headers": [
+      "Năm",
+      "Tháng",
+      "Lượng (nghìn tấn)",
+      "Kim Ngạch (triệu USD)"
+    ],
+    "schema_hash": "17c8595551a692d4c4aaa1d7f6ddd595ce24addf3407e62d2cb3eb4943c25db5",
+    "counts": {
+      "input_rows": 203,
+      "candidate_rows": 406
+    },
+    "observed": {},
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2009-01-01",
+    "period_start_max": "2025-11-01"
+  },
+  "provincial_coffee_world_ending_stocks": {
+    "sha256": "a0b2b585235d1540b08c03681d2daa8bb46e4d11132e53268c1fe95b936ea511",
+    "headers": [
+      "Năm",
+      "Quốc gia",
+      "Giá_trị",
+      "ĐVT"
+    ],
+    "schema_hash": "514af65ca6464897b98ec3cd0271376a7f6a7e06936ee534d5fae6660b324887",
+    "counts": {
+      "input_rows": 450,
+      "candidate_rows": 450
+    },
+    "observed": {
+      "ĐVT": {
+        "nghìn bao (60kg/bao)": 450
+      }
+    },
+    "mapping_errors": {},
+    "conflicting_keys": 0,
+    "period_start_min": "2010-01-01",
+    "period_start_max": "2025-01-01"
+  }
+}

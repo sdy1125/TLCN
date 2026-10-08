@@ -244,7 +244,7 @@ dataset results.
 Run deterministic host tests and configuration validation:
 
 ```bash
-PYTHONPATH=airflow/include python3 -m unittest discover -s tests -v
+PYTHONPATH=spark:airflow/include python3 -m unittest discover -s tests -t . -v
 PYTHONPYCACHEPREFIX=/tmp/tlcn-pycache python3 -m compileall -q \
   airflow/include airflow/dags tests
 docker compose config --quiet
@@ -253,3 +253,74 @@ docker compose config --quiet
 The tests cover manifest inventory, safe path resolution, Full Load,
 unchanged skip, changed-file Incremental Load, missing/empty/corrupt sources,
 retry safety, metadata fields, XLSX structure, and the real large NASA file.
+
+## Bronze-to-Silver pipeline
+
+The Silver implementation covers all 26 registered sources and six independent
+Iceberg contracts: `production_national`, `production_provincial`,
+`market_indicator`, `trade_partner`, `trade_total`, and `weather_daily`.
+It reads immutable Bronze success metadata, verifies SHA-256, normalizes source
+observations, audits/quarantines errors and publishes with a dataset-scoped atomic
+MERGE. All six tables use yearly partitions. No Gold facts or surrogate keys are
+created. The existing demo/dbt source remains separate.
+
+See the Vietnamese [Silver runbook](docs/silver/RUNBOOK.md),
+[data dictionary](docs/silver/DICTIONARY.md),
+[read-only source baseline](docs/silver/baseline.json), and
+[validation report](docs/silver/VALIDATION.md).
+
+The domestic coffee-price workbook contains six conflicting 2022 business keys.
+The reviewed `domestic-coffee-price-v1` rule resolves only VND/kg differences of
+at most 1 by retaining the higher value, marking the winner and quarantining the
+loser as a warning. Larger differences and conflicts in every other dataset still
+block publication. This rule is versioned in `spark/silver/config/rules.json`.
+
+Build and trigger:
+
+```bash
+docker compose build spark-iceberg
+docker compose up -d spark-iceberg trino
+docker compose exec airflow-scheduler airflow dags trigger silver_transformation
+# Optional --conf '{"dataset_id":"world_bank_wdi"}' or a list of dataset IDs.
+```
+
+Verification commands (from repository root):
+
+```bash
+# Host: PySpark/country-specific tests skip if their dependencies are absent.
+PYTHONPATH=spark:airflow/include python3 -m unittest discover -s tests -t . -v
+PYTHONPYCACHEPREFIX=/tmp/tlcn-pycache python3 -m compileall -q spark airflow/dags tests
+docker compose config --quiet
+
+# Full mapping unit tests inside the pinned Spark image.
+docker compose run --rm --no-deps -v "$PWD:/repo:ro" --entrypoint python3 \
+  spark-iceberg -m unittest discover -s /repo/tests -t /repo -p test_rules.py -v
+# Spark DQ regression suite.
+docker compose run --rm --no-deps -v "$PWD:/repo:ro" \
+  --entrypoint /opt/spark/bin/spark-submit spark-iceberg --master 'local[2]' \
+  /repo/tests/silver/test_spark_quality.py
+# MinIO/Iceberg CSV+XLSX fixtures, idempotency, changed/reverted versions, schema evolution.
+docker compose run --rm --no-deps -v "$PWD:/repo:ro" \
+  --entrypoint /opt/spark/bin/spark-submit spark-iceberg --master 'local[2]' \
+  /repo/tests/silver/integration.py
+# Real NASA large-file path (requires successful Bronze ingestion).
+docker compose exec spark-iceberg /opt/spark/bin/spark-submit --master 'local[2]' \
+  /opt/silver/jobs/silver_pipeline.py --run-id nasa-validation \
+  --dataset-id nasa_power_weather_daily_63
+# Read-only consumer assertions through Trino for all six contracts.
+docker compose exec spark-iceberg python3 /opt/silver/jobs/verify_silver.py
+# Actual Airflow DAG execution, including submit/monitor of a real Spark process.
+docker compose run --rm --no-deps --entrypoint airflow airflow-scheduler \
+  dags test silver_transformation --conf '{"dataset_id":"faostat_production_coffee"}'
+# Scheduler-based import check when the full Airflow stack is running.
+docker compose exec airflow-scheduler airflow dags list-import-errors
+```
+
+Reproduce the source baseline without modifying landing/Bronze:
+
+```bash
+docker compose run --rm --no-deps \
+  -v "$PWD/data/raw:/source:ro" -v "$PWD/data/raw_manifest.csv:/manifest.csv:ro" \
+  -v "$PWD/docs/silver:/reports" --entrypoint python3 spark-iceberg \
+  -m silver.profile --raw-root /source --output /reports/baseline.json
+```

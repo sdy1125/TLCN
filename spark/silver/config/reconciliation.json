@@ -1,0 +1,30 @@
+{
+  "version": "1",
+  "pairs": [
+    {
+      "left": "faostat_detailed_trade_matrix_coffee",
+      "right": "un_comtrade_annual",
+      "definition_confirmed": false,
+      "reason": "FAO green coffee is not equivalent to all HS 0901; approve a commodity-definition crosswalk first."
+    },
+    {
+      "left": "faostat_tcl_trade_coffee",
+      "right": "provincial_coffee_export_volume_value",
+      "definition_confirmed": false,
+      "reason": "Annual versus monthly and potentially different coffee coverage; aggregation/definition policy not approved."
+    },
+    {
+      "left": "faostat_production_coffee",
+      "right": "provincial_agriculture_three_commodities",
+      "definition_confirmed": false,
+      "reason": "National versus provincial/district/source edition coverage; geography aggregation not approved."
+    },
+    {
+      "left": "faostat_producer_prices_annual_coffee",
+      "right": "world_bank_pink_sheet",
+      "definition_confirmed": false,
+      "reason": "Producer prices versus international variety benchmarks; market/variety/frequency not equivalent."
+    }
+  ],
+  "policy": "Comparisons require reviewed definition compatibility. FAO green coffee and HS 0901 are not automatically equivalent; producer and international benchmark prices are not equivalent. Configure no implicit source winner."
+}

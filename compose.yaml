@@ -32,10 +32,13 @@ x-airflow-common: &airflow-common
     BRONZE_MANIFEST_PATH: /opt/airflow/data/raw_manifest.csv
     BRONZE_RAW_ROOT: /opt/airflow/data/raw
     BRONZE_DAG_SCHEDULE: ${BRONZE_DAG_SCHEDULE:-}
-    PYTHONPATH: /opt/airflow/include
+    SILVER_DAG_SCHEDULE: ${SILVER_DAG_SCHEDULE:-}
+    SILVER_RUNNER_URL: http://spark-iceberg:8090
+    PYTHONPATH: /opt/airflow/include:/opt/silver
   volumes:
     - ./airflow/dags:/opt/airflow/dags
     - ./airflow/include:/opt/airflow/include
+    - ./spark:/opt/silver:ro
     - ./data/raw_manifest.csv:/opt/airflow/data/raw_manifest.csv:ro
     - ./data/raw:/opt/airflow/data/raw:ro
     - airflow-logs:/opt/airflow/logs
@@ -125,7 +128,10 @@ services:
       - lakehouse
 
   spark-iceberg:
-    image: tabulario/spark-iceberg:3.5.5_1.8.1
+    image: tlcn-spark-silver:3.5.5_1.8.1
+    build: ./spark
+    init: true
+    entrypoint: ["python3", "-m", "silver.runner"]
     depends_on:
       iceberg-rest:
         condition: service_started
@@ -141,6 +147,8 @@ services:
     volumes:
       - ./spark/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
       - ./spark/jobs:/home/iceberg/jobs:ro
+      - ./spark:/opt/silver:ro
+      - silver-job-logs:/tmp/silver-jobs
       - ./spark/notebooks:/home/iceberg/notebooks/notebooks
     restart: unless-stopped
     networks:
@@ -294,6 +302,7 @@ volumes:
   minio-data:
   postgres-data:
   trino-data:
+  silver-job-logs:
 
 networks:
   lakehouse:

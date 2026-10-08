@@ -1,0 +1,125 @@
+{
+  "production_national": {
+    "keys": [
+      "dataset_id",
+      "country_code",
+      "commodity_code",
+      "year",
+      "measure_code"
+    ],
+    "fields": [
+      "country_m49",
+      "country_iso3",
+      "country_name_raw",
+      "commodity_code",
+      "faostat_item_code",
+      "element_code",
+      "measure_code"
+    ]
+  },
+  "production_provincial": {
+    "keys": [
+      "dataset_id",
+      "geography_version",
+      "geographic_level",
+      "province_code",
+      "district_name",
+      "commodity_code",
+      "year",
+      "measure_code",
+      "edition"
+    ],
+    "fields": [
+      "province_name_raw",
+      "province_name_normalized",
+      "district_name",
+      "geographic_level",
+      "geography_version",
+      "commodity_code",
+      "edition",
+      "parse_status"
+    ]
+  },
+  "market_indicator": {
+    "keys": [
+      "dataset_id",
+      "geo_type",
+      "geo_code",
+      "commodity_code",
+      "period_start",
+      "frequency",
+      "indicator_code",
+      "market_type"
+    ],
+    "fields": [
+      "geo_type",
+      "geo_code",
+      "country_iso3",
+      "province_code",
+      "commodity_code",
+      "indicator_code",
+      "market_type",
+      "currency_code"
+    ]
+  },
+  "trade_partner": {
+    "keys": [
+      "dataset_id",
+      "reporter_code",
+      "partner_code",
+      "commodity_code",
+      "period_start",
+      "frequency",
+      "flow_code",
+      "measure_code"
+    ],
+    "fields": [
+      "reporter_m49",
+      "reporter_iso3",
+      "partner_m49",
+      "partner_iso3",
+      "hs_code",
+      "faostat_item_code",
+      "flow_code",
+      "is_estimated"
+    ]
+  },
+  "trade_total": {
+    "keys": [
+      "dataset_id",
+      "reporter_code",
+      "commodity_code",
+      "period_start",
+      "frequency",
+      "flow_code",
+      "measure_code"
+    ],
+    "fields": [
+      "reporter_m49",
+      "reporter_iso3",
+      "commodity_code",
+      "flow_code"
+    ]
+  },
+  "weather_daily": {
+    "keys": [
+      "dataset_id",
+      "weather_point",
+      "period_start"
+    ],
+    "fields": [
+      "weather_point",
+      "province_code_63",
+      "province_name",
+      "latitude",
+      "longitude",
+      "temperature_avg_c",
+      "temperature_max_c",
+      "temperature_min_c",
+      "relative_humidity_pct",
+      "wind_speed_m_s",
+      "precipitation_mm",
+      "solar_radiation"
+    ]
+  }
+}

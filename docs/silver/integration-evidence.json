@@ -1,0 +1,16 @@
+{
+  "namespace": "lakehouse.silver_test_deb271dc03",
+  "checks": [
+    "CSV_Bronze_reader",
+    "XLSX_Bronze_reader",
+    "conversion",
+    "provisional",
+    "same_version_no_snapshot",
+    "changed_version",
+    "scope_preserved",
+    "same_table_other_dataset_preserved",
+    "checksum_revert",
+    "additive_evolution",
+    "incompatible_evolution"
+  ]
+}

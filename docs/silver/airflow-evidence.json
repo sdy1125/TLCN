@@ -1,0 +1,12 @@
+{
+  "status": "SUCCESS",
+  "results": [
+    {
+      "status": "SKIPPED",
+      "target": "market_indicator",
+      "dataset_id": "provincial_coffee_average_price"
+    }
+  ],
+  "log_path": "/tmp/silver-jobs/6ed07f9e52ed2c5b66edfb50d9a152c18cd9b555bb432b178835021eea6ba03b/spark.log",
+  "exit_code": 0
+}

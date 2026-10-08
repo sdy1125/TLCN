@@ -14,3 +14,4 @@ data/.drive-download-state.json
 .drive_*.html
 .drive_inventory.py
 *.docx
+docs/silver/VALIDATION.md

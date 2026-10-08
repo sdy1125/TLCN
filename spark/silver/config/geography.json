@@ -1,0 +1,466 @@
+{
+  "version": "source_63_v1",
+  "provenance": "NASA source province_code_63; retain historical boundaries; no post-merger crosswalk",
+  "provinces": {
+    "An Giang": "89",
+    "Bắc Giang": "24",
+    "Bắc Kạn": "06",
+    "Bạc Liêu": "95",
+    "Bắc Ninh": "27",
+    "Bà Rịa - Vũng Tàu": "77",
+    "Bến Tre": "83",
+    "Bình Định": "52",
+    "Bình Dương": "74",
+    "Bình Phước": "70",
+    "Bình Thuận": "60",
+    "Cần Thơ": "92",
+    "Cao Bằng": "04",
+    "Cà Mau": "96",
+    "Đắk Lắk": "66",
+    "Đắk Nông": "67",
+    "Đà Nẵng": "48",
+    "Điện Biên": "11",
+    "Đồng Nai": "75",
+    "Đồng Tháp": "87",
+    "Gia Lai": "64",
+    "Hải Dương": "30",
+    "Hải Phòng": "31",
+    "Hậu Giang": "93",
+    "Hà Giang": "02",
+    "Hà Nam": "35",
+    "Hà Nội": "01",
+    "Hà Tĩnh": "42",
+    "Hòa Bình": "17",
+    "Hưng Yên": "33",
+    "Khánh Hòa": "56",
+    "Kiên Giang": "91",
+    "Kon Tum": "62",
+    "Lai Châu": "12",
+    "Lâm Đồng": "68",
+    "Lạng Sơn": "20",
+    "Lào Cai": "10",
+    "Long An": "80",
+    "Nam Định": "36",
+    "Nghệ An": "40",
+    "Ninh Bình": "37",
+    "Ninh Thuận": "58",
+    "Phú Thọ": "25",
+    "Phú Yên": "54",
+    "Quảng Bình": "44",
+    "Quảng Nam": "49",
+    "Quảng Ngãi": "51",
+    "Quảng Ninh": "22",
+    "Quảng Trị": "45",
+    "Sóc Trăng": "94",
+    "Sơn La": "14",
+    "Tây Ninh": "72",
+    "Thái Bình": "34",
+    "Thái Nguyên": "19",
+    "Thanh Hóa": "38",
+    "Thừa Thiên Huế": "46",
+    "Tiền Giang": "82",
+    "Thành phố Hồ Chí Minh": "79",
+    "Trà Vinh": "84",
+    "Tuyên Quang": "08",
+    "Vĩnh Long": "86",
+    "Vĩnh Phúc": "26",
+    "Yên Bái": "15"
+  },
+  "aliases": {
+    "Đăk Lăk": "Đắk Lắk",
+    "Đắk Lăk": "Đắk Lắk",
+    "Đăk Nông": "Đắk Nông",
+    "Thừa Thiên - Huế": "Thừa Thiên Huế",
+    "Bà Rịa - Vũng Tàu": "Bà Rịa - Vũng Tàu",
+    "TP. Hồ Chí Minh": "Thành phố Hồ Chí Minh",
+    "Bà Rịa – Vũng Tàu": "Bà Rịa - Vũng Tàu",
+    "Binh Thuan": "Bình Thuận",
+    "Dak Lak": "Đắk Lắk",
+    "Dak Nong": "Đắk Nông",
+    "Lam Dong": "Lâm Đồng",
+    "Son La": "Sơn La",
+    "Đắc Nông": "Đắk Nông",
+    "Hoà Bình": "Hòa Bình",
+    "Thanh Hoá": "Thanh Hóa"
+  },
+  "weather_points": {
+    "an_giang": {
+      "province_code_63": "89",
+      "province_name": "An Giang",
+      "latitude": "10.3864",
+      "longitude": "105.4352"
+    },
+    "bac_giang": {
+      "province_code_63": "24",
+      "province_name": "Bắc Giang",
+      "latitude": "21.281",
+      "longitude": "106.197"
+    },
+    "bac_kan": {
+      "province_code_63": "06",
+      "province_name": "Bắc Kạn",
+      "latitude": "22.147",
+      "longitude": "105.834"
+    },
+    "bac_lieu": {
+      "province_code_63": "95",
+      "province_name": "Bạc Liêu",
+      "latitude": "9.294",
+      "longitude": "105.721"
+    },
+    "bac_ninh": {
+      "province_code_63": "27",
+      "province_name": "Bắc Ninh",
+      "latitude": "21.186",
+      "longitude": "106.076"
+    },
+    "ba_ria_vung_tau": {
+      "province_code_63": "77",
+      "province_name": "Bà Rịa - Vũng Tàu",
+      "latitude": "10.4114",
+      "longitude": "107.1362"
+    },
+    "ben_tre": {
+      "province_code_63": "83",
+      "province_name": "Bến Tre",
+      "latitude": "10.243",
+      "longitude": "106.376"
+    },
+    "binh_dinh": {
+      "province_code_63": "52",
+      "province_name": "Bình Định",
+      "latitude": "13.782",
+      "longitude": "109.219"
+    },
+    "binh_duong": {
+      "province_code_63": "74",
+      "province_name": "Bình Dương",
+      "latitude": "10.9804",
+      "longitude": "106.6519"
+    },
+    "binh_phuoc": {
+      "province_code_63": "70",
+      "province_name": "Bình Phước",
+      "latitude": "11.75",
+      "longitude": "106.92"
+    },
+    "binh_thuan": {
+      "province_code_63": "60",
+      "province_name": "Bình Thuận",
+      "latitude": "10.9289",
+      "longitude": "108.1021"
+    },
+    "can_tho": {
+      "province_code_63": "92",
+      "province_name": "Cần Thơ",
+      "latitude": "10.0452",
+      "longitude": "105.7469"
+    },
+    "cao_bang": {
+      "province_code_63": "04",
+      "province_name": "Cao Bằng",
+      "latitude": "22.6666",
+      "longitude": "106.2639"
+    },
+    "ca_mau": {
+      "province_code_63": "96",
+      "province_name": "Cà Mau",
+      "latitude": "9.1769",
+      "longitude": "105.1524"
+    },
+    "dak_lak": {
+      "province_code_63": "66",
+      "province_name": "Đắk Lắk",
+      "latitude": "12.6667",
+      "longitude": "108.05"
+    },
+    "dak_nong": {
+      "province_code_63": "67",
+      "province_name": "Đắk Nông",
+      "latitude": "12.0",
+      "longitude": "107.7"
+    },
+    "da_nang": {
+      "province_code_63": "48",
+      "province_name": "Đà Nẵng",
+      "latitude": "16.0544",
+      "longitude": "108.2022"
+    },
+    "dien_bien": {
+      "province_code_63": "11",
+      "province_name": "Điện Biên",
+      "latitude": "21.386",
+      "longitude": "103.023"
+    },
+    "dong_nai": {
+      "province_code_63": "75",
+      "province_name": "Đồng Nai",
+      "latitude": "10.9453",
+      "longitude": "106.8243"
+    },
+    "dong_thap": {
+      "province_code_63": "87",
+      "province_name": "Đồng Tháp",
+      "latitude": "10.455",
+      "longitude": "105.634"
+    },
+    "gia_lai": {
+      "province_code_63": "64",
+      "province_name": "Gia Lai",
+      "latitude": "13.9833",
+      "longitude": "108.0"
+    },
+    "hai_duong": {
+      "province_code_63": "30",
+      "province_name": "Hải Dương",
+      "latitude": "20.9373",
+      "longitude": "106.3146"
+    },
+    "hai_phong": {
+      "province_code_63": "31",
+      "province_name": "Hải Phòng",
+      "latitude": "20.8449",
+      "longitude": "106.6881"
+    },
+    "hau_giang": {
+      "province_code_63": "93",
+      "province_name": "Hậu Giang",
+      "latitude": "9.7845",
+      "longitude": "105.47"
+    },
+    "ha_giang": {
+      "province_code_63": "02",
+      "province_name": "Hà Giang",
+      "latitude": "22.8233",
+      "longitude": "104.9836"
+    },
+    "ha_nam": {
+      "province_code_63": "35",
+      "province_name": "Hà Nam",
+      "latitude": "20.5411",
+      "longitude": "105.9139"
+    },
+    "ha_noi": {
+      "province_code_63": "01",
+      "province_name": "Hà Nội",
+      "latitude": "21.0278",
+      "longitude": "105.8342"
+    },
+    "ha_tinh": {
+      "province_code_63": "42",
+      "province_name": "Hà Tĩnh",
+      "latitude": "18.3559",
+      "longitude": "105.8877"
+    },
+    "hoa_binh": {
+      "province_code_63": "17",
+      "province_name": "Hòa Bình",
+      "latitude": "20.8172",
+      "longitude": "105.3376"
+    },
+    "hung_yen": {
+      "province_code_63": "33",
+      "province_name": "Hưng Yên",
+      "latitude": "20.6464",
+      "longitude": "106.0511"
+    },
+    "khanh_hoa": {
+      "province_code_63": "56",
+      "province_name": "Khánh Hòa",
+      "latitude": "12.2388",
+      "longitude": "109.1967"
+    },
+    "kien_giang": {
+      "province_code_63": "91",
+      "province_name": "Kiên Giang",
+      "latitude": "10.0125",
+      "longitude": "105.0809"
+    },
+    "kon_tum": {
+      "province_code_63": "62",
+      "province_name": "Kon Tum",
+      "latitude": "14.3497",
+      "longitude": "108.0005"
+    },
+    "lai_chau": {
+      "province_code_63": "12",
+      "province_name": "Lai Châu",
+      "latitude": "22.3862",
+      "longitude": "103.4703"
+    },
+    "lam_dong": {
+      "province_code_63": "68",
+      "province_name": "Lâm Đồng",
+      "latitude": "11.95",
+      "longitude": "108.44"
+    },
+    "lang_son": {
+      "province_code_63": "20",
+      "province_name": "Lạng Sơn",
+      "latitude": "21.8537",
+      "longitude": "106.761"
+    },
+    "lao_cai": {
+      "province_code_63": "10",
+      "province_name": "Lào Cai",
+      "latitude": "22.4809",
+      "longitude": "103.9755"
+    },
+    "long_an": {
+      "province_code_63": "80",
+      "province_name": "Long An",
+      "latitude": "10.5359",
+      "longitude": "106.4137"
+    },
+    "nam_dinh": {
+      "province_code_63": "36",
+      "province_name": "Nam Định",
+      "latitude": "20.4388",
+      "longitude": "106.1621"
+    },
+    "nghe_an": {
+      "province_code_63": "40",
+      "province_name": "Nghệ An",
+      "latitude": "18.6796",
+      "longitude": "105.6813"
+    },
+    "ninh_binh": {
+      "province_code_63": "37",
+      "province_name": "Ninh Bình",
+      "latitude": "20.2506",
+      "longitude": "105.9745"
+    },
+    "ninh_thuan": {
+      "province_code_63": "58",
+      "province_name": "Ninh Thuận",
+      "latitude": "11.5826",
+      "longitude": "108.9912"
+    },
+    "phu_tho": {
+      "province_code_63": "25",
+      "province_name": "Phú Thọ",
+      "latitude": "21.3227",
+      "longitude": "105.4019"
+    },
+    "phu_yen": {
+      "province_code_63": "54",
+      "province_name": "Phú Yên",
+      "latitude": "13.0955",
+      "longitude": "109.3209"
+    },
+    "quang_binh": {
+      "province_code_63": "44",
+      "province_name": "Quảng Bình",
+      "latitude": "17.4689",
+      "longitude": "106.6223"
+    },
+    "quang_nam": {
+      "province_code_63": "49",
+      "province_name": "Quảng Nam",
+      "latitude": "15.5736",
+      "longitude": "108.474"
+    },
+    "quang_ngai": {
+      "province_code_63": "51",
+      "province_name": "Quảng Ngãi",
+      "latitude": "15.1214",
+      "longitude": "108.8044"
+    },
+    "quang_ninh": {
+      "province_code_63": "22",
+      "province_name": "Quảng Ninh",
+      "latitude": "20.9712",
+      "longitude": "107.0448"
+    },
+    "quang_tri": {
+      "province_code_63": "45",
+      "province_name": "Quảng Trị",
+      "latitude": "16.8163",
+      "longitude": "107.1003"
+    },
+    "soc_trang": {
+      "province_code_63": "94",
+      "province_name": "Sóc Trăng",
+      "latitude": "9.6025",
+      "longitude": "105.9739"
+    },
+    "son_la": {
+      "province_code_63": "14",
+      "province_name": "Sơn La",
+      "latitude": "21.3256",
+      "longitude": "103.9188"
+    },
+    "tay_ninh": {
+      "province_code_63": "72",
+      "province_name": "Tây Ninh",
+      "latitude": "11.3",
+      "longitude": "106.1"
+    },
+    "thai_binh": {
+      "province_code_63": "34",
+      "province_name": "Thái Bình",
+      "latitude": "20.4463",
+      "longitude": "106.3366"
+    },
+    "thai_nguyen": {
+      "province_code_63": "19",
+      "province_name": "Thái Nguyên",
+      "latitude": "21.5672",
+      "longitude": "105.8252"
+    },
+    "thanh_hoa": {
+      "province_code_63": "38",
+      "province_name": "Thanh Hóa",
+      "latitude": "19.8067",
+      "longitude": "105.7852"
+    },
+    "thua_thien_hue": {
+      "province_code_63": "46",
+      "province_name": "Thừa Thiên Huế",
+      "latitude": "16.4637",
+      "longitude": "107.5909"
+    },
+    "tien_giang": {
+      "province_code_63": "82",
+      "province_name": "Tiền Giang",
+      "latitude": "10.3765",
+      "longitude": "106.3439"
+    },
+    "tp_ho_chi_minh": {
+      "province_code_63": "79",
+      "province_name": "Thành phố Hồ Chí Minh",
+      "latitude": "10.8231",
+      "longitude": "106.6297"
+    },
+    "tra_vinh": {
+      "province_code_63": "84",
+      "province_name": "Trà Vinh",
+      "latitude": "9.9513",
+      "longitude": "106.3346"
+    },
+    "tuyen_quang": {
+      "province_code_63": "08",
+      "province_name": "Tuyên Quang",
+      "latitude": "21.7767",
+      "longitude": "105.228"
+    },
+    "vinh_long": {
+      "province_code_63": "86",
+      "province_name": "Vĩnh Long",
+      "latitude": "10.2396",
+      "longitude": "105.9572"
+    },
+    "vinh_phuc": {
+      "province_code_63": "26",
+      "province_name": "Vĩnh Phúc",
+      "latitude": "21.3089",
+      "longitude": "105.6049"
+    },
+    "yen_bai": {
+      "province_code_63": "15",
+      "province_name": "Yên Bái",
+      "latitude": "21.7168",
+      "longitude": "104.8986"
+    }
+  }
+}

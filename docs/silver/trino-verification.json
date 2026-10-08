@@ -1,0 +1,48 @@
+{
+  "production_national": {
+    "rows": 28409,
+    "unique_keys": 28409,
+    "missing_lineage_or_required": 0,
+    "partitions": 64,
+    "snapshot_id": 8782731805663968919
+  },
+  "production_provincial": {
+    "rows": 3298,
+    "unique_keys": 3298,
+    "missing_lineage_or_required": 0,
+    "partitions": 31,
+    "snapshot_id": 6473138755388009241
+  },
+  "market_indicator": {
+    "rows": 16573,
+    "unique_keys": 16573,
+    "missing_lineage_or_required": 0,
+    "partitions": 67,
+    "snapshot_id": 4797414750405563190
+  },
+  "trade_partner": {
+    "rows": 23038,
+    "unique_keys": 23038,
+    "missing_lineage_or_required": 0,
+    "partitions": 14,
+    "snapshot_id": 4578640191259681354
+  },
+  "trade_total": {
+    "rows": 44751,
+    "unique_keys": 44751,
+    "missing_lineage_or_required": 0,
+    "partitions": 65,
+    "snapshot_id": 8217749209806267987
+  },
+  "weather_daily": {
+    "rows": 614754,
+    "unique_keys": 614754,
+    "missing_lineage_or_required": 0,
+    "partitions": 27,
+    "snapshot_id": 1653523408036419802
+  },
+  "weather_sentinel_check": [
+    0,
+    614754
+  ]
+}

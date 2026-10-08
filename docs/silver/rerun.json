@@ -1,0 +1,132 @@
+[
+  {
+    "dataset_id": "faostat_production_rubber",
+    "status": "SKIPPED",
+    "target": "production_national"
+  },
+  {
+    "dataset_id": "faostat_production_coffee",
+    "status": "SKIPPED",
+    "target": "production_national"
+  },
+  {
+    "dataset_id": "faostat_production_pepper",
+    "status": "SKIPPED",
+    "target": "production_national"
+  },
+  {
+    "dataset_id": "provincial_agriculture_three_commodities",
+    "status": "SKIPPED",
+    "target": "production_provincial"
+  },
+  {
+    "dataset_id": "provincial_coffee_area",
+    "status": "SKIPPED",
+    "target": "production_provincial"
+  },
+  {
+    "dataset_id": "provincial_coffee_production",
+    "status": "SKIPPED",
+    "target": "production_provincial"
+  },
+  {
+    "dataset_id": "faostat_producer_prices_annual_rubber",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "faostat_producer_prices_annual_coffee",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "faostat_producer_prices_annual_pepper",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "faostat_producer_prices_monthly_rubber",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "faostat_producer_prices_monthly_coffee",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "faostat_producer_prices_monthly_pepper",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "world_bank_pink_sheet",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "world_bank_wdi",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "provincial_coffee_average_price",
+    "status": "FAILED",
+    "error_type": "ValueError"
+  },
+  {
+    "dataset_id": "provincial_coffee_world_ending_stocks",
+    "status": "SKIPPED",
+    "target": "market_indicator"
+  },
+  {
+    "dataset_id": "faostat_detailed_trade_matrix_rubber",
+    "status": "SKIPPED",
+    "target": "trade_partner"
+  },
+  {
+    "dataset_id": "faostat_detailed_trade_matrix_coffee",
+    "status": "SKIPPED",
+    "target": "trade_partner"
+  },
+  {
+    "dataset_id": "faostat_detailed_trade_matrix_pepper",
+    "status": "SKIPPED",
+    "target": "trade_partner"
+  },
+  {
+    "dataset_id": "un_comtrade_annual",
+    "status": "SKIPPED",
+    "target": "trade_partner"
+  },
+  {
+    "dataset_id": "un_comtrade_monthly",
+    "status": "SKIPPED",
+    "target": "trade_partner"
+  },
+  {
+    "dataset_id": "faostat_tcl_trade_rubber",
+    "status": "SKIPPED",
+    "target": "trade_total"
+  },
+  {
+    "dataset_id": "faostat_tcl_trade_coffee",
+    "status": "SKIPPED",
+    "target": "trade_total"
+  },
+  {
+    "dataset_id": "faostat_tcl_trade_pepper",
+    "status": "SKIPPED",
+    "target": "trade_total"
+  },
+  {
+    "dataset_id": "provincial_coffee_export_volume_value",
+    "status": "SKIPPED",
+    "target": "trade_total"
+  },
+  {
+    "dataset_id": "nasa_power_weather_daily_63",
+    "status": "SKIPPED",
+    "target": "weather_daily"
+  }
+]
