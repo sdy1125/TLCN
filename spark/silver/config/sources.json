@@ -406,7 +406,7 @@
         "Giá Lâm Đồng",
         "ĐVT"
       ],
-      "metadata_warning": true
+      "metadata_warning": false
     },
     "provincial_coffee_world_ending_stocks": {
       "target": "market_indicator",
@@ -703,7 +703,7 @@
         "Lượng (nghìn tấn)",
         "Kim Ngạch (triệu USD)"
       ],
-      "metadata_warning": true
+      "metadata_warning": false
     },
     "nasa_power_weather_daily_63": {
       "target": "weather_daily",
@@ -711,6 +711,15 @@
       "frequency": "daily",
       "source_system": "nasa_power",
       "commodity": null,
+      "provenance": {
+        "source_product": "NASA POWER",
+        "source_parameter": "ALLSKY_SFC_SW_DWN",
+        "source_community": null,
+        "source_time_standard": null,
+        "unit": null,
+        "unit_status": "UNVERIFIED",
+        "evidence": "The consolidated Bronze CSV does not retain the original API request or unit metadata."
+      },
       "headers": [
         "YEAR",
         "DOY",

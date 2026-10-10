@@ -10,14 +10,23 @@ from airflow.sdk import dag, task, get_current_context
 from airflow.sdk.exceptions import AirflowFailException
 
 ENDPOINT = os.environ.get("SILVER_RUNNER_URL", "http://spark-iceberg:8090")
+TOKEN_ENV = "SILVER_RUNNER_TOKEN"
 
 
 def request(path, payload=None):
     data = json.dumps(payload).encode() if payload is not None else None
+    token = os.environ.get(TOKEN_ENV)
+    if not token or len(token) < 32:
+        raise AirflowFailException(f"{TOKEN_ENV} must contain at least 32 characters")
     try:
         with urllib.request.urlopen(
             urllib.request.Request(
-                ENDPOINT + path, data=data, headers={"Content-Type": "application/json"}
+                ENDPOINT + path,
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token,
+                },
             ),
             timeout=30,
         ) as response:
@@ -25,6 +34,8 @@ def request(path, payload=None):
     except urllib.error.HTTPError as exc:
         if exc.code == 400:
             raise AirflowFailException("Invalid Spark submission request") from exc
+        if exc.code == 401:
+            raise AirflowFailException("Spark runner rejected authentication") from exc
         raise
 
 

@@ -5,6 +5,7 @@ IDs are deterministic; Airflow retries attach to the existing process/results.
 """
 
 import hashlib
+import hmac
 import json
 import os
 import subprocess
@@ -17,6 +18,19 @@ from .registry import select_datasets
 ROOT = Path(os.environ.get("SILVER_JOB_ROOT", "/tmp/silver-jobs"))
 LOCK = threading.Lock()
 ACTIVE = {}
+TOKEN_ENV = "SILVER_RUNNER_TOKEN"
+
+
+def validate_token(token):
+    if not isinstance(token, str) or len(token) < 32:
+        raise RuntimeError(f"{TOKEN_ENV} must contain at least 32 characters")
+    return token
+
+
+def authorized(header, token):
+    if not isinstance(header, str) or not header.startswith("Bearer "):
+        return False
+    return hmac.compare_digest(header[7:], token)
 
 
 def execute(job, request):
@@ -65,6 +79,9 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def do_POST(self):
+        token = validate_token(os.environ.get(TOKEN_ENV))
+        if not authorized(self.headers.get("Authorization"), token):
+            return self.reply(401, {"error": "unauthorized"})
         if self.path != "/jobs":
             return self.reply(404, {"error": "not_found"})
         try:
@@ -98,6 +115,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/health":
             return self.reply(200, {"status": "ok"})
+        token = validate_token(os.environ.get(TOKEN_ENV))
+        if not authorized(self.headers.get("Authorization"), token):
+            return self.reply(401, {"error": "unauthorized"})
         job = self.path.removeprefix("/jobs/")
         if len(job) != 64 or any(c not in "0123456789abcdef" for c in job):
             return self.reply(404, {"error": "not_found"})
@@ -122,5 +142,6 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    validate_token(os.environ.get(TOKEN_ENV))
     ROOT.mkdir(parents=True, exist_ok=True)
     ThreadingHTTPServer(("0.0.0.0", 8090), Handler).serve_forever()

@@ -179,8 +179,10 @@ cp .env.example .env
 ```
 
 The relevant variables are `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`,
-`POSTGRES_PASSWORD`, `AIRFLOW_FERNET_KEY`, `AIRFLOW_JWT_SECRET`, and the optional
-`BRONZE_DAG_SCHEDULE`. Leaving the schedule blank keeps ingestion manual-only.
+`POSTGRES_PASSWORD`, `AIRFLOW_FERNET_KEY`, `AIRFLOW_JWT_SECRET`,
+`SILVER_RUNNER_TOKEN`, and the optional Bronze/Silver schedules. Replace the
+development runner token with at least 32 random characters. Leaving schedules
+blank keeps both pipelines manual-only.
 
 MinIO server and `mc` are built into one local image from pinned official source
 releases because the archived public images now reject anonymous pulls. The

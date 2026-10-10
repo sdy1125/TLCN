@@ -25,8 +25,13 @@ ROOT = Path(__file__).resolve().parents[2]
 class RuleTests(unittest.TestCase):
     def test_inventory(self):
         with (ROOT / "data/raw_manifest.csv").open() as f:
-            ids = {r["dataset_id"] for r in csv.DictReader(f)}
+            manifest = {r["dataset_id"]: r for r in csv.DictReader(f)}
+        ids = set(manifest)
         self.assertEqual(ids, set(SOURCES))
+        self.assertEqual(
+            {dataset: row["frequency"] for dataset, row in manifest.items()},
+            {dataset: spec["frequency"] for dataset, spec in SOURCES.items()},
+        )
         self.assertEqual(
             Counter(s["target"] for s in SOURCES.values()),
             {
@@ -38,6 +43,14 @@ class RuleTests(unittest.TestCase):
                 "weather_daily": 1,
             },
         )
+
+    def test_unverified_weather_provenance_is_explicit(self):
+        provenance = SOURCES["nasa_power_weather_daily_63"]["provenance"]
+        self.assertEqual(provenance["source_parameter"], "ALLSKY_SFC_SW_DWN")
+        self.assertEqual(provenance["unit_status"], "UNVERIFIED")
+        self.assertIsNone(provenance["unit"])
+        self.assertIsNone(provenance["source_community"])
+        self.assertIsNone(provenance["source_time_standard"])
 
     def test_selection(self):
         self.assertEqual(len(select_datasets()), 26)

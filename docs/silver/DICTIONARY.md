@@ -26,14 +26,17 @@ Partition tất cả sáu bảng: `years(period_start)`; Iceberg format-version 
 - `source_priority`/`is_preferred`: null nếu chưa có quyết định ưu tiên có cấu hình.
 - `district_name` nullable với level=province; edition/geography default rõ trong config.
 - Commodity nullable cho WDI vĩ mô; geography code nguồn aggregate giữ namespace khi không có crosswalk đã duyệt.
-- NASA wide metrics là độ C, %, m/s, mm/ngày và solar radiation theo unit nguồn chưa được xác minh; raw metrics trong payload. `value_standard`/unit scalar không áp dụng cho bảng wide.
+- NASA wide metrics là độ C, %, m/s, mm/ngày và solar radiation theo unit nguồn
+  chưa được xác minh; raw metrics trong payload. Dataset registry lưu provenance
+  `ALLSKY_SFC_SW_DWN` cùng `unit_status=UNVERIFIED`; chi tiết được đưa vào DQ thay
+  vì lặp trên từng dòng. `value_standard`/unit scalar không áp dụng cho bảng wide.
 - Niên vụ chỉ giữ calendar envelope + season_label; không suy diễn ngày bắt đầu vụ.
 
 ## Control tables
 
 - `dq_results`: run_id, dataset_id, bronze_ingestion_id, target_contract, check_name, check_scope, severity, status, observed_value, expected_value, threshold, details_json, checked_at.
 - `quarantine_records`: dataset_id, bronze_ingestion_id, bronze_checksum_sha256, source_record_id (fingerprint để replay dòng lỗi), target_contract, error_code, error_message, error_severity, raw_payload_json, detected_at, airflow_run_id, transform_version.
-- `processing_state`: state_key, dataset_id, checksum, ingestion id, transform_version, run_id, status, target_contract, snapshot_id, output_rows, details_json, checked_at.
+- `processing_state`: state_key, dataset_id, checksum, ingestion id, transform_version, run_id, status (`RUNNING`/`COMMITTED`/`SUCCESS`/`FAILED`), target_contract, snapshot_id, output_rows, details_json, checked_at.
 - Ba control tables không partition. Severity INFO/WARNING/FAIL; audit status PASS/WARNING/FAIL và NOT_EVALUATED cho source pair chưa được duyệt.
 
 ## production_national

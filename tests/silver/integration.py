@@ -86,6 +86,11 @@ try:
     before = snapshot("production_national")
     assert run_dataset(spark, a, "fixture-rerun", namespace, m)["status"] == "SKIPPED"
     assert snapshot("production_national") == before
+    # Simulate a hard crash after the domain MERGE but before SUCCESS state.
+    spark.sql(f"DELETE FROM {namespace}.processing_state WHERE dataset_id = '{a}'")
+    recovered = run_dataset(spark, a, "fixture-recover-commit", namespace, m)
+    assert recovered["recovered_existing_commit"] is True
+    assert snapshot("production_national") == before
     x = fixture(b, xlsx=True)
     assert run_dataset(spark, b, "fixture-xlsx", namespace, x)["output_rows"] == 1
     row = spark.table(namespace + ".production_provincial").first()
@@ -142,6 +147,7 @@ try:
                     "conversion",
                     "provisional",
                     "same_version_no_snapshot",
+                    "post_merge_state_recovery_no_snapshot",
                     "changed_version",
                     "scope_preserved",
                     "same_table_other_dataset_preserved",

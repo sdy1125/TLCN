@@ -14,6 +14,42 @@ from .transforms import rows
 from .transforms.weather_daily import transform as weather
 
 
+def _write_state(
+    spark,
+    namespace,
+    metadata,
+    version,
+    run_id,
+    status,
+    target,
+    snapshot,
+    rows,
+    details,
+    checked_at,
+):
+    record = (
+        state.state_key(metadata["dataset_id"], metadata["checksum_sha256"], version),
+        metadata["dataset_id"],
+        metadata["checksum_sha256"],
+        metadata["ingestion_id"],
+        version,
+        run_id,
+        status,
+        target,
+        snapshot,
+        rows,
+        details,
+        checked_at,
+    )
+    writer.upsert_control(
+        spark,
+        namespace,
+        "processing_state",
+        spark.createDataFrame([record], writer.CONTROL["processing_state"]),
+        ["state_key", "run_id"],
+    )
+
+
 def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=None):
     spec = dict(SOURCES[dataset])
     target = spec["target"]
@@ -54,6 +90,19 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
     transformed = None
     valid = None
     try:
+        _write_state(
+            spark,
+            namespace,
+            m,
+            version,
+            run_id,
+            "RUNNING",
+            target,
+            None,
+            0,
+            json.dumps({"phase": "transform"}),
+            now,
+        )
         with readers.download(m) as path:
             frame, counts = readers.read(spark, path, spec)
             metrics.update(counts)
@@ -63,6 +112,12 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
                 json.dumps(spec["headers"]).encode()
             ).hexdigest()
             metrics["metadata_frequency_mismatch"] = spec["metadata_warning"]
+            provenance = spec.get("provenance")
+            if provenance:
+                metrics["source_provenance"] = provenance
+                metrics["unverified_source_metadata"] = (
+                    provenance.get("unit_status") != "VERIFIED"
+                )
             if (
                 m.get("row_count") is not None
                 and m["row_count"] != counts["input_rows"]
@@ -172,7 +227,20 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
             )
             if not passed:
                 raise ValueError("Output contract audit failed; see dq_results")
-            snapshot = writer.publish(spark, namespace, target, dataset, valid)
+            snapshot = state.recoverable_snapshot(
+                spark,
+                namespace,
+                m,
+                version,
+                target,
+                valid,
+                metrics["output_rows"],
+            )
+            if snapshot is None:
+                snapshot = writer.publish(spark, namespace, target, dataset, valid)
+                metrics["recovered_existing_commit"] = False
+            else:
+                metrics["recovered_existing_commit"] = True
             # Read-after-write before writing SUCCESS state.
             actual = (
                 spark.table(f"{namespace}.{target}")
@@ -181,6 +249,19 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
             )
             if actual != metrics["output_rows"]:
                 raise RuntimeError("Read-after-write row count mismatch")
+            _write_state(
+                spark,
+                namespace,
+                m,
+                version,
+                run_id,
+                "COMMITTED",
+                target,
+                snapshot,
+                metrics["output_rows"],
+                json.dumps(metrics, sort_keys=True),
+                now,
+            )
             status = "SUCCESS"
     except Exception as exc:
         metrics["error_type"] = type(exc).__name__
@@ -196,6 +277,7 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
             or metrics.get("duplicates_removed", 0) > 0
             or metrics.get("resolved_conflicting_keys", 0) > 0
             or metrics.get("null_ratio", 0) > RULES["null_warning_ratio"]
+            or metrics.get("unverified_source_metadata", False)
         )
         details = json.dumps(metrics, sort_keys=True)
         dq = (
@@ -220,11 +302,10 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
             spark.createDataFrame([dq], writer.CONTROL["dq_results"]),
             ["run_id", "dataset_id", "check_name"],
         )
-        record = (
-            state.state_key(dataset, m["checksum_sha256"], version),
-            dataset,
-            m["checksum_sha256"],
-            m["ingestion_id"],
+        _write_state(
+            spark,
+            namespace,
+            m,
             version,
             run_id,
             status,
@@ -233,13 +314,6 @@ def run_dataset(spark, dataset, run_id, namespace="lakehouse.silver", metadata=N
             metrics.get("output_rows", 0),
             details,
             now,
-        )
-        writer.upsert_control(
-            spark,
-            namespace,
-            "processing_state",
-            spark.createDataFrame([record], writer.CONTROL["processing_state"]),
-            ["state_key", "run_id"],
         )
     return {
         "dataset_id": dataset,

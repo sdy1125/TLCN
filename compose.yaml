@@ -34,6 +34,7 @@ x-airflow-common: &airflow-common
     BRONZE_DAG_SCHEDULE: ${BRONZE_DAG_SCHEDULE:-}
     SILVER_DAG_SCHEDULE: ${SILVER_DAG_SCHEDULE:-}
     SILVER_RUNNER_URL: http://spark-iceberg:8090
+    SILVER_RUNNER_TOKEN: ${SILVER_RUNNER_TOKEN:-local-development-silver-runner-token-change-me}
     PYTHONPATH: /opt/airflow/include:/opt/silver
   volumes:
     - ./airflow/dags:/opt/airflow/dags
@@ -101,8 +102,6 @@ services:
           sleep 2
         done
         mc mb --ignore-existing local/bronze
-        mc mb --ignore-existing local/silver
-        mc mb --ignore-existing local/gold
         mc mb --ignore-existing local/warehouse
         echo "MinIO buckets are ready."
     restart: "no"
@@ -139,11 +138,12 @@ services:
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin123}
       AWS_REGION: us-east-1
+      SILVER_RUNNER_TOKEN: ${SILVER_RUNNER_TOKEN:-local-development-silver-runner-token-change-me}
     ports:
-      - "8888:8888"
-      - "8081:8080"
-      - "10000:10000"
-      - "10001:10001"
+      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:8081:8080"
+      - "127.0.0.1:10000:10000"
+      - "127.0.0.1:10001:10001"
     volumes:
       - ./spark/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
       - ./spark/jobs:/home/iceberg/jobs:ro
