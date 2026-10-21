@@ -1,0 +1,13 @@
+asset_v1,target_v2,classification,gap,acceptance_gate
+production_national,silver_core.production_observation,REBUILD,"Missing observation_set_id and source locator; preserve metric flags and stable grain",atomic metric uniqueness and Bronze count reconciliation
+production_provincial,silver_core.provincial_agri_observation,REBUILD,"District code/version and coverage/status missing or conflated",geography anti-join and no province/district double count
+market_indicator,silver_core.price_observation,REBUILD,"Price mixed with stock and WDI; currency/index semantics incomplete",amount/index XOR and series-specific duplicate gate
+market_indicator,silver_core.coffee_stock_observation,REBUILD,"Stock hidden among market indicators; bag-weight approval required",scenario identity and verified conversion
+market_indicator,silver_core.macro_indicator_observation,REBUILD,"WDI hidden among market indicators; missing values need retention",six-indicator registry and NULL reconciliation
+trade_total,silver_core.trade_total_observation,REBUILD,"Classification and statistical scope absent",per-product/flow/year reconciliation
+trade_partner,silver_core.trade_partner_observation,REBUILD,"Comtrade variants filtered before audit; valuation chooses first non-null field",all source variants retained and curated scope blocked until policy approved
+weather_daily,silver_core.weather_daily,ALTER,"Per-measure validity and mapping reference incomplete",daily/location uniqueness and sentinel removed from measures
+processing_state,silver_meta.observation_set,REBUILD,"State keyed on V1 transform not stable release",repeat ingestion idempotent
+dq_results,silver_meta.dq_result,REBUILD,"Rule-level provenance and thresholds incomplete",all hard gates visible
+quarantine_records,silver_meta.quarantine_record,REBUILD,"No stable source row locator",failed rows traceable to Bronze
+commodity_year_summary,none,DEPRECATE,"References old Gold design",not invoked by Silver V2

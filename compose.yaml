@@ -108,10 +108,20 @@ services:
     networks:
       - lakehouse
 
+  iceberg-catalog-init:
+    image: apache/iceberg-rest-fixture:1.8.1
+    user: "0:0"
+    entrypoint: ["sh", "-c", "chown iceberg:iceberg /catalog"]
+    volumes:
+      - iceberg-catalog:/catalog
+    restart: "no"
+
   iceberg-rest:
     image: apache/iceberg-rest-fixture:1.8.1
     depends_on:
       minio-init:
+        condition: service_completed_successfully
+      iceberg-catalog-init:
         condition: service_completed_successfully
     environment:
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:-admin}
@@ -120,6 +130,9 @@ services:
       CATALOG_WAREHOUSE: s3://warehouse/
       CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
       CATALOG_S3_ENDPOINT: http://minio:9000
+      CATALOG_URI: jdbc:sqlite:/catalog/iceberg.db
+    volumes:
+      - iceberg-catalog:/catalog
     ports:
       - "8181:8181"
     restart: unless-stopped
@@ -303,6 +316,7 @@ volumes:
   postgres-data:
   trino-data:
   silver-job-logs:
+  iceberg-catalog:
 
 networks:
   lakehouse:

@@ -182,3 +182,76 @@ def read(spark, path, spec):
         counts["excluded_rows"] += counts["excluded_transport_rows"]
         frame = totals.unionByName(unmatched)
     return frame, counts
+
+
+def read_with_lineage(spark, path, spec):
+    """Read every Bronze record with a stable physical source locator.
+
+    The CSV reader tracks logical record ordinal, so quoted newlines do not
+    change identity. XLSX sheets are explicit and row numbers are 1-based.
+    No semantic filtering is done here, including Comtrade detail variants.
+    """
+    from pyspark.sql import types as T
+
+    path = Path(path)
+    output = path.with_name("lineaged.csv")
+    headers = spec["headers"]
+    extra = ["_source_row_locator", "_source_record_hash", "_raw_payload_json"]
+
+    def emit(writer, values, locator):
+        if len(values) != len(headers):
+            raise ValueError(f"Source row width drift at {locator}")
+        normalized = ["" if v is None else str(v) for v in values]
+        payload = json.dumps(
+            dict(zip(headers, normalized)),
+            sort_keys=True,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+        writer.writerow(
+            normalized
+            + [locator, hashlib.sha256(payload.encode("utf-8")).hexdigest(), payload]
+        )
+
+    count = 0
+    with output.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(headers + extra)
+        if spec["format"] == "xlsx":
+            from openpyxl import load_workbook
+
+            if path.stat().st_size > 20 * 1024 * 1024:
+                raise ValueError("XLSX exceeds 20 MiB policy")
+            book = load_workbook(path, read_only=True, data_only=True)
+            try:
+                if [sheet.title for sheet in book.worksheets] != ["data"]:
+                    raise ValueError("Unreviewed XLSX sheet layout")
+                for sheet in book.worksheets:
+                    iterator = sheet.iter_rows(values_only=True)
+                    actual = ["" if v is None else str(v) for v in next(iterator)]
+                    if actual != headers:
+                        raise ValueError("Input schema drift: reviewed header required")
+                    for row_number, row in enumerate(iterator, 2):
+                        emit(writer, row, f"sheet:{sheet.title}:row:{row_number}")
+                        count += 1
+            finally:
+                book.close()
+        else:
+            with path.open(encoding="utf-8-sig", newline="") as source:
+                reader = csv.reader(source)
+                if next(reader) != headers:
+                    raise ValueError("Input schema drift: reviewed header required")
+                for record_number, row in enumerate(reader, 2):
+                    emit(writer, row, f"csv:record:{record_number}")
+                    count += 1
+    schema = T.StructType(
+        [T.StructField(name, T.StringType()) for name in headers + extra]
+    )
+    frame = (
+        spark.read.schema(schema)
+        .options(header=True, enforceSchema=False, mode="FAILFAST", escape='"', multiLine=True)
+        .csv(str(output))
+    )
+    if frame.count() != count:
+        raise ValueError("Lineaged record count differs from source parser")
+    return frame, {"input_rows": count, "excluded_rows": 0}

@@ -41,12 +41,11 @@ def execute(job, request):
         "/opt/spark/bin/spark-submit",
         "--master",
         "local[2]",
-        "/opt/silver/jobs/silver_pipeline.py",
+        "/opt/silver/jobs/silver_v2_backfill.py" if request["pipeline"] == "v2" else "/opt/silver/jobs/silver_pipeline.py",
         "--run-id",
         request["run_id"],
-        "--result-file",
-        str(directory / "results.json"),
     ]
+    cmd += ["--result-file", str(directory / "results.json")]
     for dataset in request["datasets"]:
         cmd += ["--dataset-id", dataset]
     code = 1
@@ -96,9 +95,13 @@ class Handler(BaseHTTPRequestHandler):
                 or not 1 <= len(request["run_id"]) <= 500
             ):
                 raise ValueError()
+            pipeline = request.get("pipeline", "v1")
+            if pipeline not in {"v1", "v2"}:
+                raise ValueError()
             request = {
                 "run_id": request["run_id"],
                 "datasets": select_datasets(request.get("dataset_id")),
+                "pipeline": pipeline,
             }
         except (ValueError, TypeError, KeyError):
             return self.reply(400, {"error": "invalid_request"})

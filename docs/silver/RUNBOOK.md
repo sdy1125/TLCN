@@ -199,6 +199,11 @@ docker compose exec airflow-scheduler \
 Spark Runner, Runner gọi `spark-submit`, Spark đọc Bronze từ MinIO và ghi Iceberg.
 Đây là lần chạy được lưu đầy đủ trong lịch sử DAG của Airflow.
 
+Lệnh này cũng là lệnh khởi tạo Silver lần đầu. Nếu schema `iceberg.silver` chưa
+tồn tại, pipeline tự tạo namespace, sáu bảng nghiệp vụ và ba bảng kiểm soát trước
+khi nạp 26 dataset. Không cần chạy `CREATE TABLE` thủ công và không upload file
+vào `warehouse` bằng MinIO Console.
+
 ### 7.2. Chạy một dataset
 
 ```bash

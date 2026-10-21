@@ -1,0 +1,71 @@
+26/10/21 02:51:13 INFO SparkContext: Running Spark version 3.5.5
+26/10/21 02:51:13 INFO SparkContext: OS info Linux, 7.0.0-38-generic, amd64
+26/10/21 02:51:13 INFO SparkContext: Java version 17.0.14
+26/10/21 02:51:13 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/10/21 02:51:13 INFO ResourceUtils: ==============================================================
+26/10/21 02:51:13 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/10/21 02:51:13 INFO ResourceUtils: ==============================================================
+26/10/21 02:51:13 INFO SparkContext: Submitted application: silver-v2-backfill
+26/10/21 02:51:13 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/10/21 02:51:13 INFO ResourceProfile: Limiting resource is cpu
+26/10/21 02:51:13 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/10/21 02:51:13 INFO SecurityManager: Changing view acls to: root
+26/10/21 02:51:13 INFO SecurityManager: Changing modify acls to: root
+26/10/21 02:51:13 INFO SecurityManager: Changing view acls groups to: 
+26/10/21 02:51:13 INFO SecurityManager: Changing modify acls groups to: 
+26/10/21 02:51:13 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: root; groups with view permissions: EMPTY; users with modify permissions: root; groups with modify permissions: EMPTY
+26/10/21 02:51:13 INFO Utils: Successfully started service 'sparkDriver' on port 39709.
+26/10/21 02:51:13 INFO SparkEnv: Registering MapOutputTracker
+26/10/21 02:51:13 INFO SparkEnv: Registering BlockManagerMaster
+26/10/21 02:51:13 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/10/21 02:51:13 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/10/21 02:51:13 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/10/21 02:51:13 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-27727c71-aa54-4d2e-9f41-92da1d79ad3a
+26/10/21 02:51:13 INFO MemoryStore: MemoryStore started with capacity 1048.8 MiB
+26/10/21 02:51:13 INFO SparkEnv: Registering OutputCommitCoordinator
+26/10/21 02:51:13 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/10/21 02:51:13 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/10/21 02:51:13 INFO Executor: Starting executor ID driver on host bacd659a23c9
+26/10/21 02:51:13 INFO Executor: OS info Linux, 7.0.0-38-generic, amd64
+26/10/21 02:51:13 INFO Executor: Java version 17.0.14
+26/10/21 02:51:13 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/10/21 02:51:13 INFO Executor: Created or updated repl class loader org.apache.spark.util.MutableURLClassLoader@74e2fb03 for default.
+26/10/21 02:51:13 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 33701.
+26/10/21 02:51:13 INFO NettyBlockTransferService: Server created on bacd659a23c9:33701
+26/10/21 02:51:13 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/10/21 02:51:13 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, bacd659a23c9, 33701, None)
+26/10/21 02:51:13 INFO BlockManagerMasterEndpoint: Registering block manager bacd659a23c9:33701 with 1048.8 MiB RAM, BlockManagerId(driver, bacd659a23c9, 33701, None)
+26/10/21 02:51:13 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, bacd659a23c9, 33701, None)
+26/10/21 02:51:13 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, bacd659a23c9, 33701, None)
+{"dataset_id": "faostat_production_rubber", "status": "SUCCESS", "input_rows": 5911, "excluded_rows": 0, "valid_rows": 5911, "quarantined_rows": 0, "published_rows": 5911, "observation_set_id": "3f0a2dcfa6043d600cc928f84585bc3ec03a606bacbd0e66c44152b8b6c345b8"}
+{"dataset_id": "faostat_production_coffee", "status": "SKIPPED", "rows": 15622, "observation_set_id": "8042e4746996339efa9e838c43796e0763f4cd3eceee1fb577eb0c8b85649591"}
+{"dataset_id": "faostat_production_pepper", "status": "SUCCESS", "input_rows": 6876, "excluded_rows": 0, "valid_rows": 6876, "quarantined_rows": 0, "published_rows": 6876, "observation_set_id": "660cc34d15408f10fe9f42c0ca570fb15880303f0bcbab32013b79cd1a171bc2"}
+{"dataset_id": "provincial_agriculture_three_commodities", "status": "SUCCESS", "input_rows": 2473, "excluded_rows": 0, "valid_rows": 2473, "quarantined_rows": 0, "published_rows": 2473, "observation_set_id": "2caf3178d5811ee8ff7d3e369bb30fe49694e8a24b928965d95d9ba4934f2088"}
+{"dataset_id": "provincial_coffee_area", "status": "SUCCESS", "input_rows": 533, "excluded_rows": 0, "valid_rows": 533, "quarantined_rows": 0, "published_rows": 533, "observation_set_id": "5149d04a0d7f85962d06dbaadcc7d8016351c54e32561c6796492e83df63b96f"}
+{"dataset_id": "provincial_coffee_production", "status": "SUCCESS", "input_rows": 292, "excluded_rows": 0, "valid_rows": 292, "quarantined_rows": 0, "published_rows": 292, "observation_set_id": "b755dbcc13c1519949f115bee42693d7f174a8cb228a20a2bed47e26b22f62fc"}
+{"dataset_id": "faostat_producer_prices_annual_rubber", "status": "SUCCESS", "input_rows": 1767, "excluded_rows": 0, "valid_rows": 1767, "quarantined_rows": 0, "published_rows": 1767, "observation_set_id": "0338a377878d6cbe13ce1798ae60f07c87b40677cbd4f307c30d110ecf66132d"}
+{"dataset_id": "faostat_producer_prices_annual_coffee", "status": "SUCCESS", "input_rows": 4877, "excluded_rows": 0, "valid_rows": 4877, "quarantined_rows": 0, "published_rows": 4877, "observation_set_id": "9d7df770a6d0f76fab664a050011e3e312d4fc92ff19d60a8c7bd9ac1b181bdd"}
+{"dataset_id": "faostat_producer_prices_annual_pepper", "status": "SUCCESS", "input_rows": 2285, "excluded_rows": 0, "valid_rows": 2285, "quarantined_rows": 0, "published_rows": 2285, "observation_set_id": "136567803d13ed0912a0e7a68642bbc0cc4299fcf9d474e7d787e297681f491c"}
+{"dataset_id": "faostat_producer_prices_monthly_rubber", "status": "SUCCESS", "input_rows": 928, "excluded_rows": 0, "valid_rows": 928, "quarantined_rows": 0, "published_rows": 928, "observation_set_id": "2e3c99fbf7791b9a4a01b88611ff30e66a3b81e96cd936a9fcf5cd3d0a27c0f7"}
+{"dataset_id": "faostat_producer_prices_monthly_coffee", "status": "SUCCESS", "input_rows": 1414, "excluded_rows": 0, "valid_rows": 1414, "quarantined_rows": 0, "published_rows": 1414, "observation_set_id": "24f1902569cc8b087965ee0d3911b7c26b96966a1bd9871435d91be5e52970f1"}
+{"dataset_id": "faostat_producer_prices_monthly_pepper", "status": "SUCCESS", "input_rows": 1256, "excluded_rows": 0, "valid_rows": 1256, "quarantined_rows": 0, "published_rows": 1256, "observation_set_id": "f452f82848ec5302044a90883361e5f66811af5ce2f406adea0dbf28b913172f"}
+{"dataset_id": "world_bank_pink_sheet", "status": "SUCCESS", "input_rows": 1963, "excluded_rows": 1163, "valid_rows": 3200, "quarantined_rows": 0, "published_rows": 3200, "observation_set_id": "f508dc161a03f5d2043d931786061f7d2d1ecba7bdfa382ea979e3b1c94eb32b"}
+{"dataset_id": "world_bank_wdi", "status": "SUCCESS", "input_rows": 396, "excluded_rows": 0, "valid_rows": 396, "quarantined_rows": 0, "published_rows": 396, "observation_set_id": "f7afa0bd1c47b83939deb9fd4e8e42e2a3a256632e48be8abcb051258ad56141"}
+Traceback (most recent call last):
+  File "/home/iceberg/jobs/silver_v2_backfill.py", line 25, in main
+    print(json.dumps(run_dataset(spark, dataset, args.run_id)), flush=True)
+  File "/opt/silver/silver_v2/pipeline.py", line 111, in run_dataset
+    raise ValueError(f"Duplicate atomic observation IDs: {duplicate_ids}")
+ValueError: Duplicate atomic observation IDs: 240
+{"dataset_id": "provincial_coffee_average_price", "status": "FAILED", "error": "Duplicate atomic observation IDs: 240"}
+{"dataset_id": "provincial_coffee_world_ending_stocks", "status": "SUCCESS", "input_rows": 450, "excluded_rows": 0, "valid_rows": 450, "quarantined_rows": 0, "published_rows": 450, "observation_set_id": "ff0d470b76b82f33dd1944d13001d4e4ded1f06580ef6a88269c4681e63f3dce"}
+{"dataset_id": "faostat_detailed_trade_matrix_rubber", "status": "SUCCESS", "input_rows": 1206, "excluded_rows": 0, "valid_rows": 1206, "quarantined_rows": 0, "published_rows": 1206, "observation_set_id": "59f5c36b751a5611bcf128ca3bdf1f0387701b095f0defb8db1daf95c2db4243"}
+{"dataset_id": "faostat_detailed_trade_matrix_coffee", "status": "SUCCESS", "input_rows": 2164, "excluded_rows": 0, "valid_rows": 2164, "quarantined_rows": 0, "published_rows": 2164, "observation_set_id": "09f50f0710776e80ae325e805c428046aa45f664f0ce025636a1d27ee83a2688"}
+{"dataset_id": "faostat_detailed_trade_matrix_pepper", "status": "SUCCESS", "input_rows": 2550, "excluded_rows": 0, "valid_rows": 2550, "quarantined_rows": 0, "published_rows": 2550, "observation_set_id": "f6f1ac376281db0f3199487e006afa360fb6dd0b0a6d7b81781ee1afee7c88f8"}
+{"dataset_id": "un_comtrade_annual", "status": "SUCCESS", "input_rows": 2807, "excluded_rows": 0, "valid_rows": 5614, "quarantined_rows": 0, "published_rows": 5614, "observation_set_id": "47b486056c82f655147af84d52cc1cf1e5411336885e0f89b34df9b552f5f438"}
+{"dataset_id": "un_comtrade_monthly", "status": "SUCCESS", "input_rows": 7824, "excluded_rows": 0, "valid_rows": 15648, "quarantined_rows": 0, "published_rows": 15648, "observation_set_id": "f674ae93ae7eaa1f05c1a93af7c13fde92a70b79d8daa57234c363e52d42eef5"}
+{"dataset_id": "faostat_tcl_trade_rubber", "status": "SUCCESS", "input_rows": 9719, "excluded_rows": 0, "valid_rows": 9719, "quarantined_rows": 0, "published_rows": 9719, "observation_set_id": "9a828e38c506a7f862fc1957e7f225a645a4717aeadf8107ec8aeda0c29a4dcf"}
+{"dataset_id": "faostat_tcl_trade_coffee", "status": "SUCCESS", "input_rows": 18647, "excluded_rows": 0, "valid_rows": 18647, "quarantined_rows": 0, "published_rows": 18647, "observation_set_id": "a36b0adba5483589986da871b8ddf75b6d81b8e4a20f283fafd12f038773ec07"}
+{"dataset_id": "faostat_tcl_trade_pepper", "status": "SUCCESS", "input_rows": 15979, "excluded_rows": 0, "valid_rows": 15979, "quarantined_rows": 0, "published_rows": 15979, "observation_set_id": "d91b6637045e626f2c225b356cf6f044ae237edb62ce176507e2ae8904d090c2"}
+{"dataset_id": "provincial_coffee_export_volume_value", "status": "SUCCESS", "input_rows": 203, "excluded_rows": 0, "valid_rows": 406, "quarantined_rows": 0, "published_rows": 406, "observation_set_id": "f0f8f551766acbd3970caa90bb7eec121341a1d8d5045250ecb9097914180d88"}
+{"dataset_id": "nasa_power_weather_daily_63", "status": "SUCCESS", "input_rows": 614754, "excluded_rows": 0, "valid_rows": 614754, "quarantined_rows": 0, "published_rows": 614754, "observation_set_id": "586015ff0b7c07fb1b226424830c5cbd3f507a46046d1ed33c4bd53a40ab10c9"}
