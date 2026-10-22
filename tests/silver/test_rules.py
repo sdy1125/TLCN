@@ -2,10 +2,10 @@ import csv
 import importlib.util
 import unittest
 from collections import Counter
-from datetime import date, datetime
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
-from silver.common import (
+from silver_v2.common import (
     RowError,
     convert,
     number,
@@ -15,9 +15,8 @@ from silver.common import (
     stable_id,
     country,
 )
-from silver.registry import SOURCES, CONTRACTS, select_datasets
-from silver.contracts import fields
-from silver.transforms import rows
+from silver_v2.registry import SOURCES, select_datasets
+from silver_v2.domains import target, source_district_geography_code
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -32,17 +31,9 @@ class RuleTests(unittest.TestCase):
             {dataset: row["frequency"] for dataset, row in manifest.items()},
             {dataset: spec["frequency"] for dataset, spec in SOURCES.items()},
         )
-        self.assertEqual(
-            Counter(s["target"] for s in SOURCES.values()),
-            {
-                "production_national": 3,
-                "production_provincial": 3,
-                "market_indicator": 10,
-                "trade_partner": 5,
-                "trade_total": 4,
-                "weather_daily": 1,
-            },
-        )
+        self.assertEqual({dataset: spec["target"] for dataset, spec in SOURCES.items()},
+                         {dataset: target(dataset) for dataset in SOURCES})
+        self.assertEqual(sum(Counter(s["target"] for s in SOURCES.values()).values()), 26)
 
     def test_unverified_weather_provenance_is_explicit(self):
         provenance = SOURCES["nasa_power_weather_daily_63"]["provenance"]
@@ -129,54 +120,13 @@ class RuleTests(unittest.TestCase):
         self.assertNotEqual(stable_id("a", [1]), stable_id("b", [1]))
         self.assertNotEqual(stable_id("a", ["a|b", "c"]), stable_id("a", ["a", "b|c"]))
 
-    def test_consumer_contracts(self):
-        for target in CONTRACTS:
-            names = fields(target)
-            self.assertTrue(set(CONTRACTS[target]["keys"]) <= names.keys())
-            self.assertTrue(
-                {"bronze_checksum_sha256", "source_record_id", "period_start"}
-                <= names.keys()
-            )
-            self.assertFalse(any(c.endswith("_key") for c in names))
-        self.assertTrue(
-            {"reporter_m49", "partner_m49", "hs_code"} <= fields("trade_partner").keys()
-        )
-        self.assertTrue(
-            {"temperature_avg_c", "precipitation_mm"} <= fields("weather_daily").keys()
-        )
-
-    def test_provincial_missing_and_error(self):
-        d = "provincial_agriculture_three_commodities"
-        spec = SOURCES[d]
-        meta = dict(
-            dataset_id=d,
-            source_system="provincial",
-            source_file_name="a.csv",
-            bronze_path="s3://bronze/a",
-            ingestion_id="id",
-            checksum_sha256="a" * 64,
-        )
-        raw = dict(
-            year="2024",
-            province_name_raw="Đắk Nông",
-            province_name_normalized="Đắk Nông",
-            commodity="coffee",
-            metric="production",
-            value="",
-            unit="tonnes",
-            parse_status="missing_source_value",
-            geographic_level="province",
-            district="",
-            edition="",
-            geography_version="",
-        )
-        out = list(rows([raw], spec, meta, "v1", "run", datetime(2026, 1, 1)))[0]
-        self.assertEqual(out["record"]["observation_status"], "missing")
-        self.assertIsNone(out["record"]["value_standard"])
-        raw["province_name_normalized"] = "unknown"
-        out = list(rows([raw], spec, meta, "v1", "run", datetime(2026, 1, 1)))[0]
-        self.assertEqual(out["error_code"], "UNKNOWN_PROVINCE")
-        self.assertIsNone(out["record"])
+    def test_source_district_identity_is_scoped_and_stable(self):
+        code = source_district_geography_code("provincial", "2024", "66", " Buôn Ma Thuột ")
+        self.assertTrue(code.startswith("SRC_DISTRICT_"))
+        self.assertEqual(code, source_district_geography_code(
+            "provincial", "2024", "66", "buôn ma thuột"))
+        self.assertNotEqual(code, source_district_geography_code(
+            "provincial", "2024", "67", "Buôn Ma Thuột"))
 
 
 if __name__ == "__main__":

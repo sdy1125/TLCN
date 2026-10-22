@@ -32,7 +32,6 @@ x-airflow-common: &airflow-common
     BRONZE_MANIFEST_PATH: /opt/airflow/data/raw_manifest.csv
     BRONZE_RAW_ROOT: /opt/airflow/data/raw
     BRONZE_DAG_SCHEDULE: ${BRONZE_DAG_SCHEDULE:-}
-    SILVER_DAG_SCHEDULE: ${SILVER_DAG_SCHEDULE:-}
     SILVER_RUNNER_URL: http://spark-iceberg:8090
     SILVER_RUNNER_TOKEN: ${SILVER_RUNNER_TOKEN:-local-development-silver-runner-token-change-me}
     PYTHONPATH: /opt/airflow/include:/opt/silver
@@ -75,8 +74,8 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
       MINIO_DOMAIN: minio
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - minio-data:/data
     restart: unless-stopped
@@ -103,6 +102,7 @@ services:
         done
         mc mb --ignore-existing local/bronze
         mc mb --ignore-existing local/warehouse
+        mc version enable local/warehouse
         echo "MinIO buckets are ready."
     restart: "no"
     networks:
@@ -130,11 +130,13 @@ services:
       CATALOG_WAREHOUSE: s3://warehouse/
       CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
       CATALOG_S3_ENDPOINT: http://minio:9000
-      CATALOG_URI: jdbc:sqlite:/catalog/iceberg.db
+      # The previous catalog points at Iceberg files removed from MinIO.
+      # Keep that SQLite file for diagnosis while rebuilding from immutable Bronze.
+      CATALOG_URI: jdbc:sqlite:/catalog/iceberg-rebuilt-20261022.db?journal_mode=WAL&busy_timeout=10000
     volumes:
       - iceberg-catalog:/catalog
     ports:
-      - "8181:8181"
+      - "127.0.0.1:8181:8181"
     restart: unless-stopped
     networks:
       - lakehouse
@@ -143,7 +145,7 @@ services:
     image: tlcn-spark-silver:3.5.5_1.8.1
     build: ./spark
     init: true
-    entrypoint: ["python3", "-m", "silver.runner"]
+    entrypoint: ["python3", "-m", "silver_v2.runner"]
     depends_on:
       iceberg-rest:
         condition: service_started
@@ -178,7 +180,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin123}
     ports:
-      - "8082:8080"
+      - "127.0.0.1:8082:8080"
     volumes:
       - ./trino/etc:/etc/trino:ro
       - trino-data:/data/trino
@@ -216,7 +218,7 @@ services:
         condition: service_completed_successfully
     command: api-server
     ports:
-      - "8083:8080"
+      - "127.0.0.1:8083:8080"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
       interval: 30s
@@ -274,41 +276,6 @@ services:
         condition: service_healthy
     command: triggerer
     restart: unless-stopped
-
-  dbt:
-    build:
-      context: ./dbt
-    depends_on:
-      trino:
-        condition: service_healthy
-    environment:
-      DBT_TRINO_HOST: trino
-      DBT_TRINO_USER: dbt
-    volumes:
-      - ./dbt:/usr/app
-    working_dir: /usr/app
-    profiles:
-      - tools
-    networks:
-      - lakehouse
-
-  ml-notebook:
-    build:
-      context: ./ml
-    depends_on:
-      trino:
-        condition: service_healthy
-    environment:
-      TRINO_HOST: trino
-      TRINO_PORT: "8080"
-    ports:
-      - "8889:8888"
-    volumes:
-      - ./ml:/workspace
-    profiles:
-      - ml
-    networks:
-      - lakehouse
 
 volumes:
   airflow-logs:

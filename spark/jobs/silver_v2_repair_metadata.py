@@ -4,8 +4,8 @@ import json
 from openpyxl import load_workbook
 from pyspark.sql import SparkSession
 
-from silver.readers import download, resolve
-from silver.registry import SOURCES
+from silver_v2.readers import download, resolve
+from silver_v2.registry import SOURCES
 from silver_v2.identity import observation_set_id
 
 

@@ -10,7 +10,7 @@ from silver_v2.canonical import decide_domain
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--domain", action="append")
-    parser.add_argument("--policy-version", default="source-local-v1")
+    parser.add_argument("--policy-version")
     args = parser.parse_args()
     spark = (SparkSession.builder.appName("silver-v2-canonical")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())

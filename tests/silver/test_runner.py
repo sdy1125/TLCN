@@ -1,6 +1,6 @@
 import unittest
 
-from silver.runner import authorized, validate_token
+from silver_v2.runner import authorized, validate_token
 
 
 class RunnerAuthenticationTests(unittest.TestCase):

@@ -174,9 +174,9 @@ cp .env.example .env
 
 The relevant variables are `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`,
 `POSTGRES_PASSWORD`, `AIRFLOW_FERNET_KEY`, `AIRFLOW_JWT_SECRET`,
-`SILVER_RUNNER_TOKEN`, and the optional Bronze/Silver schedules. Replace the
-development runner token with at least 32 random characters. Leaving schedules
-blank keeps both pipelines manual-only.
+`SILVER_RUNNER_TOKEN`, and the optional Bronze schedule. Replace the
+development runner token with at least 32 random characters. A blank Bronze
+schedule keeps Bronze manual-only; Silver V2 is always manually triggered.
 
 MinIO server and `mc` are built into one local image from pinned official source
 releases because the archived public images now reject anonymous pulls. The
@@ -256,18 +256,13 @@ Silver V2 reads the 26 immutable Bronze releases with verified SHA-256 and
 physical source-row lineage. It writes eight atomic Iceberg domains in
 `silver_core`, along with `silver_meta`, `silver_ref`, and `silver_stage`.
 Source-local canonical decisions are audited; unresolved conflicts have no
-winner. The legacy `silver` namespace remains available during acceptance.
-No Gold model is deployed.
+winner. `silver_v2_backfill` is the only Silver DAG and `silver_core` is the
+active Silver namespace. No Gold model is deployed.
 
 See the [Silver V2 runbook](docs/silver/V2_RUNBOOK.md),
-[V1 inventory](reports/silver_v1_inventory.md), and
-[V2 reconciliation](reports/silver_v2_reconciliation.md).
+[full Silver V2 implementation summary](docs/silver/TONG_KET_XAY_DUNG_SILVER_V2.md),
+[Gold contract](docs/silver/GOLD_V2_CONTRACT.md), and
+[migration evidence](reports/silver_v2_reconciliation.md).
 
-```bash
-docker compose up -d
-docker compose exec -T spark-iceberg spark-submit /home/iceberg/jobs/silver_v2_foundation.py
-docker compose exec -T spark-iceberg spark-submit /home/iceberg/jobs/silver_v2_backfill.py --run-id manual-v2-001
-docker compose exec -T spark-iceberg spark-submit /home/iceberg/jobs/silver_v2_refs.py
-docker compose exec -T spark-iceberg spark-submit /home/iceberg/jobs/silver_v2_canonical.py
-docker compose exec -T airflow-apiserver airflow dags trigger silver_v2_backfill --conf '{"dataset_id":"world_bank_wdi"}'
-```
+Use the ordered backfill, policy, canonical, acceptance, and activation
+commands in the [Silver V2 runbook](docs/silver/V2_RUNBOOK.md).

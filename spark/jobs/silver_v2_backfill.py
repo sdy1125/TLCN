@@ -3,7 +3,7 @@
 import argparse
 import json
 from pyspark.sql import SparkSession
-from silver.registry import select_datasets
+from silver_v2.registry import select_datasets
 from silver_v2.foundation import create_tables, seed_foundation
 from silver_v2.pipeline import run_dataset
 

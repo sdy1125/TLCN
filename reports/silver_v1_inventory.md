@@ -1,5 +1,7 @@
 # Silver V1 inventory — 2026-10-21
 
+> Historical record only. On 2026-10-22 the MinIO backup objects described below were deleted without bucket versioning. They are no longer available for restore.
+
 ## Running environment
 
 - Docker Compose: MinIO, Apache Iceberg REST fixture 1.8.1, Spark 3.5.5, Trino 483, Airflow 3.3.2, PostgreSQL. Airflow service containers were stopped at audit start because their old bind mounts pointed at a previous workspace path. Trino and Spark were recreated from the current Compose file; Airflow has not yet been restarted.

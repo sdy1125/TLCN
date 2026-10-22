@@ -5,6 +5,7 @@ from datetime import datetime
 from pyspark.sql import Window, functions as F
 
 from .domains import DOMAIN
+from .policy import current_policy_version
 
 
 GRAIN = {
@@ -30,22 +31,29 @@ def _value(df, domain):
     return F.coalesce(F.col("value_canonical"), F.col("value_native")).cast("string")
 
 
-def decide_domain(spark, domain, policy_version="source-local-v1"):
+def decide_domain(spark, domain, policy_version=None):
     if domain not in DOMAIN:
         raise ValueError(domain)
+    policy_version = policy_version or current_policy_version(spark)
     source = spark.table(f"lakehouse.silver_core.{domain}")
-    if policy_version == "source-local-v3":
-        policies = spark.table("lakehouse.silver_meta.source_selection_policy").filter(
-            (F.col("policy_version") == policy_version) &
-            (F.col("business_process") == domain)
-        ).select(F.col("candidate_source_code").alias("dataset_id"),
-                 "metric_code", "period_type", "is_active")
-        policy_count = policies.count()
-        if policy_count == 0:
-            raise ValueError(f"Missing selection policies for {domain}")
-        source = source.join(F.broadcast(policies),
-                             ["dataset_id", "metric_code", "period_type"], "left")
-    keys = ["dataset_id", "observation_set_id"] + GRAIN[domain]
+    policies = spark.table("lakehouse.silver_meta.source_selection_policy").filter(
+        (F.col("policy_version") == policy_version) &
+        (F.col("business_process") == domain)
+    ).select(F.col("candidate_source_code").alias("dataset_id"),
+             "metric_code", "period_type", "is_active")
+    if policies.count() == 0:
+        raise ValueError(f"Missing selection policies for {domain}")
+    source = source.join(F.broadcast(policies),
+                         ["dataset_id", "metric_code", "period_type"], "left")
+    if source.filter(F.col("is_active").isNull()).limit(1).count():
+        raise ValueError(f"Missing selection policy for observations in {domain}")
+    sets = spark.table("lakehouse.silver_meta.observation_set").select(
+        "observation_set_id", "published_at", "retrieved_at", "first_seen_at")
+    source = source.join(F.broadcast(sets), "observation_set_id", "left")
+    if source.filter(F.col("retrieved_at").isNull() & F.col("first_seen_at").isNull())\
+            .limit(1).count():
+        raise ValueError(f"Missing release metadata for {domain}")
+    keys = ["dataset_id"] + GRAIN[domain]
     key = F.sha2(F.to_json(F.struct(*[F.col(name) for name in keys]),
                             {"ignoreNullFields": "false"}), 256)
     df = source.withColumn("canonical_business_key", key).withColumn(
@@ -62,12 +70,34 @@ def decide_domain(spark, domain, policy_version="source-local-v1"):
         eligible = eligible & F.col(name).isNotNull()
     if domain == "weather_daily":
         eligible = eligible & F.col("quality_status").isin("VALID", "WARN")
+    elif domain == "provincial_agri_observation":
+        source_district = ((F.col("geography_level") == "DISTRICT") &
+                           F.col("geography_code").startswith("SRC_DISTRICT_") &
+                           (F.col("coverage_code") == "ALL_PRODUCERS"))
+        eligible = eligible & ((F.col("quality_status") == "VALID") |
+                               ((F.col("quality_status") == "WARN") & source_district))
     else:
         eligible = eligible & (F.col("quality_status") == "VALID")
-    if policy_version == "source-local-v3":
-        eligible = eligible & (F.col("is_active") == True)
-    df = df.withColumn("_eligible", eligible)
-    stats = df.filter(F.col("_eligible")).groupBy("canonical_business_key").agg(
+    eligible = eligible & (F.col("is_active") == True) & (F.col("value_status") != "MISSING")
+    if domain == "weather_daily":
+        eligible = eligible & (F.col("valid_measure_count") > 0)
+    df = df.withColumn("_eligible", eligible).withColumn(
+        "_release_time", F.coalesce("published_at", "retrieved_at", "first_seen_at", "available_at")
+    ).withColumn("_status_priority", F.when(F.col("record_status_code") == "FINAL", 3)
+                 .when(F.col("record_status_code") == "PRELIMINARY", 2)
+                 .when(F.col("record_status_code") == "FORECAST", 1).otherwise(0))
+    release_window = Window.partitionBy("canonical_business_key").orderBy(
+        F.col("_status_priority").desc(), F.col("_release_time").desc(),
+        F.col("observation_set_id").desc())
+    selected = df.filter("_eligible").select(
+        "canonical_business_key", "observation_set_id", "_status_priority", "_release_time"
+    ).distinct().withColumn("_release_rank", F.row_number().over(release_window))\
+        .filter("_release_rank=1").select(
+            "canonical_business_key", F.col("observation_set_id").alias("_winner_set_id"))
+    df = df.join(selected, "canonical_business_key", "left").withColumn(
+        "_selected_release", F.col("observation_set_id") == F.col("_winner_set_id"))
+    stats = df.filter(F.col("_eligible") & F.col("_selected_release"))\
+        .groupBy("canonical_business_key").agg(
         F.countDistinct("_comparison_value").alias("_distinct_values"),
         F.count("*").alias("_eligible_count"),
         F.to_json(F.sort_array(F.collect_set("_comparison_value"))).alias("_conflicting_values_json"),
@@ -75,9 +105,12 @@ def decide_domain(spark, domain, policy_version="source-local-v1"):
     )
     ranked = df.join(stats, "canonical_business_key", "left").withColumn(
         "_rank", F.row_number().over(Window.partitionBy("canonical_business_key")
-                                     .orderBy(F.col("_eligible").desc(), "observation_id", "source_row_locator"))
+                                     .orderBy(F.col("_selected_release").desc(),
+                                              F.col("_eligible").desc(),
+                                              "observation_id", "source_row_locator"))
     )
     decision = F.when(~F.col("_eligible"), F.lit("EXCLUDED"))\
+        .when(~F.col("_selected_release"), F.lit("LOSER"))\
         .when(F.col("_distinct_values") > 1, F.lit("EXCLUDED"))\
         .when(F.col("_rank") == 1, F.lit("WINNER"))\
         .otherwise(F.lit("LOSER"))
@@ -85,16 +118,18 @@ def decide_domain(spark, domain, policy_version="source-local-v1"):
     records = ranked.select(
         F.lit(domain).alias("business_process"), F.col("metric_code"),
         "canonical_business_key", F.col("observation_id").alias("candidate_observation_id"),
-        "observation_set_id", F.lit("SOURCE_RELEASE_ONLY").alias("policy_code"),
-        F.lit(policy_version).alias("policy_version"), F.lit(1).alias("selection_rank"),
+        "observation_set_id", F.lit("LATEST_VALID_RELEASE").alias("policy_code"),
+        F.lit(policy_version).alias("policy_version"), F.col("_rank").alias("selection_rank"),
         decision.alias("decision_status"),
         F.when(~F.col("_eligible"), "not_eligible")
+         .when(~F.col("_selected_release"), "superseded_release")
          .when(F.col("_distinct_values") > 1, "unresolved_same_grain_conflict")
-         .when(F.col("_rank") == 1, "unique_or_identical_source_value")
+         .when(F.col("_rank") == 1, "latest_valid_release")
          .otherwise("identical_duplicate").alias("decision_reason"),
         F.lit(now).alias("decided_at"), F.lit(None).cast("long").alias("published_snapshot_id"),
     )
-    collisions = ranked.filter(F.col("_eligible") & (F.col("_distinct_values") > 1))\
+    collisions = ranked.filter(F.col("_eligible") & F.col("_selected_release") &
+                               (F.col("_distinct_values") > 1))\
         .select("canonical_business_key", "_candidate_ids_json", "_conflicting_values_json")\
         .dropDuplicates(["canonical_business_key"])
     conflicts = collisions.select(
@@ -110,15 +145,19 @@ def decide_domain(spark, domain, policy_version="source-local-v1"):
     )
     existing = spark.table("lakehouse.silver_meta.canonical_decision").filter(
         (F.col("business_process") == domain) & (F.col("policy_version") == policy_version)
-    ).count()
-    if existing:
-        if existing != records.count():
-            raise ValueError("Existing canonical audit count differs; use a new policy_version")
-        return {"domain": domain, "status": "SKIPPED", "decisions": existing}
+    ).select("candidate_observation_id")
+    pending = records.join(existing, "candidate_observation_id", "left_anti")
+    pending_count = pending.count()
+    if pending_count == 0:
+        return {"domain": domain, "status": "SKIPPED", "decisions": existing.count()}
     # Both tables are append-only for a policy version. Readers use the policy
     # version pointer; a failed run never activates a new version.
-    conflicts.writeTo("lakehouse.silver_meta.canonical_conflict").append()
-    records.writeTo("lakehouse.silver_meta.canonical_decision").append()
-    return {"domain": domain, "decisions": records.count(),
-            "conflicts": conflicts.count(),
-            "winners": records.filter("decision_status='WINNER'").count()}
+    existing_conflicts = spark.table("lakehouse.silver_meta.canonical_conflict")\
+        .select("conflict_id")
+    pending_conflicts = conflicts.join(existing_conflicts, "conflict_id", "left_anti")
+    conflict_count = pending_conflicts.count()
+    winner_count = pending.filter("decision_status='WINNER'").count()
+    pending_conflicts.writeTo("lakehouse.silver_meta.canonical_conflict").append()
+    pending.writeTo("lakehouse.silver_meta.canonical_decision").append()
+    return {"domain": domain, "decisions": pending_count,
+            "conflicts": conflict_count, "winners": winner_count}

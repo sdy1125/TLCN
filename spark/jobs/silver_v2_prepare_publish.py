@@ -8,6 +8,7 @@ from pyspark.sql import SparkSession, functions as F
 
 from silver_v2.domains import DOMAIN
 from silver_v2.foundation import _upsert, create_tables
+from silver_v2.policy import current_policy_version
 
 
 def main():
@@ -20,13 +21,22 @@ def main():
     spark.sparkContext.setLogLevel("ERROR")
     try:
         create_tables(spark)
+        policy_version = current_policy_version(spark)
         dq = spark.table("lakehouse.silver_meta.dq_result").filter(
             F.col("run_id") == args.dq_run_id
         )
         failures = dq.filter("severity='BLOCK' AND status='FAIL'").count()
-        warnings = dq.filter("status='WARN'").count()
-        if dq.count() < 36 or failures:
+        warning_rows = dq.filter("status='WARN'")\
+            .select("rule_code", "failed_count").collect()
+        warnings = len(warning_rows)
+        # Three metadata, five per-domain, and eleven cross-domain checks.
+        if dq.count() < 54 or failures:
             raise ValueError("Acceptance checks incomplete or failing")
+        expected_exceptions = {
+            ("OPEN_PRICE_CONFLICTS", 6),
+            ("PENDING_OFFICIAL_DISTRICT_MAPPING", 2142),
+        }
+        actual_exceptions = {(row[0], row[1]) for row in warning_rows}
         snapshots = {}
         for domain in DOMAIN:
             table = f"lakehouse.silver_core.{domain}"
@@ -36,14 +46,18 @@ def main():
             if history is None:
                 raise ValueError("Missing snapshot: " + domain)
             snapshots[domain] = dict(snapshot_id=history[0], rows=spark.table(table).count())
-        status = "BLOCKED_BUSINESS_REVIEW" if warnings else "READY_FOR_REVIEW"
+        status = ("READY_WITH_EXCEPTIONS" if actual_exceptions == expected_exceptions
+                  else "READY_FOR_REVIEW" if not warnings else "BLOCKED_BUSINESS_REVIEW")
         row = dict(batch_id=args.batch_id, namespace="silver_core",
-                   policy_version="source-local-v3", status=status,
+                   policy_version=policy_version, status=status,
                    domain_snapshots_json=json.dumps(snapshots, sort_keys=True),
                    dq_run_id=args.dq_run_id, created_at=datetime.utcnow(),
-                   activation_reason="Gold Dimension contract and source-policy review pending")
+                   activation_reason=(
+                       "Price conflicts excluded; source-scoped district keys pending official mapping; "
+                       "Comtrade canonical inactive; NASA solar canonical unit unverified"))
         _upsert(spark, "lakehouse.silver_meta.publish_batch", [row], ["batch_id"])
-        print(json.dumps({"batch_id": args.batch_id, "status": status,
+        print(json.dumps({"batch_id": args.batch_id, "policy_version": policy_version,
+                          "status": status,
                           "block_failures": failures, "warnings": warnings,
                           "snapshots": snapshots}), flush=True)
     finally:

@@ -6,9 +6,9 @@ from datetime import datetime, timezone
 from pyspark import StorageLevel
 from pyspark.sql import functions as F, types as T
 
-from silver import readers
-from silver.common import RowError
-from silver.registry import SOURCES
+from . import readers
+from .common import RowError
+from .registry import SOURCES
 from .domains import DOMAIN, schema, target, transform
 from .foundation import TABLES
 from .identity import digest, observation_set_id

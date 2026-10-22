@@ -1,4 +1,4 @@
-"""Register orphaned Silver Iceberg tables after an ephemeral REST catalog reset.
+"""Register orphaned Silver V2 Iceberg tables after a catalog reset.
 
 The warehouse object copy must be verified before --apply. No data files are
 deleted or changed; this only recreates catalog pointers to existing metadata.
@@ -10,7 +10,7 @@ import re
 import requests
 from minio import Minio
 
-NAMESPACES = ("silver", "silver_meta", "silver_ref", "silver_stage", "silver_core")
+NAMESPACES = ("silver_meta", "silver_ref", "silver_stage", "silver_core")
 
 
 def main():

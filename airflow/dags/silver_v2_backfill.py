@@ -1,4 +1,4 @@
-"""Isolated Silver V2 backfill. It does not change the published V1 interface."""
+"""Silver V2 backfill over immutable Bronze releases."""
 
 import json
 import os
@@ -37,7 +37,7 @@ def _request(path, payload=None):
 def silver_v2_backfill():
     @task
     def select():
-        from silver.registry import select_datasets
+        from silver_v2.registry import select_datasets
 
         return select_datasets(get_current_context()["dag_run"].conf.get("dataset_id"))
 

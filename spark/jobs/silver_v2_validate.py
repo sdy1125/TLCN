@@ -9,6 +9,7 @@ from pyspark.sql import SparkSession, functions as F
 from silver_v2.domains import DOMAIN
 from silver_v2.foundation import _upsert
 from silver_v2.identity import digest
+from silver_v2.policy import current_policy_version
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
         ))
 
     try:
+        policy_version = current_policy_version(spark)
         sets = spark.table("lakehouse.silver_meta.observation_set")
         registry = spark.table("lakehouse.silver_meta.dataset_registry")
         record("silver_meta.observation_set", "PUBLISHED_SET_COUNT", 26,
@@ -40,6 +42,8 @@ def main():
         record("silver_meta.dataset_registry", "REGISTRY_COUNT", 26,
                abs(26 - registry.count()))
         observed_set_ids = []
+        decisions = spark.table("lakehouse.silver_meta.canonical_decision").filter(
+            F.col("policy_version") == policy_version)
         for domain in DOMAIN:
             table = f"lakehouse.silver_core.{domain}"
             frame = spark.table(table)
@@ -55,6 +59,20 @@ def main():
                 F.col("bronze_path").isNull()
             ).count()
             record(table, "LINEAGE_COMPLETE", total, missing_lineage)
+            stage = spark.table(f"lakehouse.silver_stage.{domain}")
+            core_ids = frame.select("observation_id")
+            stage_ids = stage.select("observation_id")
+            stage_drift = (core_ids.join(stage_ids, "observation_id", "left_anti").count()
+                           + stage_ids.join(core_ids, "observation_id", "left_anti").count()
+                           + abs(total - stage.count()))
+            record(table, "STAGE_CORE_PARITY", total, stage_drift)
+            domain_decisions = decisions.filter(
+                F.col("business_process") == domain).select("candidate_observation_id")
+            decision_drift = (core_ids.join(
+                domain_decisions,
+                core_ids.observation_id == domain_decisions.candidate_observation_id,
+                "left_anti").count() + abs(total - domain_decisions.count()))
+            record(table, "CANONICAL_AUDIT_COVERAGE", total, decision_drift)
             observed_set_ids.append(frame.select("observation_set_id").distinct())
         ids = observed_set_ids[0]
         for frame in observed_set_ids[1:]:
@@ -89,24 +107,35 @@ def main():
         missing_wdi = macro.filter("value_status='MISSING'").count()
         record("silver_core.macro_indicator_observation", "SOURCE_NULLS_RETAINED", 138,
                abs(138 - missing_wdi))
-        decisions = spark.table("lakehouse.silver_meta.canonical_decision").filter(
-            "policy_version='source-local-v3'")
         multiple_winners = decisions.filter("decision_status='WINNER'")\
             .groupBy("business_process", "canonical_business_key")\
             .count().filter("count>1").count()
         record("silver_meta.canonical_decision", "ONE_WINNER_MAX", decisions.count(),
                multiple_winners)
         conflicts = spark.table("lakehouse.silver_meta.canonical_conflict").filter(
-            "resolution_status='OPEN' AND business_process='price_observation' "
-            "AND policy_version='source-local-v3'").count()
+            (F.col("resolution_status") == "OPEN") &
+            (F.col("business_process") == "price_observation") &
+            (F.col("policy_version") == policy_version)).count()
         record("silver_meta.canonical_conflict", "OPEN_PRICE_CONFLICTS", 6, conflicts,
                severity="WARN")
         district = spark.table("lakehouse.silver_core.provincial_agri_observation")\
-            .filter("geography_level='DISTRICT' AND geography_code IS NULL").count()
-        record("silver_core.provincial_agri_observation", "UNMAPPED_DISTRICTS", district,
-               district, severity="WARN")
+            .filter("geography_level='DISTRICT'")
+        district_count = district.count()
+        missing_district_key = district.filter("geography_code IS NULL").count()
+        record("silver_core.provincial_agri_observation", "DISTRICT_KEY_PRESENT",
+               district_count, missing_district_key)
+        geography = spark.table("lakehouse.silver_ref.geography")\
+            .select("geography_code", "geography_version").distinct()
+        missing_district_ref = district.select("geography_code", "geography_version")\
+            .join(geography, ["geography_code", "geography_version"], "left_anti").count()
+        record("silver_core.provincial_agri_observation", "DISTRICT_REFERENCE_FK",
+               district_count, missing_district_ref)
+        source_scoped = district.filter(
+            F.col("geography_code").startswith("SRC_DISTRICT_")).count()
+        record("silver_ref.geography_alias", "PENDING_OFFICIAL_DISTRICT_MAPPING",
+               district_count, source_scoped, severity="WARN")
         _upsert(spark, "lakehouse.silver_meta.dq_result", checks, ["dq_result_id"])
-        print(json.dumps({"checks": checks, "block_failures":
+        print(json.dumps({"policy_version": policy_version, "checks": checks, "block_failures":
                           sum(x["status"] == "FAIL" for x in checks)},
                          default=str), flush=True)
         return 1 if any(x["status"] == "FAIL" for x in checks) else 0

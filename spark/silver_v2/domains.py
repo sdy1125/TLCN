@@ -1,12 +1,13 @@
 """Bronze row to atomic Silver V2 observations; no canonical choice here."""
 
 import json
+import hashlib
 import re
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 
-from silver.common import RULES, RowError, commodity, country, number, period, province
-from silver.transforms import faostat, provincial
+from .common import RULES, RowError, commodity, country, number, period, province
+from .parsers import faostat, provincial
 from .identity import observation_id, observation_set_id
 
 
@@ -150,6 +151,12 @@ def _base(raw, metadata, run_id, table, metric, now):
                 source_system=metadata["source_system"], source_file=metadata["source_file_name"])
 
 
+def source_district_geography_code(dataset, version, province_code, raw_district):
+    """Stable source member; never presented as an official district code."""
+    key = "|".join((dataset, version, province_code, raw_district.strip().lower()))
+    return "SRC_DISTRICT_" + hashlib.sha256(key.encode("utf-8")).hexdigest()
+
+
 def transform(raw, spec, metadata, run_id, now):
     dataset = metadata["dataset_id"]
     table = target(dataset)
@@ -224,9 +231,16 @@ def _provincial(r, spec, m, run_id, now):
                     value_status="MISSING" if o["value_standard"] is None else "VALID")
         if table == "provincial_agri_observation":
             scope = r.get("source_scope", "").lower()
-            coverage = "SMALLHOLDER_ONLY" if "smallholder" in scope else "UNKNOWN" if scope else "ALL_PRODUCERS"
+            coverage = ("SMALLHOLDER_ONLY" if "smallholder" in scope else
+                        "ALL_PRODUCERS" if scope in {"district total", "province total", ""}
+                        else "UNKNOWN")
             level = (o["geographic_level"] or "").upper()
-            base.update(geography_code=o["province_code"] if level == "PROVINCE" else None,
+            geography_code = (o["province_code"] if level == "PROVINCE" else
+                              source_district_geography_code(
+                                  m["dataset_id"], o["geography_version"],
+                                  o["province_code"], o["district_name"])
+                              if level == "DISTRICT" else None)
+            base.update(geography_code=geography_code,
                         geography_version=o["geography_version"], geography_level=level,
                         province_code=o["province_code"], district_code=None,
                         raw_province=o["province_name_raw"], raw_district=o.get("district_name"),

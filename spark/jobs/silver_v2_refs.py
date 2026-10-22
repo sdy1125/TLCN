@@ -102,18 +102,35 @@ def main():
         _upsert(spark, "lakehouse.silver_ref.trade_product_commodity_bridge", bridges,
                 ["classification_system", "classification_version", "product_code", "commodity_code"])
 
-        districts = spark.table("lakehouse.silver_core.provincial_agri_observation")\
+        provincial = spark.table("lakehouse.silver_core.provincial_agri_observation")
+        provinces = provincial.filter("geography_level='PROVINCE'")\
+            .select("geography_code", "geography_version", "raw_province",
+                    "province_code").distinct().collect()
+        province_members = [dict(geography_code=r[0], geography_version=r[1],
+                                 geography_name=r[2], geography_level="PROVINCE",
+                                 province_code=r[3]) for r in provinces if r[0]]
+        districts = provincial\
             .filter("geography_level='DISTRICT'")\
-            .select("dataset_id", "raw_district", "province_code").distinct().collect()
-        pending = [dict(source_dataset=r[0], raw_name=r[1], raw_code=None,
-                        normalized_name=r[1], geography_code=None, confidence=0.0,
+            .select("dataset_id", "raw_district", "province_code",
+                    "geography_code", "geography_version").distinct().collect()
+        district_members = [dict(geography_code=r[3], geography_version=r[4],
+                                 geography_name=r[1], geography_level="DISTRICT",
+                                 province_code=r[2], district_code=None,
+                                 parent_code=r[2]) for r in districts if r[3]]
+        _upsert(spark, "lakehouse.silver_ref.geography",
+                province_members + district_members,
+                ["geography_code", "geography_version"])
+        pending = [dict(source_dataset=r[0], raw_name=r[1], raw_code=r[2],
+                        normalized_name=r[1], geography_code=r[3], confidence=0.0,
                         approval_status="PENDING") for r in districts]
         _upsert(spark, "lakehouse.silver_ref.geography_alias", pending,
                 ["source_dataset", "raw_name"])
         print(json.dumps({"countries": len(countries), "periods": len(rows),
                           "metric_definitions": len(metrics), "price_series": len(series),
                           "trade_products": len(products), "trade_bridges": len(bridges),
-                          "pending_district_aliases": len(pending)}), flush=True)
+                          "pending_district_aliases": len(pending),
+                          "source_district_members": len(district_members),
+                          "source_province_members": len(province_members)}), flush=True)
     finally:
         spark.stop()
 

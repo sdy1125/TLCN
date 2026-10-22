@@ -2,9 +2,9 @@
 
 from datetime import datetime, timezone
 
-from silver.common import GEO, RULES
-from silver.readers import resolve
-from silver.registry import SOURCES
+from .common import GEO, RULES
+from .readers import resolve
+from .registry import SOURCES
 from .identity import observation_set_id
 
 
@@ -60,9 +60,12 @@ def _upsert(spark, table, rows, keys):
     )
     data.createOrReplaceTempView("_silver_v2_seed")
     condition = " AND ".join(f"t.{key} <=> s.{key}" for key in keys)
+    changed = " OR ".join(f"NOT (t.{name} <=> s.{name})"
+                          for name in columns if name not in keys)
+    matched = f"WHEN MATCHED AND ({changed}) THEN UPDATE SET * " if changed else ""
     spark.sql(
         f"MERGE INTO {table} t USING _silver_v2_seed s ON {condition} "
-        "WHEN MATCHED THEN UPDATE SET * WHEN NOT MATCHED THEN INSERT *"
+        f"{matched}WHEN NOT MATCHED THEN INSERT *"
     )
 
 
