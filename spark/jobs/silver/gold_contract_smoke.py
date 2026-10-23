@@ -4,12 +4,12 @@ import json
 
 from pyspark.sql import SparkSession, functions as F
 
-from silver_v2.domains import DOMAIN
-from silver_v2.policy import current_policy_version
+from silver.domains import DOMAIN
+from silver.policy import current_policy_version
 
 
 def main():
-    spark = SparkSession.builder.appName("silver-v2-gold-contract-smoke").getOrCreate()
+    spark = SparkSession.builder.appName("silver-gold-contract-smoke").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     checks = []
 

@@ -1,4 +1,4 @@
-"""Record an immutable reviewable V2 batch; never switch consumers itself."""
+"""Record an immutable reviewable batch; never switch consumers itself."""
 
 import argparse
 import json
@@ -6,9 +6,9 @@ from datetime import datetime
 
 from pyspark.sql import SparkSession, functions as F
 
-from silver_v2.domains import DOMAIN
-from silver_v2.foundation import _upsert, create_tables
-from silver_v2.policy import current_policy_version
+from silver.domains import DOMAIN
+from silver.foundation import _upsert, create_tables
+from silver.policy import current_policy_version
 
 
 def main():
@@ -16,7 +16,7 @@ def main():
     parser.add_argument("--batch-id", required=True)
     parser.add_argument("--dq-run-id", required=True)
     args = parser.parse_args()
-    spark = (SparkSession.builder.appName("silver-v2-publish-review")
+    spark = (SparkSession.builder.appName("silver-publish-review")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     try:

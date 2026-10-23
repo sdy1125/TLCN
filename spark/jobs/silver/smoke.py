@@ -1,13 +1,13 @@
-"""Read verified Bronze releases and exercise V2 parsers without writing data."""
+"""Read verified Bronze releases and exercise parsers without writing data."""
 
 import json
 from datetime import datetime, timezone
 
 from pyspark.sql import SparkSession, functions as F
 
-from silver_v2 import readers
-from silver_v2.domains import schema, target, transform
-from silver_v2.registry import SOURCES
+from silver import readers
+from silver.domains import schema, target, transform
+from silver.registry import SOURCES
 
 
 SAMPLES = (
@@ -26,7 +26,7 @@ SAMPLES = (
 
 
 def main():
-    spark = SparkSession.builder.appName("silver-v2-bronze-parser-smoke").getOrCreate()
+    spark = SparkSession.builder.appName("silver-bronze-parser-smoke").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     results = []
     try:
@@ -43,12 +43,12 @@ def main():
                 for candidate in candidates:
                     row = {key: "" if value is None else str(value)
                            for key, value in candidate.asDict().items()}
-                    observations.extend(transform(row, spec, metadata, "smoke-v2",
+                    observations.extend(transform(row, spec, metadata, "smoke-silver",
                                                   datetime.now(timezone.utc).replace(tzinfo=None)))
                     if observations:
                         break
                 if not observations:
-                    raise ValueError(f"No V2 observation parsed for {dataset}")
+                    raise ValueError(f"No observation parsed for {dataset}")
                 table = target(dataset)
                 columns = [field.name for field in schema(table)]
                 frame = spark.createDataFrame(

@@ -1,4 +1,4 @@
-"""Idempotently add source-scoped district identities to existing V2 releases."""
+"""Idempotently add source-scoped district identities to existing releases."""
 
 import json
 
@@ -6,7 +6,7 @@ from pyspark.sql import SparkSession
 
 
 def main():
-    spark = SparkSession.builder.appName("silver-v2-upgrade-geography").getOrCreate()
+    spark = SparkSession.builder.appName("silver-upgrade-geography").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
     results = {}
     try:

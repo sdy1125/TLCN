@@ -130,9 +130,8 @@ services:
       CATALOG_WAREHOUSE: s3://warehouse/
       CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
       CATALOG_S3_ENDPOINT: http://minio:9000
-      # The previous catalog points at Iceberg files removed from MinIO.
-      # Keep that SQLite file for diagnosis while rebuilding from immutable Bronze.
-      CATALOG_URI: jdbc:sqlite:/catalog/iceberg-rebuilt-20261022.db?journal_mode=WAL&busy_timeout=10000
+      # Rebuild Silver below warehouse/silver/ without changing the old catalog.
+      CATALOG_URI: jdbc:sqlite:/catalog/iceberg-layered-20261023.db?journal_mode=WAL&busy_timeout=10000
     volumes:
       - iceberg-catalog:/catalog
     ports:
@@ -145,7 +144,7 @@ services:
     image: tlcn-spark-silver:3.5.5_1.8.1
     build: ./spark
     init: true
-    entrypoint: ["python3", "-m", "silver_v2.runner"]
+    entrypoint: ["python3", "-m", "silver.runner"]
     depends_on:
       iceberg-rest:
         condition: service_started

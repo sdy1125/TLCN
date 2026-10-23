@@ -1,4 +1,4 @@
-"""Silver V2 backfill over immutable Bronze releases."""
+"""Silver backfill over immutable Bronze releases."""
 
 import json
 import os
@@ -30,14 +30,14 @@ def _request(path, payload=None):
 
 
 @dag(
-    dag_id="silver_v2_backfill", schedule=None,
+    dag_id="silver_backfill", schedule=None,
     start_date=datetime(2026, 1, 1, tzinfo=timezone.utc), catchup=False,
-    max_active_runs=1, tags=["silver-v2", "spark", "iceberg"],
+    max_active_runs=1, tags=["silver", "spark", "iceberg"],
 )
-def silver_v2_backfill():
+def silver_backfill():
     @task
     def select():
-        from silver_v2.registry import select_datasets
+        from silver.registry import select_datasets
 
         return select_datasets(get_current_context()["dag_run"].conf.get("dataset_id"))
 
@@ -46,7 +46,7 @@ def silver_v2_backfill():
         return _request("/jobs", {
             "dataset_id": datasets,
             "run_id": get_current_context()["run_id"],
-            "pipeline": "v2",
+            "pipeline": "silver",
         })["job_id"]
 
     @task(execution_timeout=timedelta(hours=3))
@@ -56,15 +56,15 @@ def silver_v2_backfill():
             status = _request("/jobs/" + job_id)
             if status["status"] == "SUCCESS":
                 if any(item["status"] == "FAILED" for item in status.get("results", [])):
-                    raise AirflowFailException("Silver V2 dataset failed; inspect Spark job log")
+                    raise AirflowFailException("Silver dataset failed; inspect Spark job log")
                 print(json.dumps(status, ensure_ascii=False))
                 return status
             if status["status"] == "FAILED":
-                raise AirflowFailException("Silver V2 Spark job failed; inspect Spark job log")
+                raise AirflowFailException("Silver Spark job failed; inspect Spark job log")
             time.sleep(15)
-        raise AirflowFailException("Silver V2 job exceeded monitor deadline")
+        raise AirflowFailException("Silver job exceeded monitor deadline")
 
     verify(submit(select()))
 
 
-silver_v2_backfill()
+silver_backfill()

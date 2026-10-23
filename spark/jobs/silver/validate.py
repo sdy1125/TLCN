@@ -1,4 +1,4 @@
-"""Reproducible acceptance gates over the eight Silver V2 Iceberg domains."""
+"""Reproducible acceptance gates over the eight Silver Iceberg domains."""
 
 import argparse
 import json
@@ -6,17 +6,17 @@ from datetime import datetime
 
 from pyspark.sql import SparkSession, functions as F
 
-from silver_v2.domains import DOMAIN
-from silver_v2.foundation import _upsert
-from silver_v2.identity import digest
-from silver_v2.policy import current_policy_version
+from silver.domains import DOMAIN
+from silver.foundation import _upsert
+from silver.identity import digest
+from silver.policy import current_policy_version
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run-id", default="silver-v2-acceptance")
+    parser.add_argument("--run-id", default="silver-acceptance")
     args = parser.parse_args()
-    spark = (SparkSession.builder.appName("silver-v2-acceptance")
+    spark = (SparkSession.builder.appName("silver-acceptance")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     checks = []

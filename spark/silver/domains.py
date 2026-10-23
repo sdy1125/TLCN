@@ -1,4 +1,4 @@
-"""Bronze row to atomic Silver V2 observations; no canonical choice here."""
+"""Bronze row to atomic Silver observations; no canonical choice here."""
 
 import json
 import hashlib

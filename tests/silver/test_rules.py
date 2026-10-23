@@ -5,7 +5,7 @@ from collections import Counter
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
-from silver_v2.common import (
+from silver.common import (
     RowError,
     convert,
     number,
@@ -15,8 +15,8 @@ from silver_v2.common import (
     stable_id,
     country,
 )
-from silver_v2.registry import SOURCES, select_datasets
-from silver_v2.domains import target, source_district_geography_code
+from silver.registry import SOURCES, select_datasets
+from silver.domains import target, source_district_geography_code
 
 ROOT = Path(__file__).resolve().parents[2]
 

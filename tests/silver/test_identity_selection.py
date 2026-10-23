@@ -1,10 +1,10 @@
 import unittest
 
-from silver_v2.identity import observation_set_id, observation_id
-from silver_v2.selection import decide
+from silver.identity import observation_set_id, observation_id
+from silver.selection import decide
 
 
-class V2IdentitySelectionTest(unittest.TestCase):
+class IdentitySelectionTest(unittest.TestCase):
     def test_release_and_row_ids_are_stable(self):
         source_hash = "a" * 64
         first = observation_set_id("price", "2022", source_hash)

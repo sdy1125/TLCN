@@ -4,13 +4,13 @@ import json
 from openpyxl import load_workbook
 from pyspark.sql import SparkSession
 
-from silver_v2.readers import download, resolve
-from silver_v2.registry import SOURCES
-from silver_v2.identity import observation_set_id
+from silver.readers import download, resolve
+from silver.registry import SOURCES
+from silver.identity import observation_set_id
 
 
 def main():
-    spark = (SparkSession.builder.appName("silver-v2-repair-metadata")
+    spark = (SparkSession.builder.appName("silver-repair-metadata")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     repaired = {}

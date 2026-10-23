@@ -1,4 +1,4 @@
-"""Register orphaned Silver V2 Iceberg tables after a catalog reset.
+"""Register orphaned Silver Iceberg tables from the layered warehouse layout.
 
 The warehouse object copy must be verified before --apply. No data files are
 deleted or changed; this only recreates catalog pointers to existing metadata.
@@ -30,7 +30,7 @@ def main():
     tables = {}
     for obj in store.list_objects("warehouse", recursive=True):
         match = re.fullmatch(
-            r"([^/]+)/([^/]+)/metadata/(\d+)-[^/]+\.metadata\.json", obj.object_name
+            r"silver/([^/]+)/([^/]+)/metadata/(\d+)-[^/]+\.metadata\.json", obj.object_name
         )
         if not match:
             continue
@@ -44,7 +44,10 @@ def main():
     for (namespace, table), (_, path) in sorted(tables.items()):
         if [namespace] not in namespaces and args.apply:
             created = requests.post(
-                f"{endpoint}/namespaces", json={"namespace": [namespace]}, timeout=20
+                f"{endpoint}/namespaces",
+                json={"namespace": [namespace], "properties": {
+                    "location": f"s3://warehouse/silver/{namespace}"
+                }}, timeout=20
             )
             created.raise_for_status()
             namespaces.append([namespace])

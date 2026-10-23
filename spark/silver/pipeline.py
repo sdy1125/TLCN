@@ -12,19 +12,22 @@ from .registry import SOURCES
 from .domains import DOMAIN, schema, target, transform
 from .foundation import TABLES
 from .identity import digest, observation_set_id
+from .storage import WAREHOUSE_SILVER, ensure_namespace, ensure_table_location
 
 
 def _create_core(spark):
     for namespace in ("silver_stage", "silver_core"):
-        spark.sql(f"CREATE NAMESPACE IF NOT EXISTS lakehouse.{namespace}")
+        ensure_namespace(spark, namespace)
         for name in DOMAIN:
             columns = ", ".join(
                 f"`{field.name}` {field.dataType.simpleString()}" for field in schema(name)
             )
             spark.sql(
                 f"CREATE TABLE IF NOT EXISTS lakehouse.{namespace}.{name} ({columns}) "
-                "USING iceberg TBLPROPERTIES ('format-version'='2')"
+                f"USING iceberg LOCATION '{WAREHOUSE_SILVER}/{namespace}/{name}' "
+                "TBLPROPERTIES ('format-version'='2')"
             )
+            ensure_table_location(spark, namespace, name)
 
 
 def _map_partition(rows, spec, metadata, run_id, now, columns):
@@ -51,9 +54,9 @@ def _upsert_records(spark, table, rows, keys):
     frame = spark.createDataFrame(
         [tuple(row.get(name) for name in cols) for row in rows], table_schema
     )
-    frame.createOrReplaceTempView("_silver_v2_control")
+    frame.createOrReplaceTempView("_silver_control")
     on = " AND ".join(f"t.{key} <=> s.{key}" for key in keys)
-    spark.sql(f"MERGE INTO {table} t USING _silver_v2_control s ON {on} "
+    spark.sql(f"MERGE INTO {table} t USING _silver_control s ON {on} "
               "WHEN MATCHED THEN UPDATE SET * WHEN NOT MATCHED THEN INSERT *")
 
 
@@ -78,7 +81,7 @@ def run_dataset(spark, dataset, run_id):
         spark.sql(f"UPDATE lakehouse.silver_meta.observation_set SET status='PUBLISHED', "
                   f"updated_at=current_timestamp() WHERE observation_set_id='{set_id}'")
         _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_v2_backfill",
+            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
             task_id=dataset, started_at=now, finished_at=now,
             environment="docker-compose", run_status="SKIPPED",
             rows_read=0, rows_valid=existing, rows_quarantined=0,
@@ -87,7 +90,7 @@ def run_dataset(spark, dataset, run_id):
                 "observation_set_id": set_id}
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-        ingestion_run_id=run_id + ":" + dataset, dag_id="silver_v2_backfill",
+        ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
         task_id=dataset, started_at=now, environment="docker-compose",
         run_status="RUNNING")], ["ingestion_run_id"])
     transformed = None
@@ -139,9 +142,9 @@ def run_dataset(spark, dataset, run_id):
                     F.lit("ROW_FAIL").alias("severity"), F.lit(now).alias("quarantine_at"),
                     F.lit("OPEN").alias("resolution_status"), F.lit(None).cast("string").alias("resolution_note"),
                 )
-                invalid.createOrReplaceTempView("_silver_v2_quarantine")
+                invalid.createOrReplaceTempView("_silver_quarantine")
                 spark.sql("MERGE INTO lakehouse.silver_meta.quarantine_record t "
-                          "USING _silver_v2_quarantine s ON t.quarantine_id=s.quarantine_id "
+                          "USING _silver_quarantine s ON t.quarantine_id=s.quarantine_id "
                           "WHEN MATCHED THEN UPDATE SET * WHEN NOT MATCHED THEN INSERT *")
                 _upsert_records(spark, "lakehouse.silver_meta.dq_result", [dict(
                     dq_result_id=digest(run_id, dataset, "SOURCE_ROW_QUARANTINE"),
@@ -170,7 +173,7 @@ def run_dataset(spark, dataset, run_id):
                 status="PASS", sample_ref=json.dumps(result), checked_at=now)],
                 ["dq_result_id"])
             _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-                ingestion_run_id=run_id + ":" + dataset, dag_id="silver_v2_backfill",
+                ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
                 task_id=dataset, started_at=now, finished_at=datetime.utcnow(),
                 environment="docker-compose", run_status="SUCCESS",
                 rows_read=counts["input_rows"], rows_valid=valid_count,
@@ -179,7 +182,7 @@ def run_dataset(spark, dataset, run_id):
             return result
     except Exception as exc:
         _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_v2_backfill",
+            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
             task_id=dataset, started_at=now, finished_at=datetime.utcnow(),
             environment="docker-compose", run_status="FAILED", error_summary=str(exc)[:500])],
             ["ingestion_run_id"])

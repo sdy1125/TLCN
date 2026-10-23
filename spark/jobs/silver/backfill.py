@@ -1,11 +1,11 @@
-"""Backfill one or all Bronze releases into isolated Silver V2 Iceberg tables."""
+"""Backfill one or all Bronze releases into isolated Silver Iceberg tables."""
 
 import argparse
 import json
 from pyspark.sql import SparkSession
-from silver_v2.registry import select_datasets
-from silver_v2.foundation import create_tables, seed_foundation
-from silver_v2.pipeline import run_dataset
+from silver.registry import select_datasets
+from silver.foundation import create_tables, seed_foundation
+from silver.pipeline import run_dataset
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--result-file")
     args = parser.parse_args()
-    spark = (SparkSession.builder.appName("silver-v2-backfill")
+    spark = (SparkSession.builder.appName("silver-backfill")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     try:
