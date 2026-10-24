@@ -3,8 +3,8 @@
 import json
 import argparse
 from pyspark.sql import SparkSession
-from silver_v2.domains import DOMAIN
-from silver_v2.canonical import decide_domain
+from silver.domains import DOMAIN
+from silver.canonical import decide_domain
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
     parser.add_argument("--domain", action="append")
     parser.add_argument("--policy-version")
     args = parser.parse_args()
-    spark = (SparkSession.builder.appName("silver-v2-canonical")
+    spark = (SparkSession.builder.appName("silver-canonical")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     try:

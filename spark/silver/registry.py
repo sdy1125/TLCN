@@ -1,4 +1,4 @@
-"""Reviewed Bronze source definitions for the Silver V2 pipeline."""
+"""Reviewed Bronze source definitions for the Silver pipeline."""
 
 import json
 from pathlib import Path

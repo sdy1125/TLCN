@@ -1,12 +1,12 @@
-"""Create and seed V2 metadata/reference namespaces from immutable Bronze metadata."""
+"""Create and seed metadata/reference namespaces from immutable Bronze metadata."""
 
 import json
 from pyspark.sql import SparkSession
-from silver_v2.foundation import create_tables, seed_foundation
+from silver.foundation import create_tables, seed_foundation
 
 
 def main():
-    spark = (SparkSession.builder.appName("silver-v2-foundation")
+    spark = (SparkSession.builder.appName("silver-foundation")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("WARN")
     try:

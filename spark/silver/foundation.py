@@ -1,4 +1,4 @@
-"""Persistent Silver V2 metadata and reference contracts in Iceberg."""
+"""Persistent Silver metadata and reference contracts in Iceberg."""
 
 from datetime import datetime, timezone
 
@@ -6,6 +6,7 @@ from .common import GEO, RULES
 from .readers import resolve
 from .registry import SOURCES
 from .identity import observation_set_id
+from .storage import WAREHOUSE_SILVER, ensure_namespace, ensure_table_location
 
 
 TABLES = {
@@ -39,12 +40,14 @@ TABLES = {
 
 def create_tables(spark):
     for namespace, tables in TABLES.items():
-        spark.sql(f"CREATE NAMESPACE IF NOT EXISTS lakehouse.{namespace}")
+        ensure_namespace(spark, namespace)
         for table, fields in tables.items():
             spark.sql(
                 f"CREATE TABLE IF NOT EXISTS lakehouse.{namespace}.{table} ({fields}) "
-                "USING iceberg TBLPROPERTIES ('format-version'='2')"
+                f"USING iceberg LOCATION '{WAREHOUSE_SILVER}/{namespace}/{table}' "
+                "TBLPROPERTIES ('format-version'='2')"
             )
+            ensure_table_location(spark, namespace, table)
     conflict = "lakehouse.silver_meta.canonical_conflict"
     if "policy_version" not in spark.table(conflict).columns:
         spark.sql(f"ALTER TABLE {conflict} ADD COLUMN policy_version string")
@@ -58,13 +61,13 @@ def _upsert(spark, table, rows, keys):
         [tuple(row.get(name) for name in columns) for row in rows],
         spark.table(table).schema,
     )
-    data.createOrReplaceTempView("_silver_v2_seed")
+    data.createOrReplaceTempView("_silver_seed")
     condition = " AND ".join(f"t.{key} <=> s.{key}" for key in keys)
     changed = " OR ".join(f"NOT (t.{name} <=> s.{name})"
                           for name in columns if name not in keys)
     matched = f"WHEN MATCHED AND ({changed}) THEN UPDATE SET * " if changed else ""
     spark.sql(
-        f"MERGE INTO {table} t USING _silver_v2_seed s ON {condition} "
+        f"MERGE INTO {table} t USING _silver_seed s ON {condition} "
         f"{matched}WHEN NOT MATCHED THEN INSERT *"
     )
 
@@ -76,9 +79,9 @@ def _insert_missing(spark, table, rows, keys):
     columns = [field.name for field in table_schema]
     spark.createDataFrame(
         [tuple(row.get(name) for name in columns) for row in rows], table_schema
-    ).createOrReplaceTempView("_silver_v2_new_sets")
+    ).createOrReplaceTempView("_silver_new_sets")
     condition = " AND ".join(f"t.{key} <=> s.{key}" for key in keys)
-    spark.sql(f"MERGE INTO {table} t USING _silver_v2_new_sets s ON {condition} "
+    spark.sql(f"MERGE INTO {table} t USING _silver_new_sets s ON {condition} "
               "WHEN NOT MATCHED THEN INSERT *")
 
 

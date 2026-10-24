@@ -7,8 +7,8 @@ from decimal import Decimal
 import pycountry
 from pyspark.sql import SparkSession, functions as F
 
-from silver_v2.foundation import _upsert, create_tables
-from silver_v2.domains import DOMAIN
+from silver.foundation import _upsert, create_tables
+from silver.domains import DOMAIN
 
 
 def dates(kind, code):
@@ -29,7 +29,7 @@ def dates(kind, code):
 
 
 def main():
-    spark = (SparkSession.builder.appName("silver-v2-reference-seed")
+    spark = (SparkSession.builder.appName("silver-reference-seed")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     try:

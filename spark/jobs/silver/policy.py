@@ -2,11 +2,11 @@
 
 import json
 from pyspark.sql import SparkSession
-from silver_v2.policy import seed
+from silver.policy import seed
 
 
 if __name__ == "__main__":
-    spark = (SparkSession.builder.appName("silver-v2-policy")
+    spark = (SparkSession.builder.appName("silver-policy")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     try:

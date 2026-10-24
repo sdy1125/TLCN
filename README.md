@@ -176,7 +176,7 @@ The relevant variables are `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`,
 `POSTGRES_PASSWORD`, `AIRFLOW_FERNET_KEY`, `AIRFLOW_JWT_SECRET`,
 `SILVER_RUNNER_TOKEN`, and the optional Bronze schedule. Replace the
 development runner token with at least 32 random characters. A blank Bronze
-schedule keeps Bronze manual-only; Silver V2 is always manually triggered.
+schedule keeps Bronze manual-only; Silver is always manually triggered.
 
 MinIO server and `mc` are built into one local image from pinned official source
 releases because the archived public images now reject anonymous pulls. The
@@ -250,19 +250,18 @@ The tests cover manifest inventory, safe path resolution, Full Load,
 unchanged skip, changed-file Incremental Load, missing/empty/corrupt sources,
 retry safety, metadata fields, XLSX structure, and the real large NASA file.
 
-## Bronze-to-Silver V2 pipeline
+## Bronze-to-Silver pipeline
 
-Silver V2 reads the 26 immutable Bronze releases with verified SHA-256 and
+Silver reads the 26 immutable Bronze releases with verified SHA-256 and
 physical source-row lineage. It writes eight atomic Iceberg domains in
 `silver_core`, along with `silver_meta`, `silver_ref`, and `silver_stage`.
 Source-local canonical decisions are audited; unresolved conflicts have no
-winner. `silver_v2_backfill` is the only Silver DAG and `silver_core` is the
+winner. `silver_backfill` is the only Silver DAG and `silver_core` is the
 active Silver namespace. No Gold model is deployed.
 
-See the [Silver V2 runbook](docs/silver/V2_RUNBOOK.md),
-[full Silver V2 implementation summary](docs/silver/TONG_KET_XAY_DUNG_SILVER_V2.md),
-[Gold contract](docs/silver/GOLD_V2_CONTRACT.md), and
+See the [Silver runbook and storage layout](docs/silver/RUNBOOK.md),
+[implementation contract](docs/silver/SILVER_V2_IMPLEMENTATION_CONTRACT.md), and
 [migration evidence](reports/silver_v2_reconciliation.md).
 
 Use the ordered backfill, policy, canonical, acceptance, and activation
-commands in the [Silver V2 runbook](docs/silver/V2_RUNBOOK.md).
+commands in the [Silver runbook](docs/silver/RUNBOOK.md).

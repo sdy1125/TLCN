@@ -41,7 +41,7 @@ def execute(job, request):
         "/opt/spark/bin/spark-submit",
         "--master",
         "local[2]",
-        "/opt/silver/jobs/silver_v2_backfill.py",
+        "/opt/silver/jobs/silver/backfill.py",
         "--run-id",
         request["run_id"],
     ]
@@ -95,8 +95,8 @@ class Handler(BaseHTTPRequestHandler):
                 or not 1 <= len(request["run_id"]) <= 500
             ):
                 raise ValueError()
-            pipeline = request.get("pipeline", "v2")
-            if pipeline != "v2":
+            pipeline = request.get("pipeline", "silver")
+            if pipeline != "silver":
                 raise ValueError()
             request = {
                 "run_id": request["run_id"],

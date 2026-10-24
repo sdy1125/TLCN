@@ -1,4 +1,4 @@
-"""Activate a validated Silver V2 batch with an auditable consumer pointer."""
+"""Activate a validated Silver batch with an auditable consumer pointer."""
 
 import argparse
 import json
@@ -6,15 +6,15 @@ from datetime import datetime
 
 from pyspark.sql import SparkSession, functions as F
 
-from silver_v2.domains import DOMAIN
-from silver_v2.policy import current_policy_version
+from silver.domains import DOMAIN
+from silver.policy import current_policy_version
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--batch-id", required=True)
     args = parser.parse_args()
-    spark = (SparkSession.builder.appName("silver-v2-activate")
+    spark = (SparkSession.builder.appName("silver-activate")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
     spark.sparkContext.setLogLevel("ERROR")
     try:
@@ -22,7 +22,7 @@ def main():
         rows = spark.table(table).filter(F.col("batch_id") == args.batch_id).collect()
         if len(rows) != 1 or rows[0]["status"] not in {
                 "READY_WITH_EXCEPTIONS", "ACTIVE_WITH_EXCEPTIONS"}:
-            raise ValueError("Batch has not passed the V2 publish gate")
+            raise ValueError("Batch has not passed the publish gate")
         batch = rows[0]
         if batch["policy_version"] != current_policy_version(spark):
             raise ValueError("Canonical policy changed after batch preparation")
@@ -37,7 +37,7 @@ def main():
             raise ValueError("Business exceptions changed after batch preparation")
         snapshots = json.loads(batch["domain_snapshots_json"])
         if set(snapshots) != set(DOMAIN):
-            raise ValueError("Batch does not cover every V2 domain")
+            raise ValueError("Batch does not cover every domain")
         for domain in DOMAIN:
             name = f"lakehouse.silver_core.{domain}"
             current = spark.sql(
