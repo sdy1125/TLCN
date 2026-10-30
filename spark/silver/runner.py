@@ -41,13 +41,18 @@ def execute(job, request):
         "/opt/spark/bin/spark-submit",
         "--master",
         "local[2]",
-        "/opt/silver/jobs/silver/backfill.py",
-        "--run-id",
-        request["run_id"],
     ]
-    cmd += ["--result-file", str(directory / "results.json")]
-    for dataset in request["datasets"]:
-        cmd += ["--dataset-id", dataset]
+    if request["pipeline"] == "gold":
+        stages = {"inspect_input", "foundation", "dimensions", "facts", "publish"}
+        stage = request["stage"]
+        if stage not in stages:
+            raise ValueError("Invalid Gold stage")
+        cmd += [f"/opt/silver/jobs/gold/{stage}.py"]
+    else:
+        cmd += ["/opt/silver/jobs/silver/backfill.py", "--run-id", request["run_id"]]
+        cmd += ["--result-file", str(directory / "results.json")]
+        for dataset in request["datasets"]:
+            cmd += ["--dataset-id", dataset]
     code = 1
     try:
         with (directory / "spark.log").open("w") as log:
@@ -96,13 +101,20 @@ class Handler(BaseHTTPRequestHandler):
             ):
                 raise ValueError()
             pipeline = request.get("pipeline", "silver")
-            if pipeline != "silver":
+            if pipeline not in {"silver", "gold"}:
                 raise ValueError()
-            request = {
-                "run_id": request["run_id"],
-                "datasets": select_datasets(request.get("dataset_id")),
-                "pipeline": pipeline,
-            }
+            if pipeline == "gold":
+                stage = request.get("stage")
+                if stage not in {"inspect_input", "foundation", "dimensions", "facts", "publish"}:
+                    raise ValueError()
+                request = {"run_id": request["run_id"], "stage": stage,
+                           "pipeline": "gold"}
+            else:
+                request = {
+                    "run_id": request["run_id"],
+                    "datasets": select_datasets(request.get("dataset_id")),
+                    "pipeline": pipeline,
+                }
         except (ValueError, TypeError, KeyError):
             return self.reply(400, {"error": "invalid_request"})
         job = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()

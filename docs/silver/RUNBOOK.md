@@ -2,18 +2,17 @@
 
 ## Contract and migration status
 
-The [migration plan](SILVER_V2_IMPLEMENTATION_CONTRACT.md) defines the Silver handoff. The code uses `silver_backfill` and a catalog whose tables reside under `warehouse/silver/`. On 2026-10-23 all 26 Bronze releases were loaded into eight atomic `silver_core` tables with matching `silver_stage` rows.
+The [migration plan](SILVER_V2_IMPLEMENTATION_CONTRACT.md) defines the Silver handoff. The code uses `silver_backfill` and a catalog whose tables reside under `warehouse/silver/`. On 2026-10-30 all 26 Bronze releases were rebuilt into eight atomic `silver_core` tables with matching `silver_stage` rows.
 
-The current batch `silver-layout-20261023` is `ACTIVE_WITH_EXCEPTIONS`, with eight core snapshot IDs and policy `source-local-v5-992e430e8b92da39`. DQ recorded 52 PASS and two known WARN; all 21 Gold input smoke checks passed. A Gold model has not been deployed.
+The current batch `silver-layered-20261030-1650` is `ACTIVE_WITH_EXCEPTIONS`, with eight core snapshot IDs and policy `source-local-v5-3cb854afd9b7f156`. DQ recorded 52 PASS and two known WARN; all 21 Gold input smoke checks passed. Gold is published separately; see `reports/gold/`.
 
 ## Storage layout
 
 Bronze continues to use the separate `bronze` bucket. The `warehouse` bucket
 holds Iceberg tables under `silver/silver_core/`, `silver/silver_stage/`,
-`silver/silver_meta/`, and `silver/silver_ref/`. The `gold/` prefix is reserved
-for future Gold tables; no Gold table is deployed. The corresponding code is
-under `spark/silver/` and `spark/jobs/silver/`; `spark/gold/` and
-`spark/jobs/gold/` currently contain only placeholders.
+`silver/silver_meta/`, and `silver/silver_ref/`. The `gold/` prefix contains
+published Gold Iceberg tables. Silver code is under `spark/silver/` and
+`spark/jobs/silver/`; Gold code is under `spark/gold/` and `spark/jobs/gold/`.
 
 ## Run and verify
 
@@ -66,6 +65,6 @@ The rebuilt `warehouse` bucket has versioning enabled, and Compose enables it at
 
 The failed Airflow run at 2026-10-22 13:21 UTC reported `Location does not exist` for `s3://warehouse/silver_meta/dataset_registry/metadata/...metadata.json`; the entire warehouse was empty. Recovery loaded all 26 Bronze releases, rebuilt canonical and references, passed 54 DQ checks (52 PASS, two known WARN) and 21 Gold input checks, and activated `silver-recovered-20261022`. A WDI-only DAG run and a full 26-dataset DAG run without configuration both finished `success` after recovery.
 
-In the MinIO Console, refresh `warehouse` to see `silver/silver_*` after the new backfill. MinIO may still list empty top-level `silver_*` prefixes; they have no current objects or versions and are not table locations. In Airflow, trigger `silver_backfill` with no configuration to check all 26 latest Bronze releases, or provide `{"dataset_id":"world_bank_wdi"}` to check one source. Existing releases return `SKIPPED` by design. When a new Bronze release exists, follow the ordered policy, canonical, DQ and activation steps above after backfill.
+In the MinIO Console, refresh `warehouse` to see only `silver/` and `gold/` at the bucket root. The obsolete top-level `silver_*` prefixes were removed after the 2026-10-30 layered rebuild passed publication checks. In Airflow, trigger `silver_backfill` with no configuration to check all 26 latest Bronze releases, or provide `{"dataset_id":"world_bank_wdi"}` to check one source. Existing releases return `SKIPPED` by design. When a new Bronze release exists, follow the ordered policy, canonical, DQ and activation steps above after backfill.
 
 The Iceberg REST fixture uses a persistent SQLite volume with WAL and a busy timeout. Keep the `iceberg-catalog` and MinIO named volumes when recreating containers. Compose publishes MinIO, Trino, Iceberg REST and Airflow only on localhost. `.env` currently holds development credentials; rotate MinIO, PostgreSQL, Airflow JWT/admin and runner token before exposing the stack beyond the local host. PostgreSQL rotation must update the initialized database role and matching Compose value together. A production deployment should replace the single-node SQLite REST fixture with a supported durable catalog and protect its credentials and backups.
