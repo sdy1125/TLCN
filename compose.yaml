@@ -32,6 +32,7 @@ x-airflow-common: &airflow-common
     BRONZE_MANIFEST_PATH: /opt/airflow/data/raw_manifest.csv
     BRONZE_RAW_ROOT: /opt/airflow/data/raw
     BRONZE_DAG_SCHEDULE: ${BRONZE_DAG_SCHEDULE:-}
+    LAKEHOUSE_RELEASE_SCHEDULE: ${LAKEHOUSE_RELEASE_SCHEDULE:-@daily}
     SILVER_RUNNER_URL: http://spark-iceberg:8090
     SILVER_RUNNER_TOKEN: ${SILVER_RUNNER_TOKEN:-local-development-silver-runner-token-change-me}
     PYTHONPATH: /opt/airflow/include:/opt/silver
@@ -129,6 +130,7 @@ services:
       AWS_REGION: us-east-1
       CATALOG_WAREHOUSE: s3://warehouse/
       CATALOG_IO__IMPL: org.apache.iceberg.aws.s3.S3FileIO
+      CATALOG_CACHE__ENABLED: "false"
       CATALOG_S3_ENDPOINT: http://minio:9000
       # Silver and Gold use the layered warehouse layout.
       CATALOG_URI: jdbc:sqlite:/catalog/iceberg-layered-20261023.db?journal_mode=WAL&busy_timeout=10000

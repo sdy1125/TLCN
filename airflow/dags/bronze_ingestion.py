@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import hashlib
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 
@@ -18,6 +19,8 @@ from bronze_ingestion import (
     validate_manifest_rows,
 )
 from bronze_ingestion.manifest import read_manifest_rows
+from bronze_ingestion.handoff import verify_handoff
+from bronze_ingestion.release import create_release
 
 LOGGER = logging.getLogger(__name__)
 MANIFEST_PATH = os.environ.get(
@@ -54,11 +57,14 @@ def bronze_ingestion():
     def validate_manifest(rows: list[dict[str, str]]) -> list[dict[str, object]]:
         sources = validate_manifest_rows(rows)
         enabled = [source for source in sources if source.enabled]
+        verified_handoff = verify_handoff(
+            RAW_ROOT, [source.to_dict() for source in enabled])
         LOGGER.info(
-            "Validated local raw manifest configured=%s enabled=%s raw_root=%s",
+            "Validated local raw manifest configured=%s enabled=%s raw_root=%s drive_handoff=%s",
             len(sources),
             len(enabled),
             RAW_ROOT,
+            verified_handoff,
         )
         return [source.to_dict() for source in enabled]
 
@@ -128,6 +134,20 @@ def bronze_ingestion():
             raise RuntimeError(f"Bronze ingestion completed with failures: {summary}")
         if len(records) != len(expected):
             raise RuntimeError(f"Bronze ingestion result count mismatch: {summary}")
+        all_sources = [source for source in validate_manifest_rows(
+            read_manifest_rows(MANIFEST_PATH)) if source.enabled]
+        conf = context["dag_run"].conf or {}
+        publish_release = conf.get("publish_release", len(expected) == len(all_sources))
+        if not isinstance(publish_release, bool):
+            raise ValueError("publish_release must be a boolean")
+        if publish_release:
+            release_id = conf.get("release_id") or (
+                "bronze-" + hashlib.sha256(run_id.encode()).hexdigest()[:24])
+            release = create_release(
+                build_minio_client(), BRONZE_BUCKET,
+                [source.dataset_id for source in all_sources], release_id)
+            summary["release_id"] = release_id
+            summary["release_fingerprint"] = release["fingerprint"]
         return summary
 
     rows = load_manifest()

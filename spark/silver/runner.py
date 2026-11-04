@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import signal
+import re
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -33,6 +34,19 @@ def authorized(header, token):
     return hmac.compare_digest(header[7:], token)
 
 
+def gold_input_matches(log_path, expected_batch_id):
+    records = []
+    for line in Path(log_path).read_text().splitlines():
+        if not line.startswith("{") or '"silver_batch_id"' not in line:
+            continue
+        try:
+            records.append(json.loads(line))
+        except json.JSONDecodeError:
+            return False
+    return (len(records) == 1 and
+            records[0].get("silver_batch_id") == expected_batch_id)
+
+
 def execute(job, request):
     directory = ROOT / job
     directory.mkdir(parents=True, exist_ok=True)
@@ -42,6 +56,7 @@ def execute(job, request):
         "--master",
         "local[2]",
     ]
+    environment = os.environ.copy()
     if request["pipeline"] == "gold":
         stages = {"inspect_input", "foundation", "dimensions", "facts", "publish"}
         stage = request["stage"]
@@ -55,6 +70,27 @@ def execute(job, request):
             actual = "inspect" if stage == "inspect_input" else stage
             cmd += ["/opt/silver/jobs/gold/candidate.py", "--stage", actual,
                     "--manifest-id", manifest_id]
+    elif request["pipeline"] == "silver_release":
+        stage = request["stage"]
+        scripts = {
+            "foundation": "foundation.py", "backfill": "backfill.py",
+            "repair_metadata": "repair_metadata.py", "refs": "refs.py",
+            "policy": "policy.py", "canonical": "canonical.py",
+            "validate": "validate.py", "gold_smoke": "gold_contract_smoke.py",
+            "prepare": "prepare_publish.py", "activate": "activate.py",
+        }
+        cmd += [f"/opt/silver/jobs/silver/{scripts[stage]}"]
+        environment["BRONZE_RELEASE_ID"] = request["bronze_release_id"]
+        if stage == "backfill":
+            cmd += ["--run-id", request["run_id"],
+                    "--result-file", str(directory / "results.json")]
+        elif stage == "validate":
+            cmd += ["--run-id", request["dq_run_id"]]
+        elif stage == "prepare":
+            cmd += ["--batch-id", request["batch_id"],
+                    "--dq-run-id", request["dq_run_id"]]
+        elif stage == "activate":
+            cmd += ["--batch-id", request["batch_id"]]
     else:
         cmd += ["/opt/silver/jobs/silver/backfill.py", "--run-id", request["run_id"]]
         cmd += ["--result-file", str(directory / "results.json")]
@@ -64,7 +100,8 @@ def execute(job, request):
     try:
         with (directory / "spark.log").open("w") as log:
             process = subprocess.Popen(
-                cmd, stdout=log, stderr=subprocess.STDOUT, start_new_session=True
+                cmd, stdout=log, stderr=subprocess.STDOUT, start_new_session=True,
+                env=environment,
             )
             try:
                 code = process.wait(timeout=7200)
@@ -72,6 +109,14 @@ def execute(job, request):
                 os.killpg(process.pid, signal.SIGKILL)
                 process.wait()
                 code = 124
+        if (code == 0 and request["pipeline"] == "gold" and
+                request["stage"] == "inspect_input" and
+                request.get("expected_silver_batch_id")):
+            if not gold_input_matches(
+                    directory / "spark.log", request["expected_silver_batch_id"]):
+                with (directory / "spark.log").open("a") as log:
+                    log.write("Gold inspected a different Silver batch\n")
+                code = 1
     finally:
         temporary = directory / "exit.tmp"
         temporary.write_text(json.dumps({"exit_code": code}))
@@ -108,19 +153,45 @@ class Handler(BaseHTTPRequestHandler):
             ):
                 raise ValueError()
             pipeline = request.get("pipeline", "silver")
-            if pipeline not in {"silver", "gold"}:
+            if pipeline not in {"silver", "silver_release", "gold"}:
                 raise ValueError()
             if pipeline == "gold":
                 stage = request.get("stage")
                 if stage not in {"inspect_input", "foundation", "dimensions", "facts", "publish"}:
                     raise ValueError()
                 manifest_id = request.get("manifest_id")
+                expected = request.get("expected_silver_batch_id")
                 if not isinstance(manifest_id, str):
                     raise ValueError()
                 from gold.candidate import validate_id
                 validate_id(manifest_id)
+                if expected is not None and (
+                        not isinstance(expected, str) or
+                        not re.fullmatch(r"silver-[a-z0-9][a-z0-9_-]{2,95}", expected)):
+                    raise ValueError()
                 request = {"run_id": request["run_id"], "stage": stage,
-                           "manifest_id": manifest_id, "pipeline": "gold"}
+                           "manifest_id": manifest_id, "pipeline": "gold",
+                           "expected_silver_batch_id": expected}
+            elif pipeline == "silver_release":
+                stage = request.get("stage")
+                if stage not in {"foundation", "backfill", "repair_metadata",
+                                 "refs", "policy", "canonical", "validate",
+                                 "gold_smoke", "prepare", "activate"}:
+                    raise ValueError()
+                release_id = request.get("bronze_release_id")
+                batch_id = request.get("batch_id")
+                dq_run_id = request.get("dq_run_id")
+                if (not isinstance(release_id, str) or
+                        not re.fullmatch(r"bronze-[a-z0-9][a-z0-9_-]{2,95}", release_id) or
+                        not isinstance(batch_id, str) or
+                        not re.fullmatch(r"silver-[a-z0-9][a-z0-9_-]{2,95}", batch_id) or
+                        not isinstance(dq_run_id, str) or
+                        not re.fullmatch(r"silver-dq-[a-z0-9][a-z0-9_-]{2,95}", dq_run_id)):
+                    raise ValueError()
+                request = {"pipeline": "silver_release", "stage": stage,
+                           "run_id": request["run_id"],
+                           "bronze_release_id": release_id,
+                           "batch_id": batch_id, "dq_run_id": dq_run_id}
             else:
                 request = {
                     "run_id": request["run_id"],

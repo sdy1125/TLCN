@@ -28,6 +28,28 @@ def dates(kind, code):
     raise ValueError((kind, code))
 
 
+def unique_geographies(rows):
+    """Keep one source label per official geography key for Iceberg MERGE.
+
+    Different source files may spell the same province differently.  The
+    administrative code and hierarchy are authoritative; the label is only
+    descriptive.  Conflicting hierarchy must be reviewed rather than merged.
+    """
+    unique = {}
+    for row in rows:
+        key = (row["geography_code"], row["geography_version"])
+        previous = unique.get(key)
+        if previous is None:
+            unique[key] = row
+            continue
+        for field in ("geography_level", "province_code", "district_code", "parent_code"):
+            if previous.get(field) != row.get(field):
+                raise ValueError(f"Conflicting geography hierarchy for {key}: {field}")
+        if (row.get("geography_name") or "") < (previous.get("geography_name") or ""):
+            unique[key] = row
+    return list(unique.values())
+
+
 def main():
     spark = (SparkSession.builder.appName("silver-reference-seed")
              .config("spark.sql.session.timeZone", "UTC").getOrCreate())
@@ -118,7 +140,7 @@ def main():
                                  province_code=r[2], district_code=None,
                                  parent_code=r[2]) for r in districts if r[3]]
         _upsert(spark, "lakehouse.silver_ref.geography",
-                province_members + district_members,
+                unique_geographies(province_members + district_members),
                 ["geography_code", "geography_version"])
         pending = [dict(source_dataset=r[0], raw_name=r[1], raw_code=r[2],
                         normalized_name=r[1], geography_code=r[3], confidence=0.0,

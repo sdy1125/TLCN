@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`airflow/dags/` contains Bronze ingestion, `silver_backfill`, and `gold_build`; reusable Bronze code lives in `airflow/include/bronze_ingestion/`. Silver parsers, contracts, selection rules, and Iceberg logic are in `spark/silver/`, with runnable entrypoints in `spark/jobs/silver/`. Gold candidate, scope, DQ, publication and semantic-view code lives in `spark/gold/` and `spark/jobs/gold/`. `data/raw_manifest.csv` lists the 26 source files under `data/raw/`. Tests are in `tests/`, operational guidance is in `docs/silver/` and `docs/gold/`, and reconciliation evidence is in `reports/`. Local services are configured in `compose.yaml`, `minio/`, and `trino/etc/`.
+`airflow/dags/` contains Bronze ingestion, `silver_release`, `gold_build`, and the ordered `lakehouse_release` workflow; `silver_backfill` remains available for targeted repair. Reusable Bronze code lives in `airflow/include/bronze_ingestion/`. Silver parsers, contracts, selection rules, and Iceberg logic are in `spark/silver/`, with runnable entrypoints in `spark/jobs/silver/`. Gold candidate, scope, DQ, publication and semantic-view code lives in `spark/gold/` and `spark/jobs/gold/`. `data/raw_manifest.csv` lists the 26 source files under `data/raw/`. Tests are in `tests/`, operational guidance is in `docs/silver/` and `docs/gold/`, and reconciliation evidence is in `reports/`. Local services are configured in `compose.yaml`, `minio/`, and `trino/etc/`.
 
 ## Build, Test & Development Commands
 
@@ -17,7 +17,7 @@ PYTHONPYCACHEPREFIX=/tmp/tlcn-pycache python3 -m compileall -q spark airflow/dag
 docker compose exec -T airflow-apiserver airflow dags list-import-errors
 ```
 
-For a Silver release, follow the ordered backfill, quality, publish, and activation commands in `docs/silver/RUNBOOK.md`; use unique run and batch IDs.
+For a full release, trigger `lakehouse_release`; for manual repair, follow the ordered commands in `docs/silver/RUNBOOK.md` and use unique run and batch IDs. Read `docs/PIPELINE_RELEASE_AUDIT_20261104.md` before claiming production readiness.
 
 ## Coding Style & Naming Conventions
 

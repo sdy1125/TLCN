@@ -35,18 +35,44 @@ def snapshot_at_activation(spark, name, activated_at):
 
 def resolve(spark):
     """Fail closed if the published Silver snapshot set cannot be reproduced."""
-    rows = (spark.table("lakehouse.silver_meta.publish_batch")
-            .filter(F.col("status").isin("ACTIVE", "ACTIVE_WITH_EXCEPTIONS"))
-            .orderBy(F.col("activated_at").desc()).limit(2).collect())
+    pointer = "lakehouse.silver_meta.publication_pointer"
+    pointed = (spark.table(pointer).filter("pointer_id='silver'").collect()
+               if spark.catalog.tableExists(pointer) else [])
+    if len(pointed) > 1:
+        raise RuntimeError("Multiple Silver publication pointers")
+    if pointed:
+        rows = spark.table("lakehouse.silver_meta.publish_batch").filter(
+            F.col("batch_id") == pointed[0]["active_batch_id"]).collect()
+    else:
+        rows = (spark.table("lakehouse.silver_meta.publish_batch")
+                .filter(F.col("status").isin("ACTIVE", "ACTIVE_WITH_EXCEPTIONS"))
+                .orderBy(F.col("activated_at").desc()).limit(2).collect())
     if len(rows) != 1:
         raise RuntimeError(f"Expected one active Silver batch, found {len(rows)}")
     batch = rows[0].asDict()
-    if batch["activated_at"] is None:
+    if batch["activated_at"] is None and not batch.get("release_manifest_json"):
         raise RuntimeError("Active Silver batch has no activation timestamp")
     published = json.loads(batch["domain_snapshots_json"])
     if set(published) != set(DOMAIN):
         raise RuntimeError("Silver publish manifest does not cover all eight domains")
     snapshots = {}
+    if batch.get("release_manifest_json"):
+        from silver.publication import verify_manifest
+        manifest = verify_manifest(json.loads(batch["release_manifest_json"]))
+        if manifest["batch_id"] != batch["batch_id"] or (
+                manifest["policy_version"] != batch["policy_version"]):
+            raise RuntimeError("Silver release manifest identity mismatch")
+        snapshots = manifest["input_snapshots"]
+        for domain in DOMAIN:
+            table = f"lakehouse.silver_core.{domain}"
+            if snapshots.get(table) != int(published[domain]["snapshot_id"]):
+                raise RuntimeError(f"Silver core snapshot mismatch: {domain}")
+        required = {
+            *(f"lakehouse.silver_ref.{name}" for name in REFERENCE_TABLES),
+            *(f"lakehouse.silver_meta.{name}" for name in META_TABLES)}
+        if any(not snapshots.get(name) for name in required):
+            raise RuntimeError("Silver release lacks Gold reference snapshots")
+        return batch, snapshots
     for domain in DOMAIN:
         table = f"lakehouse.silver_core.{domain}"
         snapshot = int(published[domain]["snapshot_id"])

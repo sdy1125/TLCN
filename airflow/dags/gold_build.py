@@ -30,17 +30,29 @@ def _request(path, payload=None):
 
 @dag(dag_id="gold_build", schedule=None,
      start_date=datetime(2026, 1, 1, tzinfo=timezone.utc), catchup=False,
-     max_active_runs=1, tags=["gold", "spark", "iceberg"])
+     max_active_runs=1, default_args={"retries": 2,
+                                      "retry_delay": timedelta(minutes=2)},
+     tags=["gold", "spark", "iceberg"])
 def gold_build():
-    @task(execution_timeout=timedelta(hours=3))
+    @task(execution_timeout=timedelta(hours=3), retries=2,
+          retry_delay=timedelta(minutes=2))
     def run_stage(stage):
         context = get_current_context()
         run_id = f"{context['run_id']}:{stage}:{context['ti'].try_number}"
         manifest_id = "gold-" + hashlib.sha256(
             context["run_id"].encode()).hexdigest()[:24]
-        job_id = _request("/jobs", {"pipeline": "gold", "stage": stage,
-                                    "run_id": run_id,
-                                    "manifest_id": manifest_id})["job_id"]
+        expected = (context["dag_run"].conf or {}).get("expected_silver_batch_id")
+        if context["run_id"].startswith("pipeline-gold-"):
+            silver_run = "pipeline-silver-" + context["run_id"][len("pipeline-gold-"):]
+            derived = "silver-" + hashlib.sha256(silver_run.encode()).hexdigest()[:24]
+            if expected and expected != derived:
+                raise AirflowFailException("Gold expected Silver batch ID mismatch")
+            expected = derived
+        request = {"pipeline": "gold", "stage": stage, "run_id": run_id,
+                   "manifest_id": manifest_id}
+        if expected:
+            request["expected_silver_batch_id"] = expected
+        job_id = _request("/jobs", request)["job_id"]
         deadline = time.monotonic() + 7500
         while time.monotonic() < deadline:
             result = _request("/jobs/" + job_id)

@@ -10,6 +10,8 @@ from silver.domains import DOMAIN
 from silver.foundation import _upsert
 from silver.identity import digest
 from silver.policy import current_policy_version
+from silver.dq_contract import required_checks
+from silver.registry import SOURCES
 
 
 def main():
@@ -28,19 +30,29 @@ def main():
             checked_count=int(checked), failed_count=int(failed), threshold=float(threshold),
             status="FAIL" if severity == "BLOCK" and failed > threshold else
                    "WARN" if failed else "PASS",
-            checked_at=datetime.utcnow(),
+            checked_at=datetime.utcnow(), policy_version=policy_version,
         ))
 
     try:
         policy_version = current_policy_version(spark)
         sets = spark.table("lakehouse.silver_meta.observation_set")
         registry = spark.table("lakehouse.silver_meta.dataset_registry")
-        record("silver_meta.observation_set", "PUBLISHED_SET_COUNT", 26,
-               abs(26 - sets.filter("status='PUBLISHED'").count()))
-        record("silver_meta.observation_set", "SOURCE_RECORD_COUNT_PRESENT", 26,
-               sets.filter("source_record_count IS NULL").count())
-        record("silver_meta.dataset_registry", "REGISTRY_COUNT", 26,
-               abs(26 - registry.count()))
+        expected = spark.createDataFrame(
+            [(name,) for name in SOURCES], "dataset_id string")
+        registered = registry.select("dataset_id").distinct()
+        published = sets.filter("status='PUBLISHED'")
+        published_ids = published.select("dataset_id").distinct()
+        registry_drift = (expected.join(registered, "dataset_id", "left_anti").count()
+                          + registered.join(expected, "dataset_id", "left_anti").count())
+        published_drift = (registered.join(published_ids, "dataset_id", "left_anti").count()
+                           + published_ids.join(registered, "dataset_id", "left_anti").count())
+        record("silver_meta.observation_set", "PUBLISHED_SET_COUNT",
+               registered.count(), published_drift)
+        record("silver_meta.observation_set", "SOURCE_RECORD_COUNT_PRESENT",
+               published.count(), published.filter(
+                   "source_record_count IS NULL").count())
+        record("silver_meta.dataset_registry", "REGISTRY_COUNT",
+               len(SOURCES), registry_drift)
         observed_set_ids = []
         decisions = spark.table("lakehouse.silver_meta.canonical_decision").filter(
             F.col("policy_version") == policy_version)
@@ -104,9 +116,13 @@ def main():
         sentinel = weather.filter(" OR ".join(f"{name}=-999" for name in names)).count()
         record("silver_core.weather_daily", "NO_SENTINEL_IN_MEASURES", weather.count(), sentinel)
         macro = spark.table("lakehouse.silver_core.macro_indicator_observation")
-        missing_wdi = macro.filter("value_status='MISSING'").count()
-        record("silver_core.macro_indicator_observation", "SOURCE_NULLS_RETAINED", 138,
-               abs(138 - missing_wdi))
+        null_mismatch = macro.filter(
+            (F.col("value_status").eqNullSafe(F.lit("MISSING")) !=
+             F.col("indicator_value_native").isNull()) |
+            (F.col("indicator_value_native").isNull() &
+             F.col("indicator_value_canonical").isNotNull())).count()
+        record("silver_core.macro_indicator_observation", "SOURCE_NULLS_RETAINED",
+               macro.count(), null_mismatch)
         multiple_winners = decisions.filter("decision_status='WINNER'")\
             .groupBy("business_process", "canonical_business_key")\
             .count().filter("count>1").count()
@@ -116,8 +132,17 @@ def main():
             (F.col("resolution_status") == "OPEN") &
             (F.col("business_process") == "price_observation") &
             (F.col("policy_version") == policy_version)).count()
-        record("silver_meta.canonical_conflict", "OPEN_PRICE_CONFLICTS", 6, conflicts,
+        record("silver_meta.canonical_conflict", "OPEN_PRICE_CONFLICTS", conflicts, conflicts,
                severity="WARN")
+        open_keys = spark.table("lakehouse.silver_meta.canonical_conflict").filter(
+            (F.col("resolution_status") == "OPEN") &
+            (F.col("policy_version") == policy_version)
+        ).select("business_process", "canonical_business_key").distinct()
+        winner_keys = decisions.filter("decision_status='WINNER'").select(
+            "business_process", "canonical_business_key").distinct()
+        record("silver_meta.canonical_conflict", "OPEN_CONFLICT_NO_WINNER",
+               open_keys.count(), open_keys.join(
+                   winner_keys, ["business_process", "canonical_business_key"]).count())
         district = spark.table("lakehouse.silver_core.provincial_agri_observation")\
             .filter("geography_level='DISTRICT'")
         district_count = district.count()
@@ -134,6 +159,8 @@ def main():
             F.col("geography_code").startswith("SRC_DISTRICT_")).count()
         record("silver_ref.geography_alias", "PENDING_OFFICIAL_DISTRICT_MAPPING",
                district_count, source_scoped, severity="WARN")
+        if {(x["object_name"], x["rule_code"]) for x in checks} != required_checks():
+            raise RuntimeError("Silver DQ implementation omitted a required rule")
         _upsert(spark, "lakehouse.silver_meta.dq_result", checks, ["dq_result_id"])
         print(json.dumps({"policy_version": policy_version, "checks": checks, "block_failures":
                           sum(x["status"] == "FAIL" for x in checks)},

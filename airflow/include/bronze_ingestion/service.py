@@ -11,6 +11,7 @@ import os
 import re
 import uuid
 import zipfile
+from urllib.parse import urlparse
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -173,6 +174,7 @@ class IngestionService:
 
             prior_version = self._read_json_if_exists(checksum_key)
             if prior_version is not None:
+                self._verify_reusable_version(source, profile, prior_version)
                 if prior_version.get("ingestion_id") == ingestion_id:
                     self._write_json(
                         _latest_success_key(source.dataset_id), prior_version
@@ -189,19 +191,25 @@ class IngestionService:
                     )
                     return prior_version
 
-                record.change_state = "UNCHANGED"
+                restored = (latest is not None and
+                            latest.get("checksum_sha256") != profile.checksum_sha256)
+                record.change_state = "RESTORED" if restored else "UNCHANGED"
                 record.load_type = "INCREMENTAL"
                 record.status = "SKIPPED"
                 record.bronze_path = _optional_string(
                     prior_version.get("bronze_path")
                 )
+                if restored:
+                    self._write_json(_latest_success_key(source.dataset_id),
+                                     prior_version)
                 self._record_result(record)
                 LOGGER.info(
                     "bronze_ingestion event=COMPLETE dataset_id=%s source_path=%s "
-                    "state=UNCHANGED load_type=INCREMENTAL status=SKIPPED "
+                    "state=%s load_type=INCREMENTAL status=SKIPPED "
                     "bronze_path=%s checksum=%s",
                     source.dataset_id,
                     source.relative_path,
+                    record.change_state,
                     record.bronze_path,
                     profile.checksum_sha256,
                 )
@@ -266,6 +274,26 @@ class IngestionService:
                 record.error_message,
             )
             raise
+
+    def _verify_reusable_version(self, source, profile, prior):
+        """Do not point at a missing or tampered immutable Bronze object."""
+        uri = urlparse(str(prior.get("bronze_path") or ""))
+        if (prior.get("status") != "SUCCESS" or
+                prior.get("dataset_id") != source.dataset_id or
+                prior.get("checksum_sha256") != profile.checksum_sha256 or
+                uri.scheme != "s3" or uri.netloc != self.bucket or
+                not uri.path.lstrip("/") or uri.query or uri.fragment):
+            raise IngestionError("Invalid prior Bronze version metadata")
+        response = self.client.get_object(self.bucket, uri.path.lstrip("/"))
+        checksum = hashlib.sha256()
+        try:
+            while chunk := response.read(_CHUNK_SIZE):
+                checksum.update(chunk)
+        finally:
+            response.close()
+            response.release_conn()
+        if checksum.hexdigest() != profile.checksum_sha256:
+            raise IngestionError("Prior Bronze object checksum mismatch")
 
     def _copy_object(self, source_key: str, destination_key: str) -> None:
         from minio.commonconfig import CopySource

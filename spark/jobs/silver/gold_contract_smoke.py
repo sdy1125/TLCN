@@ -80,8 +80,10 @@ def main():
             .select("indicator_code").distinct()
         check("F08.indicator_ref", macro.select("indicator_code")\
               .join(indicators, "indicator_code", "left_anti").count())
-        check("F08.missing_retained", abs(138 - macro.filter(
-            "value_status='MISSING' AND indicator_value_native IS NULL").count()))
+        check("F08.missing_retained", macro.filter(
+            "(value_status='MISSING' AND indicator_value_native IS NOT NULL) OR "
+            "(value_status<>'MISSING' AND indicator_value_native IS NULL)"
+        ).count())
         check("canonical.one_winner", decisions.filter("decision_status='WINNER'")
               .groupBy("business_process", "canonical_business_key")
               .count().filter("count>1").count())

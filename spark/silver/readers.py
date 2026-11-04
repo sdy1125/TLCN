@@ -27,17 +27,47 @@ def client():
     )
 
 
+def release_manifest(release_id=None, connection=None):
+    release_id = release_id or os.environ.get("BRONZE_RELEASE_ID")
+    if not release_id:
+        return None
+    if not re.fullmatch(r"bronze-[a-z0-9][a-z0-9_-]{2,95}", release_id):
+        raise ValueError("Invalid Bronze release ID")
+    c = connection or client()
+    bucket = os.environ.get("BRONZE_BUCKET", "bronze")
+    response = c.get_object(bucket, f"_metadata/releases/{release_id}.json")
+    try:
+        manifest = json.load(response)
+    finally:
+        response.close()
+        response.release_conn()
+    sources = manifest.get("sources")
+    if (manifest.get("release_id") != release_id or
+            not isinstance(sources, dict) or
+            manifest.get("source_count") != len(sources) or
+            set(sources) != set(SOURCES)):
+        raise ValueError("Incomplete Bronze release manifest")
+    payload = json.dumps(sources, sort_keys=True, separators=(",", ":")).encode()
+    if hashlib.sha256(payload).hexdigest() != manifest.get("fingerprint"):
+        raise ValueError("Bronze release manifest checksum mismatch")
+    return manifest
+
+
 def resolve(dataset, connection=None):
     if dataset not in SOURCES:
         raise ValueError("Unknown dataset")
     c = connection or client()
     bucket = os.environ.get("BRONZE_BUCKET", "bronze")
-    response = c.get_object(bucket, f"_metadata/latest_success/{dataset}.json")
-    try:
-        m = json.load(response)
-    finally:
-        response.close()
-        response.release_conn()
+    manifest = release_manifest(connection=c)
+    if manifest:
+        m = manifest["sources"][dataset]
+    else:
+        response = c.get_object(bucket, f"_metadata/latest_success/{dataset}.json")
+        try:
+            m = json.load(response)
+        finally:
+            response.close()
+            response.release_conn()
     required = [
         "dataset_id",
         "ingestion_id",

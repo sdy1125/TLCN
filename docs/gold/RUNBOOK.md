@@ -1,7 +1,10 @@
 # Gold release runbook
 
-Gold consumes an ACTIVE Silver release. Bronze is immutable and Silver is published using
-`docs/silver/RUNBOOK.md`. Run Gold from the repository root after Silver activation.
+Gold consumes the Silver release selected by `silver_meta.publication_pointer` and
+pins its core, reference and metadata snapshots. Bronze is immutable and Silver
+is published using `docs/silver/RUNBOOK.md`. Run Gold from the repository root
+after Silver activation, or trigger the `lakehouse_release` Airflow DAG for the
+ordered Bronze → Silver → Gold workflow.
 
 ## Contract and analytical boundary
 
@@ -35,7 +38,9 @@ and scope versions, all core/reference/metadata snapshot IDs and a checksum. Lat
 stages reuse that manifest. A code or scope change requires a new ID. The candidate
 namespace is private to the manifest. No stage writes the serving Fact or Dimension
 tables. Publication requires zero failed Gold DQ checks and records exceptions for
-that batch. BI reads `iceberg.gold_semantic.*`, whose views are pinned to release
+that batch. The registry stays `PREPARED` until semantic views have passed and
+the pointer has moved; a failed view update can be retried with the same candidate.
+BI reads `iceberg.gold_semantic.*`, whose views are pinned to release
 snapshots and filtered through `gold_meta.publication_pointer`. The pointer is updated
 as one Iceberg row only after the views are ready.
 `fact_production_provincial_canonical` collapses overlapping source rows at the
@@ -64,6 +69,16 @@ Rollback updates the same pointer. Keep candidate tables, release metadata, MinI
 objects and catalog volumes. Never delete Iceberg files directly from MinIO.
 
 ## Current evidence and limits
+
+The 2026-11-04 Airflow E2E run `manual__e2e_20261104_fixed` published
+`gold-84bab056530b551e14627720` from Silver
+`silver-b2a36b2e5c4a6e6018aabac5`. It passed 222 DQ checks, wrote 710,093
+lineage rows and recorded eleven exception groups. The Gold pointer was rolled
+back to the prior release and then restored; its generation is 12. The Silver
+pointer was similarly restored and is generation 7. The local SQLite REST
+fixture has produced `SQLITE_BUSY_SNAPSHOT` during concurrent access, so this
+is validation evidence rather than a production deployment. See
+`docs/PIPELINE_RELEASE_AUDIT_20261104.md` for remaining blockers.
 
 The 2026-11-04 candidate `gold-candidate-20261104-f` (`gold-v3`,
 `scope-5100fb5c64927fd2`) pinned Silver batch

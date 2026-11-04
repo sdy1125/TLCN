@@ -1,10 +1,52 @@
 # Silver runbook
 
+## Automated release workflow (2026-11-04)
+
+Use `lakehouse_release` for an ordered Bronze → Silver → Gold run. It creates a
+verified Bronze release manifest, then runs the ten Silver stages and the five
+Gold stages. Its default schedule is daily; set `LAKEHOUSE_RELEASE_SCHEDULE`
+before deploying Airflow to change the cadence. Drive download remains an
+independent handoff. Its in-progress marker blocks Bronze during download;
+after completion Bronze verifies all source SHA256 values from
+`data/raw/.drive-handoff.json` before ingestion.
+
+```bash
+docker compose exec -T airflow-apiserver airflow dags trigger lakehouse_release
+docker compose exec -T airflow-apiserver airflow dags list-runs lakehouse_release -o plain
+docker compose exec -T airflow-apiserver airflow dags list-runs silver_release -o plain
+docker compose exec -T airflow-apiserver airflow dags list-runs gold_build -o plain
+```
+
+The Silver candidate stores a checksum protected manifest with Bronze release
+ID, policy version, DQ run ID, all core/ref/meta Iceberg snapshots and domain
+row counts. `silver_meta.publication_pointer` selects the serving Silver batch
+with a one row generation guarded update. Gold resolves this pointer and reads
+the candidate's pinned snapshots. The old `publish_batch.status` remains useful
+for audit but is no longer the serving selector. To roll back to a candidate
+with a complete manifest, run
+`spark-submit /home/iceberg/jobs/silver/activate.py --rollback-to <batch-id>`.
+The legacy batch can also be selected if its historical snapshots still exist.
+
+Silver validation uses the configured source registry and observed data for
+nulls and exceptions. A candidate can publish without warnings; accepted
+warning categories are recorded per batch in `silver_meta.release_exception`.
+Any new warning category blocks publication until its policy and evidence are
+reviewed. Do not edit parser, mapping, DQ or publication code during a running
+release: the content based policy version intentionally rejects code drift.
+
+The following sections describe the historical October recovery and manual
+commands. Their fixed batch counts are evidence from that run, not current
+acceptance criteria.
+
 ## Contract and migration status
 
 The [migration plan](SILVER_V2_IMPLEMENTATION_CONTRACT.md) defines the Silver handoff. The code uses `silver_backfill` and a catalog whose tables reside under `warehouse/silver/`. On 2026-10-30 all 26 Bronze releases were rebuilt into eight atomic `silver_core` tables with matching `silver_stage` rows.
 
-The current batch `silver-layered-20261030-1650` is `ACTIVE_WITH_EXCEPTIONS`, with eight core snapshot IDs and policy `source-local-v5-3cb854afd9b7f156`. DQ recorded 52 PASS and two known WARN; all 21 Gold input smoke checks passed. Gold is published separately; see `reports/gold/`.
+The historical October batch `silver-layered-20261030-1650` was
+`ACTIVE_WITH_EXCEPTIONS`, with eight core snapshot IDs and policy
+`source-local-v5-3cb854afd9b7f156`. Its DQ recorded 52 PASS and two known
+WARN; all 21 Gold input smoke checks passed. The current Silver release is
+selected by `silver_meta.publication_pointer`.
 
 ## Storage layout
 
@@ -43,7 +85,12 @@ docker compose exec -T spark-iceberg spark-submit /home/iceberg/jobs/silver/prep
 docker compose exec -T spark-iceberg spark-submit /home/iceberg/jobs/silver/activate.py --batch-id new-batch-id
 ```
 
-The activation job requires 54 DQ checks, zero failed BLOCK checks, the known warning counts, the current policy version and unchanged row counts and snapshot IDs for all eight domains. Treat `publish_batch` as the release pointer; consumers needing a stable release should read its snapshot IDs and use Iceberg time travel rather than assuming all tables switch atomically. Re-running an unchanged Bronze release skips its existing observation set.
+The current activation job requires the complete configured DQ rule set, zero
+failed BLOCK checks, reviewed warning categories, the candidate policy version,
+and unchanged pinned snapshots and row counts. Consumers needing a stable
+release should follow `silver_meta.publication_pointer` and use Iceberg time
+travel. Re-running an unchanged Bronze release skips its existing observation
+set.
 
 ## Known source limitations
 

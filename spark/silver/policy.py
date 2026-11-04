@@ -1,21 +1,61 @@
 """Versioned source-local policy for a coherent set of Bronze releases."""
 
 import hashlib
+import json
+from pathlib import Path
 
 from .domains import DOMAIN
 from .foundation import _upsert
 
 
-POLICY_FAMILY = "source-local-v5"
+POLICY_FAMILY = "source-local-v6"
+SOURCE_CODE_FILES = (
+    "silver/canonical.py", "silver/common.py", "silver/domains.py",
+    "silver/foundation.py", "silver/identity.py", "silver/pipeline.py",
+    "silver/policy.py", "silver/readers.py", "silver/selection.py",
+    "silver/parsers/faostat.py", "silver/parsers/provincial.py",
+    "silver/config/geography.json", "silver/config/rules.json",
+    "silver/config/sources.json", "jobs/silver/refs.py",
+    "silver/dq_contract.py", "jobs/silver/validate.py",
+    "jobs/silver/gold_contract_smoke.py",
+    "jobs/silver/prepare_publish.py", "jobs/silver/activate.py",
+)
+REFERENCE_TABLES = (
+    "country", "commodity", "geography", "geography_alias", "weather_location",
+    "price_series", "trade_product", "trade_product_commodity_bridge",
+    "macro_indicator", "period", "unit_conversion", "metric_definition",
+)
 
 
 def current_policy_version(spark):
+    from .readers import release_manifest
+
     sets = spark.table("lakehouse.silver_meta.observation_set").filter(
         "status='PUBLISHED'").select("observation_set_id").collect()
     if not sets:
         raise ValueError("No published observation sets")
-    payload = "|".join(sorted(row[0] for row in sets))
-    return POLICY_FAMILY + "-" + hashlib.sha256(payload.encode()).hexdigest()[:16]
+    digest = hashlib.sha256()
+    root = Path(__file__).parents[1]
+    for name in SOURCE_CODE_FILES:
+        digest.update(name.encode())
+        digest.update((root / name).read_bytes())
+    snapshots = {}
+    for namespace, names in (("silver_core", DOMAIN),
+                             ("silver_ref", REFERENCE_TABLES)):
+        for name in names:
+            table = f"lakehouse.{namespace}.{name}"
+            history = spark.sql(
+                f"SELECT snapshot_id FROM {table}.history "
+                "ORDER BY made_current_at DESC LIMIT 1").first()
+            snapshots[table] = int(history[0]) if history else None
+    release = release_manifest()
+    payload = {
+        "observation_sets": sorted(row[0] for row in sets),
+        "snapshots": snapshots,
+        "bronze_fingerprint": release["fingerprint"] if release else None,
+    }
+    digest.update(json.dumps(payload, sort_keys=True).encode())
+    return POLICY_FAMILY + "-" + digest.hexdigest()[:20]
 
 
 def seed(spark):

@@ -17,9 +17,11 @@ TABLES = {
         "source_selection_policy": "policy_code string, policy_version string, business_process string, metric_code string, grain_scope string, period_type string, geography_level string, coverage_code string, candidate_source_code string, source_priority int, allowed_record_status string, allowed_quality_flags string, effective_from date, effective_to date, tie_break_rule string, conflict_action string, is_active boolean, approved_by string, approved_at timestamp",
         "canonical_decision": "business_process string, metric_code string, canonical_business_key string, candidate_observation_id string, observation_set_id string, policy_code string, policy_version string, selection_rank int, decision_status string, decision_reason string, decided_at timestamp, published_snapshot_id bigint",
         "canonical_conflict": "conflict_id string, business_process string, metric_code string, canonical_business_key string, candidate_ids_json string, conflicting_values_json string, conflict_reason string, conflict_action string, resolution_status string, resolved_by string, resolved_at timestamp, policy_version string",
-        "dq_result": "dq_result_id string, run_id string, object_name string, rule_code string, severity string, checked_count bigint, failed_count bigint, threshold double, status string, sample_ref string, checked_at timestamp",
+        "dq_result": "dq_result_id string, run_id string, object_name string, rule_code string, severity string, checked_count bigint, failed_count bigint, threshold double, status string, sample_ref string, checked_at timestamp, policy_version string",
         "quarantine_record": "quarantine_id string, run_id string, dataset_id string, observation_set_id string, source_row_locator string, raw_payload_json string, error_code string, error_detail string, severity string, quarantine_at timestamp, resolution_status string, resolution_note string",
-        "publish_batch": "batch_id string, namespace string, policy_version string, status string, domain_snapshots_json string, dq_run_id string, created_at timestamp, activated_at timestamp, activation_reason string",
+        "publish_batch": "batch_id string, namespace string, policy_version string, status string, domain_snapshots_json string, dq_run_id string, created_at timestamp, activated_at timestamp, activation_reason string, release_manifest_json string",
+        "publication_pointer": "pointer_id string, active_batch_id string, generation bigint, updated_at timestamp",
+        "release_exception": "batch_id string, rule_code string, affected_count bigint, reason string, approval_status string, approved_by string, approved_at timestamp",
     },
     "silver_ref": {
         "country": "m49_code string, iso2_code string, iso3_code string, country_name string, country_type string, is_aggregate boolean, valid_from date, valid_to date, source_code string",
@@ -51,6 +53,12 @@ def create_tables(spark):
     conflict = "lakehouse.silver_meta.canonical_conflict"
     if "policy_version" not in spark.table(conflict).columns:
         spark.sql(f"ALTER TABLE {conflict} ADD COLUMN policy_version string")
+    batch = "lakehouse.silver_meta.publish_batch"
+    if "release_manifest_json" not in spark.table(batch).columns:
+        spark.sql(f"ALTER TABLE {batch} ADD COLUMN release_manifest_json string")
+    dq = "lakehouse.silver_meta.dq_result"
+    if "policy_version" not in spark.table(dq).columns:
+        spark.sql(f"ALTER TABLE {dq} ADD COLUMN policy_version string")
 
 
 def _upsert(spark, table, rows, keys):

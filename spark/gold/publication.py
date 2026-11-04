@@ -135,7 +135,7 @@ def _source_namespace(release, table):
 
 def _refresh_semantic_views(spark):
     releases = spark.table(RELEASE).filter(
-        "status='PUBLISHED'").orderBy("gold_batch_id").collect()
+        "status IN ('PUBLISHED','PREPARED')").orderBy("gold_batch_id").collect()
     if not releases:
         raise RuntimeError("No Gold release registered")
     _trino_sql("CREATE SCHEMA IF NOT EXISTS iceberg.gold_semantic")
@@ -356,6 +356,10 @@ def publish_candidate(spark, manifest_id):
     _ensure_tables(spark)
     pointer = _initialize_pointer(spark)
     if pointer["active_gold_batch_id"] == manifest_id:
+        spark.sql(
+            f"UPDATE {RELEASE} SET status='PUBLISHED', "
+            "published_at=current_timestamp() "
+            f"WHERE gold_batch_id='{manifest_id}' AND status='PREPARED'")
         return {"status": "ALREADY_PUBLISHED", "gold_batch_id": manifest_id}
     context = load_manifest(spark, manifest_id)
     namespace = candidate_namespace(manifest_id)
@@ -376,10 +380,14 @@ def publish_candidate(spark, manifest_id):
         input_snapshots_json=json.dumps(inputs, sort_keys=True),
         output_snapshots_json=json.dumps(snapshots, sort_keys=True),
         row_counts_json=json.dumps(counts, sort_keys=True),
-        status="PUBLISHED", published_at=datetime.utcnow())],
+        status="PREPARED", published_at=None)],
         ["gold_batch_id"])
     _refresh_semantic_views(spark)
     _flip_pointer(spark, pointer, manifest_id)
+    spark.sql(
+        f"UPDATE {RELEASE} SET status='PUBLISHED', "
+        "published_at=current_timestamp() "
+        f"WHERE gold_batch_id='{manifest_id}' AND status='PREPARED'")
     return {"status": "ACTIVE_WITH_EXCEPTIONS" if exceptions else "ACTIVE",
             "gold_batch_id": manifest_id, "checks": len(checks),
             "exception_count": len(exceptions)}

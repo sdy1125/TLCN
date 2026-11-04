@@ -17,12 +17,14 @@ from bronze_ingestion.manifest import (
     validate_manifest_rows,
 )
 from bronze_ingestion.service import (
+    IngestionError,
     IngestionService,
     TechnicalValidationError,
     inspect_source,
     list_run_results,
     resolve_source_path,
 )
+from bronze_ingestion.release import create_release
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -292,6 +294,58 @@ class IngestionServiceTests(unittest.TestCase):
         self.assertEqual(second["status"], "SUCCESS")
         self.assertNotEqual(first["bronze_path"], second["bronze_path"])
         self.assertEqual(len(self.final_keys()), 2)
+
+    def test_a_b_a_restores_latest_pointer_without_new_object(self) -> None:
+        path = self.write_source()
+        first = self.service.ingest(self.source, airflow_run_id="run-a")
+        path.write_bytes(b"item,value\ncoffee,456\n")
+        second = self.service.ingest(self.source, airflow_run_id="run-b")
+        path.write_bytes(b"item,value\ncoffee,123\n")
+        restored = self.service.ingest(self.source, airflow_run_id="run-a-again")
+        latest = json.loads(self.client.objects[(
+            "bronze", f"_metadata/latest_success/{self.source.dataset_id}.json")])
+        self.assertEqual(restored["change_state"], "RESTORED")
+        self.assertEqual(restored["status"], "SKIPPED")
+        self.assertEqual(latest["bronze_path"], first["bronze_path"])
+        self.assertNotEqual(latest["bronze_path"], second["bronze_path"])
+        self.assertEqual(len(self.final_keys()), 2)
+
+    def test_a_b_a_refuses_corrupt_prior_object(self) -> None:
+        path = self.write_source()
+        first = self.service.ingest(self.source, airflow_run_id="run-a")
+        path.write_bytes(b"item,value\ncoffee,456\n")
+        second = self.service.ingest(self.source, airflow_run_id="run-b")
+        path.write_bytes(b"item,value\ncoffee,123\n")
+        key = first["bronze_path"].removeprefix("s3://bronze/")
+        self.client.objects[("bronze", key)] = b"corrupt"
+        with self.assertRaisesRegex(IngestionError, "checksum mismatch"):
+            self.service.ingest(self.source, airflow_run_id="run-a-again")
+        latest = json.loads(self.client.objects[(
+            "bronze", f"_metadata/latest_success/{self.source.dataset_id}.json")])
+        self.assertEqual(latest["bronze_path"], second["bronze_path"])
+
+    def test_bronze_release_pins_verified_source_and_is_immutable(self) -> None:
+        self.write_source()
+        first = self.service.ingest(self.source, airflow_run_id="run-a")
+        release = create_release(self.client, "bronze",
+                                 [self.source.dataset_id], "bronze-test-001")
+        self.assertEqual(release["sources"][self.source.dataset_id], first)
+        self.assertEqual(create_release(self.client, "bronze",
+                         [self.source.dataset_id], "bronze-test-001"), release)
+        path = self.raw_root / self.source.relative_path
+        path.write_bytes(b"item,value\ncoffee,456\n")
+        self.service.ingest(self.source, airflow_run_id="run-b")
+        with self.assertRaisesRegex(ValueError, "already pins"):
+            create_release(self.client, "bronze", [self.source.dataset_id],
+                           "bronze-test-001")
+
+    def test_bronze_release_requires_every_source(self) -> None:
+        self.write_source()
+        self.service.ingest(self.source, airflow_run_id="run-a")
+        with self.assertRaisesRegex(ValueError, "No verified Bronze success"):
+            create_release(self.client, "bronze",
+                           [self.source.dataset_id, "missing_source"],
+                           "bronze-test-002")
 
     def test_missing_source_is_failed_with_diagnostic(self) -> None:
         self.raw_root.mkdir()

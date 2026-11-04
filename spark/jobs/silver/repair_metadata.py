@@ -31,7 +31,8 @@ def main():
                     workbook.close()
             spark.sql("UPDATE lakehouse.silver_meta.observation_set "
                       f"SET source_record_count={count}, updated_at=current_timestamp() "
-                      f"WHERE observation_set_id='{set_id}'")
+                      f"WHERE observation_set_id='{set_id}' "
+                      f"AND (source_record_count IS NULL OR source_record_count<>{count})")
             repaired[dataset] = count
         print(json.dumps(repaired), flush=True)
     finally:
