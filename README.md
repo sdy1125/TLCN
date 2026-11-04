@@ -257,7 +257,9 @@ physical source-row lineage. It writes eight atomic Iceberg domains in
 `silver_core`, along with `silver_meta`, `silver_ref`, and `silver_stage`.
 Source-local canonical decisions are audited; unresolved conflicts have no
 winner. `silver_backfill` is the only Silver DAG and `silver_core` is the
-active Silver namespace. No Gold model is deployed.
+active Silver namespace. The `gold_build` DAG creates an isolated Gold candidate,
+validates its complete Silver WINNER coverage, and publishes it through a
+release pointer. Analytics reads the `iceberg.gold_semantic` views.
 
 See the [Silver runbook and storage layout](docs/silver/RUNBOOK.md),
 [implementation contract](docs/silver/SILVER_V2_IMPLEMENTATION_CONTRACT.md), and
@@ -265,3 +267,6 @@ See the [Silver runbook and storage layout](docs/silver/RUNBOOK.md),
 
 Use the ordered backfill, policy, canonical, acceptance, and activation
 commands in the [Silver runbook](docs/silver/RUNBOOK.md).
+
+Gold release commands, exceptions, semantic views, and rollback are documented
+in the [Gold runbook](docs/gold/RUNBOOK.md).

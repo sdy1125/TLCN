@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-`airflow/dags/` contains Bronze ingestion and the `silver_backfill` workflow; reusable Bronze code lives in `airflow/include/bronze_ingestion/`. Silver parsers, contracts, selection rules, and Iceberg logic are in `spark/silver/`, with runnable entrypoints in `spark/jobs/silver/`. `spark/gold/` and `spark/jobs/gold/` are placeholders; no Gold job is deployed. `data/raw_manifest.csv` lists the 26 source files under `data/raw/`. Tests are in `tests/`, operational guidance is in `docs/silver/`, and reconciliation evidence is in `reports/`. Local services are configured in `compose.yaml`, `minio/`, and `trino/etc/`.
+`airflow/dags/` contains Bronze ingestion, `silver_backfill`, and `gold_build`; reusable Bronze code lives in `airflow/include/bronze_ingestion/`. Silver parsers, contracts, selection rules, and Iceberg logic are in `spark/silver/`, with runnable entrypoints in `spark/jobs/silver/`. Gold candidate, scope, DQ, publication and semantic-view code lives in `spark/gold/` and `spark/jobs/gold/`. `data/raw_manifest.csv` lists the 26 source files under `data/raw/`. Tests are in `tests/`, operational guidance is in `docs/silver/` and `docs/gold/`, and reconciliation evidence is in `reports/`. Local services are configured in `compose.yaml`, `minio/`, and `trino/etc/`.
 
 ## Build, Test & Development Commands
 

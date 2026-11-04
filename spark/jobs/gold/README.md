@@ -1,3 +1,3 @@
 # Gold Spark jobs
 
-Run in order after a published Silver release: `inspect_input.py`, `foundation.py`, `dimensions.py`, `facts.py`, `publish.py`. The `gold_build` Airflow DAG executes the same fixed sequence through the authenticated runner. Reruns use stable keys and a pinned Silver release. See `reports/gold/GOLD_RUNBOOK.md` for exact Compose commands and publication checks.
+Run `candidate.py` stages `inspect`, `foundation`, `dimensions`, `facts`, and `validate` with one manifest ID, then use `publish_candidate.py`. The `gold_build` Airflow DAG executes the same release flow through the authenticated runner. See `docs/gold/RUNBOOK.md` for commands, checks, and rollback.

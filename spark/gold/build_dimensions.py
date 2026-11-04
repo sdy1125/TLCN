@@ -2,8 +2,8 @@
 
 from pyspark.sql import functions as F
 
-from .contracts import DIMENSIONS, BRIDGE, ensure_storage
-from .source import guard_existing_publication, pinned, resolve
+from .contracts import DIMENSIONS, BRIDGE
+from .source import pinned
 from silver.common import GEO, RULES
 
 
@@ -33,10 +33,10 @@ def insert_new(spark, namespace, name, frame, key_columns):
     return count
 
 
-def build(spark):
-    batch, snapshots = resolve(spark)
-    ensure_storage(spark)
-    guard_existing_publication(spark, batch['batch_id'])
+def build(spark, context, namespace):
+    batch, snapshots = context
+    dimension_namespace = namespace
+    bridge_namespace = namespace
     ref = lambda name: pinned(spark, f'lakehouse.silver_ref.{name}', snapshots)
     lit = F.lit
     period = ref('period').select(
@@ -122,13 +122,15 @@ def build(spark):
               'dim_macro_indicator': indicator}
     counts = {}
     for name in DIMENSIONS:
-        counts[name] = insert_new(spark, 'gold_dim', name, frames[name], [name.removeprefix('dim_') + '_key'])
+        counts[name] = insert_new(
+            spark, dimension_namespace, name, frames[name],
+            [name.removeprefix('dim_') + '_key'])
     bridge = ref('trade_product_commodity_bridge').select(
         hashed('classification_system', 'classification_version', 'product_code').alias('trade_product_key'),
         hashed('commodity_code').alias('commodity_key'), 'mapping_type', 'allocation_weight',
         'mapping_status', 'mapping_rule', 'valid_from', 'valid_to',
         F.col('valid_to').isNull().alias('is_current'))
     counts['bridge_trade_product_commodity'] = insert_new(
-        spark, 'gold_bridge', 'bridge_trade_product_commodity', bridge,
+        spark, bridge_namespace, 'bridge_trade_product_commodity', bridge,
         ['trade_product_key', 'commodity_key', 'valid_from'])
     return {'silver_batch': batch['batch_id'], 'rows_inserted': counts}

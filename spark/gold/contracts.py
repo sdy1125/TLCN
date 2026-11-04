@@ -1,7 +1,7 @@
 """Physical contracts from Gold.pdf; technical columns support safe publication."""
 
 ROOT = "s3://warehouse/gold"
-VERSION = "gold-v1"
+VERSION = "gold-v2"
 
 DIMENSIONS = {
     "dim_period": "period_key string, period_type string, period_code string, period_start_date date, period_end_date date, calendar_year int, calendar_quarter int, calendar_month int, calendar_day int, day_of_year int, crop_year_label string, days_in_period int, period_label string, period_sort_key string, is_complete_period boolean",
@@ -36,10 +36,6 @@ META = {
     "dq_result": "gold_batch_id string, table_name string, rule_code string, failed_count bigint, status string, checked_at timestamp",
 }
 
-TABLES = {"gold_dim": DIMENSIONS, "gold_bridge": BRIDGE,
-          "gold_fact": FACTS, "gold_meta": META}
-
-
 def key(*parts):
     """Canonical, length-delimited serialization; NULL differs from empty text."""
     import hashlib
@@ -47,25 +43,3 @@ def key(*parts):
 
     return hashlib.sha256(json.dumps(parts, ensure_ascii=False,
                                      separators=(",", ":")).encode()).hexdigest()
-
-
-def ensure_storage(spark):
-    """Create only missing Gold objects, then refuse unexpected locations."""
-    for namespace, tables in TABLES.items():
-        expected = f"{ROOT}/{namespace}"
-        spark.sql(f"CREATE NAMESPACE IF NOT EXISTS lakehouse.{namespace} LOCATION '{expected}'")
-        details = spark.sql(f"DESCRIBE NAMESPACE EXTENDED lakehouse.{namespace}").collect()
-        actual = [str(r[1]).rstrip("/") for r in details
-                  if str(r[0]).strip().lower() == "location"]
-        if actual != [expected]:
-            raise RuntimeError(f"Unsafe Gold namespace location: {namespace}: {actual}")
-        for name, fields in tables.items():
-            location = f"{expected}/{name}"
-            spark.sql(f"CREATE TABLE IF NOT EXISTS lakehouse.{namespace}.{name} "
-                      f"({fields}) USING iceberg LOCATION '{location}' "
-                      "TBLPROPERTIES ('format-version'='2')")
-            details = spark.sql(f"DESCRIBE TABLE EXTENDED lakehouse.{namespace}.{name}").collect()
-            actual = [str(r[1]).rstrip("/") for r in details
-                      if str(r[0]).strip().lower() == "location"]
-            if actual != [location]:
-                raise RuntimeError(f"Unsafe Gold table location: {namespace}.{name}: {actual}")

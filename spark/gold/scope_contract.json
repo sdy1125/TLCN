@@ -1,0 +1,208 @@
+{
+  "contract_name": "gold-silver-winner-scope",
+  "approved_on": "2026-11-04",
+  "approved_by": "project_owner_instruction",
+  "domains": {
+    "production_observation": {
+      "fact": "fact_production_national",
+      "datasets": [
+        "faostat_production_rubber",
+        "faostat_production_coffee",
+        "faostat_production_pepper"
+      ],
+      "grain": "country × commodity × year × source observation set",
+      "metrics": [
+        "area_harvested_ha",
+        "production_tonnes",
+        "yield_kg_ha"
+      ],
+      "periods": [
+        "YEAR"
+      ],
+      "geography": "M49 country",
+      "units": [
+        "ha",
+        "tonne",
+        "kg/ha"
+      ],
+      "analysis_scope": "FAOSTAT national production"
+    },
+    "provincial_agri_observation": {
+      "fact": "fact_production_provincial",
+      "datasets": [
+        "provincial_agriculture_three_commodities",
+        "provincial_coffee_area",
+        "provincial_coffee_production"
+      ],
+      "grain": "geography version × commodity × year × coverage × source observation set",
+      "metrics": [
+        "area_planted_ha",
+        "area_harvested_ha",
+        "production_tonnes",
+        "yield_kg_ha"
+      ],
+      "periods": [
+        "YEAR"
+      ],
+      "geography": "verified source province version",
+      "units": [
+        "ha",
+        "tonne",
+        "kg/ha"
+      ],
+      "analysis_scope": "provincial agriculture, source coverage retained"
+    },
+    "price_observation": {
+      "fact": "fact_price",
+      "datasets": [
+        "faostat_producer_prices_annual_rubber",
+        "faostat_producer_prices_annual_coffee",
+        "faostat_producer_prices_annual_pepper",
+        "faostat_producer_prices_monthly_rubber",
+        "faostat_producer_prices_monthly_coffee",
+        "faostat_producer_prices_monthly_pepper",
+        "world_bank_pink_sheet",
+        "provincial_coffee_average_price"
+      ],
+      "approved_exclusions": {
+        "provincial_coffee_average_price": "LOCAL_PRICE_GEOGRAPHY_VERSION_UNVERIFIED"
+      },
+      "grain": "series × commodity × country or geography × source period × source observation set",
+      "metrics": [
+        "price_amount_native",
+        "price_amount_canonical",
+        "price_index_value"
+      ],
+      "periods": [
+        "MONTH",
+        "YEAR"
+      ],
+      "geography": "M49 country or verified source geography",
+      "units": [
+        "native currency/native unit",
+        "canonical currency/unit",
+        "index points"
+      ],
+      "analysis_scope": "price series separated by price type and unit"
+    },
+    "trade_total_observation": {
+      "fact": "fact_trade_total",
+      "datasets": [
+        "faostat_tcl_trade_rubber",
+        "faostat_tcl_trade_coffee",
+        "faostat_tcl_trade_pepper",
+        "provincial_coffee_export_volume_value"
+      ],
+      "approved_exclusions": {
+        "provincial_coffee_export_volume_value": "NATIONAL_REPORTED_NOT_EQUIVALENT_TO_SOURCE_TOTAL"
+      },
+      "grain": "reporter country × product × flow × year × source observation set",
+      "metrics": [
+        "trade_quantity_tonnes",
+        "trade_value_usd"
+      ],
+      "periods": [
+        "YEAR"
+      ],
+      "geography": "M49 reporter country",
+      "units": [
+        "tonne",
+        "USD"
+      ],
+      "analysis_scope": "SOURCE_TOTAL only; NATIONAL_REPORTED separate pending equivalence"
+    },
+    "trade_partner_observation": {
+      "fact": "fact_trade_partner",
+      "datasets": [
+        "faostat_detailed_trade_matrix_rubber",
+        "faostat_detailed_trade_matrix_coffee",
+        "faostat_detailed_trade_matrix_pepper",
+        "un_comtrade_annual",
+        "un_comtrade_monthly"
+      ],
+      "grain": "reporter × partner × product × flow × year × source observation set",
+      "metrics": [
+        "trade_quantity_tonnes",
+        "trade_value_usd"
+      ],
+      "periods": [
+        "YEAR"
+      ],
+      "geography": "M49 reporter and partner",
+      "units": [
+        "tonne",
+        "USD"
+      ],
+      "analysis_scope": "approved FAOSTAT partner matrix only; Comtrade inactive"
+    },
+    "weather_daily": {
+      "fact": "fact_weather_daily",
+      "datasets": [
+        "nasa_power_weather_daily_63"
+      ],
+      "grain": "weather location version × day × source observation set",
+      "metrics": [
+        "temperature_avg_c",
+        "temperature_max_c",
+        "temperature_min_c",
+        "relative_humidity_pct",
+        "wind_speed_m_s",
+        "precipitation_mm",
+        "solar_radiation_mj_m2_day"
+      ],
+      "periods": [
+        "DAY"
+      ],
+      "geography": "weather grid point with verified location code",
+      "units": [
+        "degC",
+        "percent",
+        "m/s",
+        "mm",
+        "MJ/m2/day when verified"
+      ],
+      "analysis_scope": "NASA POWER daily; unverified solar measure remains NULL"
+    },
+    "coffee_stock_observation": {
+      "fact": "fact_coffee_stock",
+      "datasets": [
+        "provincial_coffee_world_ending_stocks"
+      ],
+      "approved_exclusions": {
+        "provincial_coffee_world_ending_stocks": "EU_AGGREGATE_HAS_NO_VERIFIED_M49_MEMBER"
+      },
+      "grain": "country × commodity × crop year × actual/forecast × source observation set",
+      "metrics": [
+        "ending_stock_thousand_bags",
+        "ending_stock_tonnes"
+      ],
+      "periods": [
+        "CROP_YEAR"
+      ],
+      "geography": "verified M49 country",
+      "units": [
+        "thousand bags",
+        "tonne"
+      ],
+      "analysis_scope": "actual and forecast separated; unverified EU aggregate excluded"
+    },
+    "macro_indicator_observation": {
+      "fact": "fact_macro_indicator",
+      "datasets": [
+        "world_bank_wdi"
+      ],
+      "grain": "country × indicator × year × source observation set",
+      "metrics": [
+        "indicator_value"
+      ],
+      "periods": [
+        "YEAR"
+      ],
+      "geography": "M49 country",
+      "units": [
+        "indicator specific"
+      ],
+      "analysis_scope": "WDI indicator values; aggregation follows indicator rule"
+    }
+  }
+}

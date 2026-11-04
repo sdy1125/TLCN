@@ -3,8 +3,10 @@
 from pyspark.sql import functions as F
 
 from .build_dimensions import hashed, insert_new
-from .contracts import FACTS, VERSION
-from .source import guard_existing_publication, resolve, winners
+from .contracts import FACTS
+from .source import winners
+from .scope import classify
+from .temporal import attach_key
 
 
 SPECS = {
@@ -57,38 +59,39 @@ def _product(frame):
         'classification_system', 'classification_version', 'product_code'))
 
 
-def _lineage(spark, source, fact, key, snapshot, batch_id):
+def _lineage(spark, source, fact, key, snapshot, batch_id, namespace):
     rows = source.select(
         F.lit(batch_id).alias('gold_batch_id'), F.lit(fact).alias('fact_table'),
         F.col(key).alias('fact_key'), 'metric_code', 'observation_id',
         F.lit(snapshot).cast('long').alias('silver_snapshot_id'),
         F.lit('WINNER').alias('contribution_status'))
-    return insert_new(spark, 'gold_meta', 'fact_lineage', rows,
+    return insert_new(spark, namespace, 'fact_lineage', rows,
                       ['gold_batch_id', 'fact_table', 'fact_key', 'metric_code', 'observation_id'])
 
 
-def build(spark):
-    batch, snapshots = resolve(spark)
-    guard_existing_publication(spark, batch['batch_id'])
-    batch_id = 'gold-' + batch['batch_id'] + '-' + VERSION
+def build(spark, context, namespace):
+    batch, snapshots = context
+    fact_namespace = namespace
+    dimension_namespace = namespace
+    lineage_namespace = namespace
+    batch_id = batch['gold_batch_id']
     counts = {}
     for domain, (name, key) in SPECS.items():
-        source = winners(spark, domain, batch['policy_version'], snapshots)
-        if domain == 'trade_partner_observation':
-            source = source.filter(
-                (F.col('classification_system') == 'FAOSTAT') &
-                (F.col('statistical_scope_code') == 'PARTNER_MATRIX') &
-                F.col('partner2_code').isNull() & F.col('customs_code').isNull() &
-                F.col('mode_of_transport_code').isNull())
-        if domain == 'trade_total_observation':
-            source = source.filter(F.col('statistical_scope_code') == 'SOURCE_TOTAL')
+        source = classify(domain, winners(
+            spark, domain, batch['policy_version'], snapshots
+        )).filter(F.col('_scope_status') == 'INCLUDED')
         if domain == 'price_observation':
-            # Silver price observations do not carry a geography version.
-            # Keep local source rows in Silver until a temporal mapping is proven.
-            source = source.filter(F.col('geography_code').isNull())
             source = source.withColumn(
                 'country_m49_code', F.when(F.col('market_scope') == 'GLOBAL',
                                            F.lit('001')).otherwise(F.col('country_m49_code')))
+            source = attach_key(
+                source, spark.table(f'lakehouse.{dimension_namespace}.dim_price_series'),
+                'series_code', 'series_code', 'price_series_key')
+        if domain == 'weather_daily':
+            source = attach_key(
+                source, spark.table(f'lakehouse.{dimension_namespace}.dim_weather_location'),
+                'weather_location_code', 'weather_location_code',
+                'weather_location_key')
         if domain == 'production_observation':
             grain = ['m49_code', 'commodity_code', 'period_type', 'period_code',
                      'observation_set_id', 'dataset_id']
@@ -145,7 +148,6 @@ def build(spark):
             base = _country(base, 'country_m49_code', 'country_key')
             base = base.withColumn('geography_key', F.when(
                 F.col('geography_code').isNotNull(), hashed('geography_code', F.lit(None))))
-            base = base.withColumn('price_series_key', hashed('series_code', F.lit(None)))
             base = _key(base, grain, key).select(
                 key, 'period_key', 'commodity_key', 'country_key', 'geography_key',
                 'price_series_key', 'price_amount_native', 'price_amount_canonical',
@@ -188,8 +190,7 @@ def build(spark):
             grain = ['weather_location_code', 'observation_date', 'observation_set_id']
             if source.groupBy(*grain).count().filter('count > 1').limit(1).count():
                 raise ValueError('Weather has duplicate target grain')
-            base = source.withColumn('weather_location_key',
-                                     hashed('weather_location_code', F.lit(None)))
+            base = source
             base = _period(base)
             base = _key(base, grain, key).select(
                 key, 'period_key', 'weather_location_key', 'temperature_avg_c',
@@ -216,10 +217,10 @@ def build(spark):
                 F.col('value_status').alias('observation_status_code'),
                 'observation_set_id', F.col('dataset_id').alias('record_source_code'))
         base = _common(base)
-        counts[name] = insert_new(spark, 'gold_fact', name, base, [key])
+        counts[name] = insert_new(spark, fact_namespace, name, base, [key])
         if name == 'fact_trade_partner':
             flags = base.select(key, 'quantity_estimated_flag', 'value_estimated_flag')
-            current = spark.table('lakehouse.gold_fact.fact_trade_partner').select(
+            current = spark.table(f'lakehouse.{fact_namespace}.fact_trade_partner').select(
                 key, 'quantity_estimated_flag', 'value_estimated_flag')
             changed = flags.alias('s').join(current.alias('t'), key).filter(
                 ~F.col('s.quantity_estimated_flag').eqNullSafe(F.col('t.quantity_estimated_flag')) |
@@ -229,7 +230,7 @@ def build(spark):
                                F.col('s.quantity_estimated_flag').alias('quantity_estimated_flag'),
                                F.col('s.value_estimated_flag').alias('value_estimated_flag'))\
                     .createOrReplaceTempView('_gold_partner_flags')
-                spark.sql("MERGE INTO lakehouse.gold_fact.fact_trade_partner t "
+                spark.sql(f"MERGE INTO lakehouse.{fact_namespace}.fact_trade_partner t "
                           "USING _gold_partner_flags s ON t.trade_partner_key=s.trade_partner_key "
                           "WHEN MATCHED THEN UPDATE SET "
                           "t.quantity_estimated_flag=s.quantity_estimated_flag, "
@@ -238,5 +239,6 @@ def build(spark):
         # The join uses the source grain, never the measure value.
         source_key = _key(source, grain, key)
         _lineage(spark, source_key, name, key,
-                 snapshots[f'lakehouse.silver_core.{domain}'], batch_id)
+                 snapshots[f'lakehouse.silver_core.{domain}'], batch_id,
+                 lineage_namespace)
     return {'gold_batch': batch_id, 'rows_inserted': counts}

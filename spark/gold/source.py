@@ -8,10 +8,11 @@ from silver.domains import DOMAIN
 
 
 REFERENCE_TABLES = (
-    "country", "commodity", "geography", "weather_location", "price_series",
+    "country", "commodity", "geography", "geography_alias", "weather_location", "price_series",
     "trade_product", "trade_product_commodity_bridge", "macro_indicator", "period",
 )
-META_TABLES = ("canonical_decision", "source_selection_policy", "observation_set")
+META_TABLES = ("canonical_decision", "canonical_conflict",
+               "source_selection_policy", "observation_set")
 
 
 def current_snapshot(spark, name):
@@ -66,17 +67,6 @@ def resolve(spark):
 def pinned(spark, table, snapshots):
     return spark.read.format("iceberg").option(
         "snapshot-id", str(snapshots[table])).load(table)
-
-
-def guard_existing_publication(spark, silver_batch_id):
-    """Do not append a new Silver release into an already active Gold model."""
-    active = spark.table("lakehouse.gold_meta.publish_batch").filter(
-        F.col("status").isin("ACTIVE", "ACTIVE_WITH_EXCEPTIONS")
-    ).select("silver_batch_id").collect()
-    if len(active) > 1 or (active and active[0][0] != silver_batch_id):
-        raise RuntimeError(
-            "A different Silver release is already active in Gold; "
-            "build an isolated candidate before changing the active model")
 
 
 def winners(spark, domain, policy_version, snapshots):

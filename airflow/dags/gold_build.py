@@ -1,6 +1,7 @@
 """Publication-gated Gold build over the bounded internal Spark runner."""
 
 import json
+import hashlib
 import os
 import time
 import urllib.error
@@ -35,8 +36,11 @@ def gold_build():
     def run_stage(stage):
         context = get_current_context()
         run_id = f"{context['run_id']}:{stage}:{context['ti'].try_number}"
+        manifest_id = "gold-" + hashlib.sha256(
+            context["run_id"].encode()).hexdigest()[:24]
         job_id = _request("/jobs", {"pipeline": "gold", "stage": stage,
-                                    "run_id": run_id})["job_id"]
+                                    "run_id": run_id,
+                                    "manifest_id": manifest_id})["job_id"]
         deadline = time.monotonic() + 7500
         while time.monotonic() < deadline:
             result = _request("/jobs/" + job_id)

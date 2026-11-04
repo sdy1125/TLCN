@@ -47,7 +47,14 @@ def execute(job, request):
         stage = request["stage"]
         if stage not in stages:
             raise ValueError("Invalid Gold stage")
-        cmd += [f"/opt/silver/jobs/gold/{stage}.py"]
+        manifest_id = request["manifest_id"]
+        if stage == "publish":
+            cmd += ["/opt/silver/jobs/gold/publish_candidate.py",
+                    "--manifest-id", manifest_id]
+        else:
+            actual = "inspect" if stage == "inspect_input" else stage
+            cmd += ["/opt/silver/jobs/gold/candidate.py", "--stage", actual,
+                    "--manifest-id", manifest_id]
     else:
         cmd += ["/opt/silver/jobs/silver/backfill.py", "--run-id", request["run_id"]]
         cmd += ["--result-file", str(directory / "results.json")]
@@ -107,8 +114,13 @@ class Handler(BaseHTTPRequestHandler):
                 stage = request.get("stage")
                 if stage not in {"inspect_input", "foundation", "dimensions", "facts", "publish"}:
                     raise ValueError()
+                manifest_id = request.get("manifest_id")
+                if not isinstance(manifest_id, str):
+                    raise ValueError()
+                from gold.candidate import validate_id
+                validate_id(manifest_id)
                 request = {"run_id": request["run_id"], "stage": stage,
-                           "pipeline": "gold"}
+                           "manifest_id": manifest_id, "pipeline": "gold"}
             else:
                 request = {
                     "run_id": request["run_id"],
