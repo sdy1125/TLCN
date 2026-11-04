@@ -38,6 +38,8 @@ tables. Publication requires zero failed Gold DQ checks and records exceptions f
 that batch. BI reads `iceberg.gold_semantic.*`, whose views are pinned to release
 snapshots and filtered through `gold_meta.publication_pointer`. The pointer is updated
 as one Iceberg row only after the views are ready.
+`fact_production_provincial_canonical` collapses overlapping source rows at the
+analytic grain and returns NULL for measures with conflicting source values.
 
 ## Verify and roll back
 
@@ -63,15 +65,17 @@ objects and catalog volumes. Never delete Iceberg files directly from MinIO.
 
 ## Current evidence and limits
 
-The 2026-11-04 candidate `gold-candidate-20261104-c` (`gold-v2`,
+The 2026-11-04 candidate `gold-candidate-20261104-f` (`gold-v3`,
 `scope-5100fb5c64927fd2`) pinned Silver batch
 `silver-layered-20261030-1650`, built 8 Dimensions, 1 Bridge and 8 Facts, and passed
-206 DQ checks with zero failures. It classified all 710,965 Silver WINNER rows:
+222 DQ checks with zero failures. It classified all 710,965 Silver WINNER rows:
 710,093 contributed to Fact lineage; 450 local prices, 406 NATIONAL_REPORTED trade
 observations and 16 European Union stock observations were approved exclusions.
-The release recorded nine exception groups, including six open price conflicts,
+The release recorded eleven exception groups, including six open price conflicts,
 eight pending product mappings, 2,142 district source observations, inactive
-Comtrade and unverified solar conversion.
+Comtrade and unverified solar conversion. The provincial canonical view handles
+26 conflicting area values and eight conflicting production values by leaving
+those measures NULL until source precedence is reviewed.
 These data remain unavailable to affected KPI queries until evidence is approved
 and a new Silver/Gold release is built. The existing source files do not establish
 all missing administrative crosswalks, Comtrade harmonization, or solar units.

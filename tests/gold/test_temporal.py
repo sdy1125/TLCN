@@ -43,28 +43,32 @@ class TemporalJoinTest(unittest.TestCase):
         self.assertEqual(result.first()["price_series_key"], "old")
 
     def test_adjacent_versions_choose_correct_key(self):
-        rows = [("A", "old", None, "2025-01-31"),
+        rows = [("A", "old", None, "2025-02-01"),
                 ("A", "new", "2025-02-01", None)]
         self.assertEqual(self.map("2025-02", rows).first()["price_series_key"],
                          "new")
 
     def test_gap_blocks_mapping(self):
-        rows = [("A", "old", None, "2025-01-15"),
+        rows = [("A", "old", None, "2025-01-16"),
                 ("A", "new", "2025-02-01", None)]
         with self.assertRaises(ValueError):
             self.map("2025-01", rows)
 
     def test_month_crossing_version_blocks_mapping(self):
-        rows = [("A", "old", None, "2025-01-15"),
+        rows = [("A", "old", None, "2025-01-16"),
                 ("A", "new", "2025-01-16", None)]
         with self.assertRaises(ValueError):
             self.map("2025-01", rows)
 
     def test_overlap_blocks_mapping(self):
-        rows = [("A", "old", None, "2025-02-01"),
+        rows = [("A", "old", None, "2025-02-02"),
                 ("A", "new", "2025-02-01", None)]
         with self.assertRaises(ValueError):
             self.map("2025-01", rows)
+
+    def test_empty_half_open_interval_is_invalid(self):
+        with self.assertRaises(ValueError):
+            self.map("2025-01", [("A", "empty", "2025-01-01", "2025-01-01")])
 
     def test_missing_dimension_blocks_mapping(self):
         with self.assertRaises(ValueError):

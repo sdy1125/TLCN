@@ -1,7 +1,7 @@
 """Physical contracts from Gold.pdf; technical columns support safe publication."""
 
 ROOT = "s3://warehouse/gold"
-VERSION = "gold-v2"
+VERSION = "gold-v3"
 
 DIMENSIONS = {
     "dim_period": "period_key string, period_type string, period_code string, period_start_date date, period_end_date date, calendar_year int, calendar_quarter int, calendar_month int, calendar_day int, day_of_year int, crop_year_label string, days_in_period int, period_label string, period_sort_key string, is_complete_period boolean",

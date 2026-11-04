@@ -30,7 +30,7 @@ def validate_intervals(dimensions, code_column):
     """Reject invalid bounds and overlapping versions of one business code."""
     invalid = dimensions.filter(
         F.col("valid_from").isNotNull() & F.col("valid_to").isNotNull() &
-        (F.col("valid_from") > F.col("valid_to")))
+        (F.col("valid_from") >= F.col("valid_to")))
     if invalid.limit(1).count():
         raise ValueError(f"Invalid validity interval: {code_column}")
     window = Window.partitionBy(code_column).orderBy(
@@ -42,7 +42,7 @@ def validate_intervals(dimensions, code_column):
         .withColumn("_end", F.coalesce(F.col("valid_to"), _max_date()))
         .withColumn("_previous_end", F.lag("_end").over(window))
     )
-    if ordered.filter(F.col("_start") <= F.col("_previous_end")).limit(1).count():
+    if ordered.filter(F.col("_start") < F.col("_previous_end")).limit(1).count():
         raise ValueError(f"Overlapping dimension versions: {code_column}")
 
 
@@ -57,7 +57,7 @@ def attach_key(source, dimensions, source_code, dimension_code, key_column):
     condition = (
         F.col(f"s.{source_code}") == F.col("d._dim_code")
     ) & (F.col("s._period_start") >= F.coalesce(F.col("d.valid_from"), _min_date())) & (
-        F.col("s._period_end") <= F.coalesce(F.col("d.valid_to"), _max_date()))
+        F.col("s._period_end") < F.coalesce(F.col("d.valid_to"), _max_date()))
     matched = left.join(right, condition, "left")
     invalid = matched.filter(
         F.col("s._period_start").isNull() | F.col("s._period_end").isNull() |

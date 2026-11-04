@@ -163,6 +163,45 @@ def _refresh_semantic_views(spark):
                " UNION ALL ".join(branches))
         _trino_sql(sql)
         _trino_sql(f"SELECT * FROM iceberg.gold_semantic.{table} LIMIT 0")
+    keys = ("period_key, geography_key, commodity_key, coverage_code, "
+            "record_status_code")
+    measures = ("area_planted_ha", "area_harvested_ha",
+                "production_tonnes", "yield_kg_ha")
+    expressions = [
+        f"CASE WHEN count(DISTINCT {measure})=1 THEN max({measure}) "
+        f"ELSE NULL END AS {measure}, "
+        f"count(DISTINCT {measure})>1 AS {measure}_conflict"
+        for measure in measures
+    ]
+    canonical = (
+        "CREATE OR REPLACE VIEW "
+        "iceberg.gold_semantic.fact_production_provincial_canonical AS "
+        f"SELECT {keys}, count(*) AS source_row_count, " +
+        ", ".join(expressions) +
+        " FROM iceberg.gold_semantic.fact_production_provincial "
+        f"GROUP BY {keys}"
+    )
+    _trino_sql(canonical)
+    _trino_sql("SELECT * FROM iceberg.gold_semantic."
+               "fact_production_provincial_canonical LIMIT 0")
+    canonical_views = {
+        "production_national_canonical": "fact_production_national",
+        "production_provincial_canonical":
+            "fact_production_provincial_canonical",
+        "price_canonical": "fact_price",
+        "trade_total_canonical": "fact_trade_total",
+        "trade_partner_canonical": "fact_trade_partner",
+        "weather_daily_canonical": "fact_weather_daily",
+        "coffee_stock_actual": "fact_coffee_stock",
+        "macro_indicator_canonical": "fact_macro_indicator",
+    }
+    for name, source_table in canonical_views.items():
+        condition = " WHERE scenario_code='ACTUAL'" if name == (
+            "coffee_stock_actual") else ""
+        _trino_sql(
+            f"CREATE OR REPLACE VIEW iceberg.gold_semantic.{name} AS "
+            f"SELECT * FROM iceberg.gold_semantic.{source_table}{condition}")
+        _trino_sql(f"SELECT * FROM iceberg.gold_semantic.{name} LIMIT 0")
     kpis = {
         "kpi_production_tonnes_annual": (
             "SELECT p.calendar_year, c.commodity_code, n.m49_code AS country_m49_code, "
@@ -201,13 +240,25 @@ def _refresh_semantic_views(spark):
             "JOIN iceberg.gold_semantic.dim_price_series s ON f.price_series_key=s.price_series_key "
             "WHERE f.price_amount_native IS NOT NULL AND f.price_index_value IS NULL "
             "GROUP BY 1,2,3,4,5,6"),
+        "kpi_provincial_coffee_production_source_year": (
+            "SELECT p.calendar_year, g.geography_code, g.geography_version, "
+            "c.commodity_code, f.production_tonnes "
+            "FROM iceberg.gold_semantic.fact_production_provincial_canonical f "
+            "JOIN iceberg.gold_semantic.dim_period p ON f.period_key=p.period_key "
+            "JOIN iceberg.gold_semantic.dim_geography g ON f.geography_key=g.geography_key "
+            "JOIN iceberg.gold_semantic.dim_commodity c ON f.commodity_key=c.commodity_key "
+            "WHERE p.period_type='YEAR' AND g.geography_level='PROVINCE' "
+            "AND c.commodity_code='COFFEE' "
+            "AND f.coverage_code='ALL_PRODUCERS' "
+            "AND f.record_status_code='FINAL' "
+            "AND f.production_tonnes IS NOT NULL"),
     }
     for name, query in kpis.items():
         _trino_sql(f"CREATE OR REPLACE VIEW iceberg.gold_semantic.{name} AS {query}")
         _trino_sql(f"SELECT * FROM iceberg.gold_semantic.{name} LIMIT 0")
 
 
-def _exceptions(spark, context):
+def _exceptions(spark, context, namespace):
     batch, snapshots = context
     result = []
     approved_by = CONTRACT["approved_by"]
@@ -248,6 +299,21 @@ def _exceptions(spark, context):
     add("DISTRICT_SOURCE_IDENTITY_ONLY", "provincial_agri_observation",
         districts, "District rows retain source identity pending official crosswalk",
         "silver_core.provincial_agri_observation")
+    provincial = spark.table(
+        f"lakehouse.{namespace}.fact_production_provincial")
+    provincial_grain = [
+        "period_key", "geography_key", "commodity_key", "coverage_code",
+        "record_status_code"]
+    for measure in ("area_planted_ha", "area_harvested_ha",
+                    "production_tonnes", "yield_kg_ha"):
+        conflicts = provincial.groupBy(*provincial_grain).agg(
+            F.countDistinct(measure).alias("variants")
+        ).filter("variants > 1").count()
+        add("PROVINCIAL_" + measure.upper() + "_CONFLICT",
+            "provincial_agri_observation", conflicts,
+            "Multiple source values at one provincial business grain; semantic "
+            "canonical view returns NULL for this measure",
+            "gold_semantic.fact_production_provincial_canonical")
     bridge = pinned(
         spark, "lakehouse.silver_ref.trade_product_commodity_bridge", snapshots
     ).filter("mapping_status='PENDING'").count()
@@ -301,7 +367,7 @@ def publish_candidate(spark, manifest_id):
         return {"status": "BLOCKED", "gold_batch_id": manifest_id,
                 "failed_checks": [(x["table_name"], x["rule_code"],
                                    x["failed_count"]) for x in failures]}
-    exceptions = _exceptions(spark, context)
+    exceptions = _exceptions(spark, context, namespace)
     _upsert(spark, EXCEPTION, exceptions,
             ["gold_batch_id", "exception_code", "business_process"])
     _upsert(spark, RELEASE, [dict(

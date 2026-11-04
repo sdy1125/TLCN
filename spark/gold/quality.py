@@ -6,7 +6,7 @@ from pyspark.sql import functions as F
 
 from .contracts import BRIDGE, DIMENSIONS, FACTS
 from .source import current_snapshot, winners
-from .scope import SCOPE_VERSION, classify
+from .scope import CONTRACT, SCOPE_VERSION, classify
 
 
 FOREIGN_KEYS = {
@@ -46,6 +46,12 @@ BUSINESS_GRAINS = {
                           'scenario_code', 'observation_set_id'],
     'fact_macro_indicator': ['period_key', 'country_key',
                              'macro_indicator_key', 'observation_set_id'],
+}
+ANALYTIC_GRAINS = {
+    name: [field for field in grain if field not in (
+        'observation_set_id', 'record_source_code')]
+    for name, grain in BUSINESS_GRAINS.items()
+    if name != 'fact_production_provincial'
 }
 
 
@@ -92,6 +98,9 @@ def audit(spark, context, namespace):
                 record(name, 'CANONICAL_ONLY', frame.filter(~F.col('is_canonical')).count())
                 record(name, 'BUSINESS_GRAIN_UNIQUE', frame.groupBy(
                     *BUSINESS_GRAINS[name]).count().filter('count > 1').count())
+                if name in ANALYTIC_GRAINS:
+                    record(name, 'ANALYTIC_GRAIN_UNIQUE', frame.groupBy(
+                        *ANALYTIC_GRAINS[name]).count().filter('count > 1').count())
                 for foreign, dimension in FOREIGN_KEYS[name].items():
                     if foreign in REQUIRED_FKS[name]:
                         record(name, 'REQUIRED_' + foreign.upper(),
@@ -106,6 +115,32 @@ def audit(spark, context, namespace):
     price = spark.table(f'lakehouse.{fact_namespace}.fact_price')
     record('fact_price', 'AMOUNT_INDEX_XOR', price.filter(
         F.col('price_amount_native').isNotNull() & F.col('price_index_value').isNotNull()).count())
+    price_scope = (price.alias('f').join(
+        spark.table(f'lakehouse.{dim_namespace}.dim_price_series').select(
+            'price_series_key', 'market_scope').alias('s'),
+        F.col('f.price_series_key') == F.col('s.price_series_key'), 'left'
+    ).join(
+        spark.table(f'lakehouse.{dim_namespace}.dim_country').select(
+            F.col('country_key').alias('_country_key'), 'm49_code').alias('c'),
+        F.col('f.country_key') == F.col('c._country_key'), 'left'
+    ).join(
+        spark.table(f'lakehouse.{dim_namespace}.dim_geography').select(
+            F.col('geography_key').alias('_geography_key'),
+            F.col('geography_level').alias('_geography_level'),
+            F.col('country_key').alias('_geography_country_key')).alias('g'),
+        F.col('f.geography_key') == F.col('g._geography_key'), 'left'))
+    global_ok = ((F.col('s.market_scope') == 'GLOBAL') &
+                 (F.col('c.m49_code') == '001') &
+                 F.col('f.geography_key').isNull())
+    country_ok = ((F.col('s.market_scope') == 'COUNTRY') &
+                  (F.col('c.m49_code') != '001') &
+                  F.col('f.geography_key').isNull())
+    local_ok = (F.col('s.market_scope').isin('PROVINCE', 'DISTRICT') &
+                (F.col('s.market_scope') == F.col('g._geography_level')) &
+                F.col('f.geography_key').isNotNull() &
+                (F.col('f.country_key') == F.col('g._geography_country_key')))
+    record('fact_price', 'GEOGRAPHY_SCOPE', price_scope.filter(
+        ~F.coalesce(global_ok | country_ok | local_ok, F.lit(False))).count())
     stock = spark.table(f'lakehouse.{fact_namespace}.fact_coffee_stock')
     record('fact_coffee_stock', 'BAG_CONVERSION', stock.filter(
         F.col('ending_stock_tonnes') !=
@@ -145,6 +180,12 @@ def audit(spark, context, namespace):
         'macro_indicator_observation': 'fact_macro_indicator',
     }
     for domain, fact in domains.items():
+        fact_periods = spark.table(f'lakehouse.{fact_namespace}.{fact}').join(
+            spark.table(f'lakehouse.{dim_namespace}.dim_period').select(
+                'period_key', 'period_type'), 'period_key', 'left')
+        record(fact, 'PERIOD_SCOPE', fact_periods.filter(
+            ~F.coalesce(F.col('period_type').isin(
+                *CONTRACT['domains'][domain]['periods']), F.lit(False))).count())
         source = classify(domain, winners(spark, domain, batch['policy_version'], inputs))
         included = source.filter("_scope_status='INCLUDED'").select('observation_id').distinct()
         excluded = source.filter("_scope_status='EXCLUDED_APPROVED'").select('observation_id').distinct()

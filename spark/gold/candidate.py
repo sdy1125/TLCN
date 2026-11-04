@@ -4,6 +4,7 @@ import hashlib
 import json
 import re
 from datetime import datetime
+from pathlib import Path
 
 from .contracts import BRIDGE, DIMENSIONS, FACTS, META, ROOT, VERSION
 from .scope import SCOPE_VERSION, validate_contract
@@ -19,6 +20,19 @@ CANDIDATE_META = {
     "fact_lineage": META["fact_lineage"],
     "dq_result": META["dq_result"],
 }
+CODE_FILES = (
+    "build_dimensions.py", "build_facts.py", "candidate.py", "contracts.py",
+    "publication.py", "quality.py", "scope.py", "source.py", "temporal.py",
+)
+
+
+def transform_version():
+    """Fingerprint the exact Gold implementation pinned by a candidate run."""
+    digest = hashlib.sha256()
+    for name in CODE_FILES:
+        digest.update(name.encode())
+        digest.update((Path(__file__).parent / name).read_bytes())
+    return VERSION + "-" + digest.hexdigest()[:20]
 
 
 def _hash(payload):
@@ -62,7 +76,7 @@ def create_manifest(spark, manifest_id):
         "manifest_id": manifest_id,
         "silver_batch_id": silver_batch["batch_id"],
         "policy_version": silver_batch["policy_version"],
-        "transform_version": VERSION,
+        "transform_version": transform_version(),
         "scope_version": SCOPE_VERSION,
         "input_snapshots_json": json.dumps(snapshots, sort_keys=True),
     }
@@ -87,7 +101,8 @@ def load_manifest(spark, manifest_id):
         "scope_version", "input_snapshots_json")}
     if _hash(payload) != row["manifest_sha256"]:
         raise RuntimeError("Gold run manifest checksum mismatch")
-    if row["scope_version"] != SCOPE_VERSION or row["transform_version"] != VERSION:
+    if (row["scope_version"] != SCOPE_VERSION or
+            row["transform_version"] != transform_version()):
         raise RuntimeError("Gold code or scope changed after run manifest creation")
     snapshots = json.loads(row["input_snapshots_json"])
     batch = {"batch_id": row["silver_batch_id"],
