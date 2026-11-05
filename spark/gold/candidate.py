@@ -23,6 +23,7 @@ CANDIDATE_META = {
 CODE_FILES = (
     "build_dimensions.py", "build_facts.py", "candidate.py", "contracts.py",
     "publication.py", "quality.py", "scope.py", "source.py", "temporal.py",
+    "geography.py", "config/nso_district_crosswalk.json",
 )
 
 
@@ -53,6 +54,16 @@ def candidate_namespace(manifest_id):
 
 
 def _ensure_manifest_table(spark):
+    location = f"{ROOT}/gold_meta"
+    spark.sql(
+        "CREATE NAMESPACE IF NOT EXISTS lakehouse.gold_meta "
+        f"LOCATION '{location}'"
+    )
+    details = spark.sql("DESCRIBE NAMESPACE EXTENDED lakehouse.gold_meta").collect()
+    actual = [str(row[1]).rstrip("/") for row in details
+              if str(row[0]).strip().lower() == "location"]
+    if actual != [location]:
+        raise RuntimeError("Gold metadata namespace location mismatch")
     spark.sql(
         f"CREATE TABLE IF NOT EXISTS {MANIFEST_TABLE} ({MANIFEST_SCHEMA}) "
         f"USING iceberg LOCATION '{ROOT}/gold_meta/run_manifest' "

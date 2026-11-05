@@ -19,7 +19,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg://airflow:${POSTGRES_PASSWORD:-airflow}@postgres:5432/airflow
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY:-bG9jYWwtZGV2LWZlcm5ldC1rZXktMzItYnl0ZXMhISE=}
-    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
     AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_JWT_SECRET:-local-development-jwt-secret-change-me}
@@ -33,6 +33,7 @@ x-airflow-common: &airflow-common
     BRONZE_RAW_ROOT: /opt/airflow/data/raw
     BRONZE_DAG_SCHEDULE: ${BRONZE_DAG_SCHEDULE:-}
     LAKEHOUSE_RELEASE_SCHEDULE: ${LAKEHOUSE_RELEASE_SCHEDULE:-@daily}
+    LAKEHOUSE_HEALTHCHECK_SCHEDULE: ${LAKEHOUSE_HEALTHCHECK_SCHEDULE:-@hourly}
     SILVER_RUNNER_URL: http://spark-iceberg:8090
     SILVER_RUNNER_TOKEN: ${SILVER_RUNNER_TOKEN:-local-development-silver-runner-token-change-me}
     PYTHONPATH: /opt/airflow/include:/opt/silver

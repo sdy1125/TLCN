@@ -1,5 +1,6 @@
-"""Airflow DAG that verifies the local lakehouse services are reachable."""
+"""Scheduled check that makes infrastructure failures visible in Airflow."""
 
+import os
 from datetime import datetime, timezone
 from urllib.request import urlopen
 
@@ -8,8 +9,8 @@ from airflow.sdk import dag, task
 
 @dag(
     dag_id="lakehouse_healthcheck",
-    description="Check MinIO, Iceberg REST and Trino from the Airflow network",
-    schedule=None,
+    description="Check MinIO, Iceberg REST, Spark runner and Trino",
+    schedule=os.environ.get("LAKEHOUSE_HEALTHCHECK_SCHEDULE", "@hourly"),
     start_date=datetime(2025, 1, 1, tzinfo=timezone.utc),
     catchup=False,
     tags=["tlcn", "lakehouse"],
@@ -20,6 +21,7 @@ def lakehouse_healthcheck():
         endpoints = {
             "minio": "http://minio:9000/minio/health/live",
             "iceberg_rest": "http://iceberg-rest:8181/v1/config",
+            "spark_runner": "http://spark-iceberg:8090/health",
             "trino": "http://trino:8080/v1/info",
         }
         statuses = {}

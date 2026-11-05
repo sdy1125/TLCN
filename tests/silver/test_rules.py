@@ -35,13 +35,13 @@ class RuleTests(unittest.TestCase):
                          {dataset: target(dataset) for dataset in SOURCES})
         self.assertEqual(sum(Counter(s["target"] for s in SOURCES.values()).values()), 26)
 
-    def test_unverified_weather_provenance_is_explicit(self):
+    def test_weather_provenance_is_verified_by_api_comparison(self):
         provenance = SOURCES["nasa_power_weather_daily_63"]["provenance"]
         self.assertEqual(provenance["source_parameter"], "ALLSKY_SFC_SW_DWN")
-        self.assertEqual(provenance["unit_status"], "UNVERIFIED")
-        self.assertIsNone(provenance["unit"])
-        self.assertIsNone(provenance["source_community"])
-        self.assertIsNone(provenance["source_time_standard"])
+        self.assertEqual(provenance["unit_status"], "VERIFIED_BY_API_COMPARISON")
+        self.assertEqual(provenance["unit"], "MJ/m^2/day")
+        self.assertEqual(provenance["source_community"], "AG_INFERRED_BY_EXACT_API_MATCH")
+        self.assertEqual(provenance["source_time_standard"], "UTC_INFERRED_BY_EXACT_API_MATCH")
 
     def test_selection(self):
         self.assertEqual(len(select_datasets()), 26)
@@ -95,7 +95,8 @@ class RuleTests(unittest.TestCase):
         self.assertEqual(number("-999"), -999)  # sentinel is source-specific
 
     def test_exact_mappings(self):
-        self.assertEqual(commodity("0901"), "coffee")
+        with self.assertRaises(RowError):
+            commodity("0901")
         self.assertEqual(province("Đắc Nông")[0], "67")
         with self.assertRaises(RowError):
             commodity("0902")

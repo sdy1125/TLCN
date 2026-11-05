@@ -384,7 +384,7 @@ def _weather(r, m, run_id, now):
                 weather_location_code=r["weather_point"], observation_date=day,
                 calendar_year=year, day_of_year=doy, latitude=float(r["latitude"]),
                 longitude=float(r["longitude"]), province_code_source=r["province_code_63"].zfill(2),
-                weather_provider="NASA_POWER", solar_native_unit="SOURCE_UNVERIFIED",
+                weather_provider="NASA_POWER", solar_native_unit="MJ/m^2/day",
                 quality_status="WARN")
     missing = 0
     for source, (field, flag) in fields.items():
@@ -400,7 +400,7 @@ def _weather(r, m, run_id, now):
     if all(base[k] is not None for k in ("temperature_min_c", "temperature_avg_c", "temperature_max_c")):
         if not base["temperature_min_c"] <= base["temperature_avg_c"] <= base["temperature_max_c"]:
             raise RowError("IMPOSSIBLE_VALUE", "Temperature ordering")
-    base["solar_radiation_mj_m2_day"] = None
+    base["solar_radiation_mj_m2_day"] = base["solar_native_value"]
     base["valid_measure_count"] = len(fields) - missing
     base["has_missing_measure"] = missing > 0
     return [base]

@@ -1,6 +1,9 @@
 """Source-local canonical audit with deterministic duplicate and conflict rules."""
 
 from datetime import datetime
+from decimal import Decimal
+
+from .common import RULES
 
 from pyspark.sql import Window, functions as F
 
@@ -60,7 +63,8 @@ def decide_domain(spark, domain, policy_version=None):
         "_comparison_value", F.coalesce(_value(source, domain), F.lit("<NULL>"))
     )
     # The source-specific policy never compares or adds different datasets.
-    # Unmapped district geography and unresolved Comtrade valuation stay out.
+    # Source-native HS observations can be selected without claiming
+    # equivalence to FAOSTAT or to an agricultural commodity.
     required = [name for name in GRAIN[domain]
                 if name not in {"district_code", "coverage_end_date", "country_m49_code",
                 "geography_code", "partner2_code", "customs_code",
@@ -76,6 +80,10 @@ def decide_domain(spark, domain, policy_version=None):
                            (F.col("coverage_code") == "ALL_PRODUCERS"))
         eligible = eligible & ((F.col("quality_status") == "VALID") |
                                ((F.col("quality_status") == "WARN") & source_district))
+    elif domain == "trade_partner_observation":
+        comtrade = F.col("dataset_id").startswith("un_comtrade_")
+        eligible = eligible & ((F.col("quality_status") == "VALID") |
+                               ((F.col("quality_status") == "WARN") & comtrade))
     else:
         eligible = eligible & (F.col("quality_status") == "VALID")
     eligible = eligible & (F.col("is_active") == True) & (F.col("value_status") != "MISSING")
@@ -96,22 +104,40 @@ def decide_domain(spark, domain, policy_version=None):
             "canonical_business_key", F.col("observation_set_id").alias("_winner_set_id"))
     df = df.join(selected, "canonical_business_key", "left").withColumn(
         "_selected_release", F.col("observation_set_id") == F.col("_winner_set_id"))
+    price_rule = RULES["conflict_resolution"]["provincial_coffee_average_price"]
+    if price_rule["strategy"] != "maximum_value_within_tolerance":
+        raise ValueError("Unsupported local price conflict policy")
+    price_value = F.coalesce(F.col("price_amount_native"), F.col("price_index_value")) if domain == "price_observation" else F.lit(None).cast("decimal(28,8)")
+    df = df.withColumn("_numeric_value", price_value)
     stats = df.filter(F.col("_eligible") & F.col("_selected_release"))\
         .groupBy("canonical_business_key").agg(
         F.countDistinct("_comparison_value").alias("_distinct_values"),
         F.count("*").alias("_eligible_count"),
         F.to_json(F.sort_array(F.collect_set("_comparison_value"))).alias("_conflicting_values_json"),
         F.to_json(F.sort_array(F.collect_set("observation_id"))).alias("_candidate_ids_json"),
+        F.min("_numeric_value").alias("_min_numeric_value"),
+        F.max("_numeric_value").alias("_max_numeric_value"),
     )
     ranked = df.join(stats, "canonical_business_key", "left").withColumn(
+        "_resolved_price_conflict",
+        (F.col("dataset_id") == "provincial_coffee_average_price") &
+        (F.col("metric_code") == "DOMESTIC_COFFEE_PRICE") &
+        (F.col("canonical_unit_code") == price_rule["unit_standard"]) &
+        (F.col("_distinct_values") > 1) &
+        (F.col("_max_numeric_value") - F.col("_min_numeric_value") <=
+         F.lit(Decimal(price_rule["max_absolute_delta"])))
+    ).withColumn(
         "_rank", F.row_number().over(Window.partitionBy("canonical_business_key")
                                      .orderBy(F.col("_selected_release").desc(),
                                               F.col("_eligible").desc(),
+                                              F.when(F.col("_resolved_price_conflict"),
+                                                     F.col("_numeric_value")).desc_nulls_last(),
                                               "observation_id", "source_row_locator"))
     )
     decision = F.when(~F.col("_eligible"), F.lit("EXCLUDED"))\
         .when(~F.col("_selected_release"), F.lit("LOSER"))\
-        .when(F.col("_distinct_values") > 1, F.lit("EXCLUDED"))\
+        .when((F.col("_distinct_values") > 1) &
+              ~F.col("_resolved_price_conflict"), F.lit("EXCLUDED"))\
         .when(F.col("_rank") == 1, F.lit("WINNER"))\
         .otherwise(F.lit("LOSER"))
     now = datetime.utcnow()
@@ -123,14 +149,17 @@ def decide_domain(spark, domain, policy_version=None):
         decision.alias("decision_status"),
         F.when(~F.col("_eligible"), "not_eligible")
          .when(~F.col("_selected_release"), "superseded_release")
-         .when(F.col("_distinct_values") > 1, "unresolved_same_grain_conflict")
+         .when((F.col("_distinct_values") > 1) &
+               ~F.col("_resolved_price_conflict"), "unresolved_same_grain_conflict")
+         .when(F.col("_resolved_price_conflict"), price_rule["winner_reason"])
          .when(F.col("_rank") == 1, "latest_valid_release")
          .otherwise("identical_duplicate").alias("decision_reason"),
         F.lit(now).alias("decided_at"), F.lit(None).cast("long").alias("published_snapshot_id"),
     )
     collisions = ranked.filter(F.col("_eligible") & F.col("_selected_release") &
                                (F.col("_distinct_values") > 1))\
-        .select("canonical_business_key", "_candidate_ids_json", "_conflicting_values_json")\
+        .select("canonical_business_key", "_candidate_ids_json", "_conflicting_values_json",
+                "_resolved_price_conflict")\
         .dropDuplicates(["canonical_business_key"])
     conflicts = collisions.select(
         F.sha2(F.concat_ws("|", F.lit(domain), F.lit(policy_version), "canonical_business_key"), 256).alias("conflict_id"),
@@ -138,9 +167,14 @@ def decide_domain(spark, domain, policy_version=None):
         "canonical_business_key", F.col("_candidate_ids_json").alias("candidate_ids_json"),
         F.col("_conflicting_values_json").alias("conflicting_values_json"),
         F.lit("CONFLICTING_VALUES").alias("conflict_reason"),
-        F.lit("BLOCK").alias("conflict_action"), F.lit("OPEN").alias("resolution_status"),
-        F.lit(None).cast("string").alias("resolved_by"),
-        F.lit(None).cast("timestamp").alias("resolved_at"),
+        F.when(F.col("_resolved_price_conflict"), "SELECT_MAX_WITHIN_1_VND")
+         .otherwise("BLOCK").alias("conflict_action"),
+        F.when(F.col("_resolved_price_conflict"), "RESOLVED")
+         .otherwise("OPEN").alias("resolution_status"),
+        F.when(F.col("_resolved_price_conflict"), F.lit(price_rule["version"]))
+         .otherwise(F.lit(None).cast("string")).alias("resolved_by"),
+        F.when(F.col("_resolved_price_conflict"), F.lit(now))
+         .otherwise(F.lit(None).cast("timestamp")).alias("resolved_at"),
         F.lit(policy_version).alias("policy_version"),
     )
     existing = spark.table("lakehouse.silver_meta.canonical_decision").filter(

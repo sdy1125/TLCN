@@ -714,11 +714,11 @@
       "provenance": {
         "source_product": "NASA POWER",
         "source_parameter": "ALLSKY_SFC_SW_DWN",
-        "source_community": null,
-        "source_time_standard": null,
-        "unit": null,
-        "unit_status": "UNVERIFIED",
-        "evidence": "The consolidated Bronze CSV does not retain the original API request or unit metadata."
+        "source_community": "AG_INFERRED_BY_EXACT_API_MATCH",
+        "source_time_standard": "UTC_INFERRED_BY_EXACT_API_MATCH",
+        "unit": "MJ/m^2/day",
+        "unit_status": "VERIFIED_BY_API_COMPARISON",
+        "evidence": "docs/silver/NASA_POWER_UNIT_VERIFICATION_20261105.md"
       },
       "headers": [
         "YEAR",

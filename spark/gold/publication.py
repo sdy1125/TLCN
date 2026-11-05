@@ -10,6 +10,7 @@ from pyspark.sql import functions as F
 
 from .candidate import candidate_namespace, load_manifest, validate_id
 from .contracts import BRIDGE, DIMENSIONS, FACTS, ROOT
+from .geography import ROWS as DISTRICT_ROWS, trino_values
 from .quality import audit
 from .scope import CONTRACT, SCOPE_VERSION, classify
 from .source import current_snapshot, pinned, winners
@@ -71,9 +72,13 @@ def _trino_sql(statement):
 
 
 def _legacy_release(spark):
+    if not spark.catalog.tableExists("lakehouse.gold_meta.publish_batch"):
+        return None
     rows = spark.table("lakehouse.gold_meta.publish_batch").filter(
         F.col("status").isin("ACTIVE", "ACTIVE_WITH_EXCEPTIONS")
     ).select("gold_batch_id").collect()
+    if not rows:
+        return None
     if len(rows) != 1:
         raise RuntimeError("Expected one legacy active Gold release for migration")
     batch_id = rows[0][0]
@@ -101,7 +106,11 @@ def _initialize_pointer(spark):
                                                          sort_keys=True)
             _upsert(spark, RELEASE, [updated], ['gold_batch_id'])
         return rows[0].asDict()
+    if spark.table(RELEASE).filter("status='PUBLISHED'").limit(1).count():
+        raise RuntimeError("Published Gold release exists without a publication pointer")
     legacy = _legacy_release(spark)
+    if legacy is None:
+        return None
     legacy_snapshots = {}
     for table in TABLES:
         kind = ('gold_dim' if table in DIMENSIONS else
@@ -133,20 +142,43 @@ def _source_namespace(release, table):
     return "gold_fact"
 
 
-def _refresh_semantic_views(spark):
+def _refresh_semantic_views(spark, selected_ids):
+    """Route only the releases involved in the current pointer transition."""
+    selected_ids = set(selected_ids)
+    if not selected_ids:
+        raise RuntimeError("No Gold release selected")
     releases = spark.table(RELEASE).filter(
-        "status IN ('PUBLISHED','PREPARED')").orderBy("gold_batch_id").collect()
-    if not releases:
-        raise RuntimeError("No Gold release registered")
+        F.col("gold_batch_id").isin(*selected_ids) &
+        F.col("status").isin("PUBLISHED", "PREPARED")
+    ).orderBy("gold_batch_id").collect()
+    if {row["gold_batch_id"] for row in releases} != selected_ids:
+        raise RuntimeError("Selected Gold release is not registered")
     _trino_sql("CREATE SCHEMA IF NOT EXISTS iceberg.gold_semantic")
     for table in TABLES:
-        branches = []
+        schemas = []
         for row in releases:
             release = row.asDict()
+            namespace = _source_namespace(release, table)
+            schemas.append((release, namespace,
+                            spark.table(f'lakehouse.{namespace}.{table}').columns))
+        fields = list(dict.fromkeys(
+            column for _, _, columns in schemas for column in columns))
+        # A rollback can select only a pre-migration release. Keep the
+        # serving contract wide enough for scope-aware views in that case.
+        compatibility = {
+            'fact_trade_total': ('statistical_scope_code',),
+            'fact_trade_partner': (
+                'partner_m49_code', 'partner2_code', 'customs_code',
+                'mode_of_transport_code', 'statistical_scope_code',
+                'valuation_basis_code'),
+        }
+        fields.extend(column for column in compatibility.get(table, ())
+                      if column not in fields)
+        branches = []
+        for release, namespace, available in schemas:
             batch_id = release["gold_batch_id"]
             if not re.fullmatch(r"[a-zA-Z0-9_-]+", batch_id):
                 raise RuntimeError("Unsafe Gold release ID")
-            namespace = _source_namespace(release, table)
             if not re.fullmatch(r"[a-zA-Z0-9_]+", namespace):
                 raise RuntimeError("Unsafe Gold release namespace")
             snapshot_name = f'lakehouse.{namespace}.{table}'
@@ -154,8 +186,20 @@ def _refresh_semantic_views(spark):
             snapshot_id = snapshots.get(snapshot_name)
             if not isinstance(snapshot_id, int) or snapshot_id <= 0:
                 raise RuntimeError(f'Missing pinned release snapshot: {snapshot_name}')
+            defaults = {
+                ('fact_trade_total', 'statistical_scope_code'):
+                    "'SOURCE_TOTAL'",
+                ('fact_trade_partner', 'statistical_scope_code'):
+                    "'PARTNER_MATRIX'",
+                ('fact_trade_partner', 'valuation_basis_code'):
+                    "'AS_PUBLISHED'",
+            }
+            projection = ", ".join(
+                (f't."{column}"' if column in available else
+                 defaults.get((table, column), 'CAST(NULL AS varchar)')) +
+                f' AS "{column}"' for column in fields)
             branches.append(
-                f"SELECT t.* FROM iceberg.{namespace}.{table} "
+                f"SELECT {projection} FROM iceberg.{namespace}.{table} "
                 f"FOR VERSION AS OF {snapshot_id} t "
                 "JOIN iceberg.gold_meta.publication_pointer p "
                 f"ON p.pointer_id='gold' AND p.active_gold_batch_id='{batch_id}'")
@@ -184,13 +228,34 @@ def _refresh_semantic_views(spark):
     _trino_sql(canonical)
     _trino_sql("SELECT * FROM iceberg.gold_semantic."
                "fact_production_provincial_canonical LIMIT 0")
+    district_sql = (
+        "CREATE OR REPLACE VIEW "
+        "iceberg.gold_semantic.fact_production_provincial_district_official AS "
+        "SELECT f.*, p.calendar_year AS source_calendar_year, "
+        "g.province_code AS source_province_code, "
+        "x.official_district_code, "
+        "'NSO_YEAR_END_VERIFIED' AS district_mapping_method "
+        "FROM iceberg.gold_semantic.fact_production_provincial f "
+        "JOIN iceberg.gold_semantic.dim_geography g "
+        "ON f.geography_key=g.geography_key "
+        "JOIN iceberg.gold_semantic.dim_period p "
+        "ON f.period_key=p.period_key "
+        "JOIN (VALUES " + trino_values() + ") "
+        "AS x(province_code, raw_name, calendar_year, "
+        "official_district_code, mapping_status) "
+        "ON g.province_code=x.province_code "
+        "AND g.geography_name=x.raw_name "
+        "AND p.calendar_year=x.calendar_year "
+        "WHERE g.geography_level='DISTRICT' "
+        "AND x.mapping_status='VERIFIED'")
+    _trino_sql(district_sql)
+    _trino_sql("SELECT * FROM iceberg.gold_semantic."
+               "fact_production_provincial_district_official LIMIT 0")
     canonical_views = {
         "production_national_canonical": "fact_production_national",
         "production_provincial_canonical":
             "fact_production_provincial_canonical",
         "price_canonical": "fact_price",
-        "trade_total_canonical": "fact_trade_total",
-        "trade_partner_canonical": "fact_trade_partner",
         "weather_daily_canonical": "fact_weather_daily",
         "coffee_stock_actual": "fact_coffee_stock",
         "macro_indicator_canonical": "fact_macro_indicator",
@@ -202,6 +267,34 @@ def _refresh_semantic_views(spark):
             f"CREATE OR REPLACE VIEW iceberg.gold_semantic.{name} AS "
             f"SELECT * FROM iceberg.gold_semantic.{source_table}{condition}")
         _trino_sql(f"SELECT * FROM iceberg.gold_semantic.{name} LIMIT 0")
+    trade_views = {
+        'trade_total_canonical':
+            "SELECT * FROM iceberg.gold_semantic.fact_trade_total "
+            "WHERE statistical_scope_code='SOURCE_TOTAL'",
+        'trade_national_reported':
+            "SELECT * FROM iceberg.gold_semantic.fact_trade_total "
+            "WHERE statistical_scope_code='NATIONAL_REPORTED'",
+        'trade_partner_canonical':
+            "SELECT * FROM iceberg.gold_semantic.fact_trade_partner "
+            "WHERE valuation_basis_code='AS_PUBLISHED'",
+        'trade_hs_source':
+            "SELECT * FROM iceberg.gold_semantic.fact_trade_partner "
+            "WHERE valuation_basis_code='PRIMARY_VALUE_USD'",
+    }
+    for name, query in trade_views.items():
+        _trino_sql(
+            f"CREATE OR REPLACE VIEW iceberg.gold_semantic.{name} AS {query}")
+        _trino_sql(f"SELECT * FROM iceberg.gold_semantic.{name} LIMIT 0")
+    _trino_sql(
+        "CREATE OR REPLACE VIEW "
+        "iceberg.gold_semantic.trade_hs_total_mode_country AS "
+        "SELECT * FROM iceberg.gold_semantic.trade_hs_source "
+        "WHERE mode_of_transport_code='0' "
+        "AND partner_country_key IS NOT NULL "
+        "AND partner_m49_code<>'000'")
+    _trino_sql(
+        "SELECT * FROM iceberg.gold_semantic."
+        "trade_hs_total_mode_country LIMIT 0")
     kpis = {
         "kpi_production_tonnes_annual": (
             "SELECT p.calendar_year, c.commodity_code, n.m49_code AS country_m49_code, "
@@ -220,6 +313,7 @@ def _refresh_semantic_views(spark):
             "JOIN iceberg.gold_semantic.dim_commodity c ON f.commodity_key=c.commodity_key "
             "JOIN iceberg.gold_semantic.dim_country n ON f.reporter_country_key=n.country_key "
             "WHERE p.period_type='YEAR' AND f.trade_flow_code='EXPORT' "
+            "AND f.statistical_scope_code='SOURCE_TOTAL' "
             "AND f.trade_value_usd IS NOT NULL "
             "GROUP BY 1,2,3"),
         "kpi_coffee_stock_actual_tonnes": (
@@ -288,17 +382,12 @@ def _exceptions(spark, context, namespace):
     add("OPEN_CANONICAL_CONFLICT", "price_observation", conflicts,
         "Source values conflict; no canonical winner",
         "silver_meta.canonical_conflict")
-    aliases = pinned(
-        spark, "lakehouse.silver_ref.geography_alias", snapshots
-    ).filter("approval_status='PENDING'").count()
-    add("PENDING_GEOGRAPHY_ALIAS", "provincial_agri_observation", aliases,
-        "Official district identity not verified", "silver_ref.geography_alias")
-    districts = pinned(
-        spark, "lakehouse.silver_core.provincial_agri_observation", snapshots
-    ).filter("geography_level='DISTRICT'").count()
-    add("DISTRICT_SOURCE_IDENTITY_ONLY", "provincial_agri_observation",
-        districts, "District rows retain source identity pending official crosswalk",
-        "silver_core.provincial_agri_observation")
+    unresolved = sum(row["mapping_status"] != "VERIFIED"
+                     for row in DISTRICT_ROWS)
+    add("DISTRICT_ANNUAL_BOUNDARY_UNRESOLVED",
+        "provincial_agri_observation", unresolved,
+        "The annual source record cannot be assigned to a single year-end "
+        "administrative boundary", "spark/gold/config/nso_district_crosswalk.json")
     provincial = spark.table(
         f"lakehouse.{namespace}.fact_production_provincial")
     provincial_grain = [
@@ -322,22 +411,26 @@ def _exceptions(spark, context, namespace):
         "silver_ref.trade_product_commodity_bridge")
     weather = pinned(
         spark, "lakehouse.silver_core.weather_daily", snapshots
-    ).filter("solar_radiation_mj_m2_day IS NULL").count()
-    add("SOLAR_UNIT_UNVERIFIED", "weather_daily", weather,
-        "NASA request metadata does not establish canonical solar unit",
+    ).filter("solar_native_value IS NOT NULL AND "
+             "solar_radiation_mj_m2_day IS NULL").count()
+    add("SOLAR_CANONICAL_MISSING", "weather_daily", weather,
+        "Verified NASA solar value was not propagated to canonical MJ/m2/day",
         "silver_core.weather_daily")
-    comtrade = pinned(
-        spark, "lakehouse.silver_core.trade_partner_observation", snapshots
-    ).filter("dataset_id LIKE 'un_comtrade_%'").count()
-    add("COMTRADE_CANONICAL_INACTIVE", "trade_partner_observation", comtrade,
-        "HS scope and valuation rules not approved",
-        "silver_meta.source_selection_policy")
     return result
 
 
 def _flip_pointer(spark, expected, target):
     if not re.fullmatch(r"[a-zA-Z0-9_-]+", target):
         raise ValueError("Unsafe release ID")
+    if expected is None:
+        frame = spark.createDataFrame([dict(
+            pointer_id="gold", active_gold_batch_id=target, generation=0,
+            updated_at=datetime.utcnow())], spark.table(POINTER).schema)
+        frame.writeTo(POINTER).append()
+        rows = spark.table(POINTER).filter("pointer_id='gold'").collect()
+        if len(rows) != 1 or rows[0]["active_gold_batch_id"] != target:
+            raise RuntimeError("Gold initial publication pointer changed concurrently")
+        return
     generation = int(expected["generation"])
     spark.sql(
         f"UPDATE {POINTER} SET active_gold_batch_id='{target}', "
@@ -355,11 +448,12 @@ def publish_candidate(spark, manifest_id):
     validate_id(manifest_id)
     _ensure_tables(spark)
     pointer = _initialize_pointer(spark)
-    if pointer["active_gold_batch_id"] == manifest_id:
+    if pointer and pointer["active_gold_batch_id"] == manifest_id:
         spark.sql(
             f"UPDATE {RELEASE} SET status='PUBLISHED', "
             "published_at=current_timestamp() "
             f"WHERE gold_batch_id='{manifest_id}' AND status='PREPARED'")
+        _refresh_semantic_views(spark, {manifest_id})
         return {"status": "ALREADY_PUBLISHED", "gold_batch_id": manifest_id}
     context = load_manifest(spark, manifest_id)
     namespace = candidate_namespace(manifest_id)
@@ -382,12 +476,14 @@ def publish_candidate(spark, manifest_id):
         row_counts_json=json.dumps(counts, sort_keys=True),
         status="PREPARED", published_at=None)],
         ["gold_batch_id"])
-    _refresh_semantic_views(spark)
+    prior = {pointer["active_gold_batch_id"]} if pointer else set()
+    _refresh_semantic_views(spark, prior | {manifest_id})
     _flip_pointer(spark, pointer, manifest_id)
     spark.sql(
         f"UPDATE {RELEASE} SET status='PUBLISHED', "
         "published_at=current_timestamp() "
         f"WHERE gold_batch_id='{manifest_id}' AND status='PREPARED'")
+    _refresh_semantic_views(spark, {manifest_id})
     return {"status": "ACTIVE_WITH_EXCEPTIONS" if exceptions else "ACTIVE",
             "gold_batch_id": manifest_id, "checks": len(checks),
             "exception_count": len(exceptions)}
@@ -401,8 +497,11 @@ def rollback(spark, target):
     if len(rows) != 1:
         raise ValueError("Rollback target is not a published Gold release")
     pointer = _initialize_pointer(spark)
+    if pointer is None:
+        raise RuntimeError("Cannot roll back before the first Gold publication")
     if pointer["active_gold_batch_id"] == target:
         return {"status": "ALREADY_ACTIVE", "gold_batch_id": target}
-    _refresh_semantic_views(spark)
+    _refresh_semantic_views(spark, {pointer["active_gold_batch_id"], target})
     _flip_pointer(spark, pointer, target)
+    _refresh_semantic_views(spark, {target})
     return {"status": "ROLLED_BACK", "gold_batch_id": target}

@@ -1,0 +1,2080 @@
+{
+  "source": "https://danhmuchanhchinh.nso.gov.vn/DMDVHC.asmx?op=DanhMucQuanHuyen",
+  "query_date_rule": "31/12 of source calendar year",
+  "retrieved_on": "2026-11-05",
+  "normalization": "Unicode NFKD, remove administrative type and punctuation; Phu Quy/Phu Qui manually verified",
+  "rows": [
+    {
+      "province_code": "60",
+      "raw_name": "Bac Binh district",
+      "year": 2020,
+      "official_district_code": "596",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Bac Binh district",
+      "year": 2021,
+      "official_district_code": "596",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Bac Binh district",
+      "year": 2022,
+      "official_district_code": "596",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Bac Binh district",
+      "year": 2023,
+      "official_district_code": "596",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Bac Binh district",
+      "year": 2024,
+      "official_district_code": "596",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2018,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2019,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2020,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2021,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2022,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2023,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baolam district",
+      "year": 2024,
+      "official_district_code": "680",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2018,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2019,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2020,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2021,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2022,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2023,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Baoloc city",
+      "year": 2024,
+      "official_district_code": "673",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Cattien district",
+      "year": 2018,
+      "official_district_code": "683",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Cattien district",
+      "year": 2019,
+      "official_district_code": "683",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Cattien district",
+      "year": 2020,
+      "official_district_code": "683",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Cattien district",
+      "year": 2021,
+      "official_district_code": "683",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Cattien district",
+      "year": 2022,
+      "official_district_code": "683",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Cattien district",
+      "year": 2023,
+      "official_district_code": "683",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2015,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2018,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2019,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2020,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2021,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2022,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2023,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Cu Jut district",
+      "year": 2024,
+      "official_district_code": "662",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2018,
+      "official_district_code": "681",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2019,
+      "official_district_code": "681",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2020,
+      "official_district_code": "681",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2021,
+      "official_district_code": "681",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2022,
+      "official_district_code": "681",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2023,
+      "official_district_code": "681",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dahuoai district",
+      "year": 2024,
+      "official_district_code": null,
+      "mapping_status": "UNRESOLVED_ANNUAL_BOUNDARY"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2015,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2018,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2019,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2020,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2021,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2022,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2023,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak G'long district",
+      "year": 2024,
+      "official_district_code": "661",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2015,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2018,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2019,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2020,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2021,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2022,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2023,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Mil district",
+      "year": 2024,
+      "official_district_code": "663",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2015,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2018,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2019,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2020,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2021,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2022,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2023,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak R'lap district",
+      "year": 2024,
+      "official_district_code": "666",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2015,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2018,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2019,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2020,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2021,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2022,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2023,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Dak Song district",
+      "year": 2024,
+      "official_district_code": "665",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2018,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2019,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2020,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2021,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2022,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2023,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dalat city",
+      "year": 2024,
+      "official_district_code": "672",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2018,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2019,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2020,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2021,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2022,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2023,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Damrong district",
+      "year": 2024,
+      "official_district_code": "674",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dateh district",
+      "year": 2018,
+      "official_district_code": "682",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dateh district",
+      "year": 2019,
+      "official_district_code": "682",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dateh district",
+      "year": 2020,
+      "official_district_code": "682",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dateh district",
+      "year": 2021,
+      "official_district_code": "682",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dateh district",
+      "year": 2022,
+      "official_district_code": "682",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dateh district",
+      "year": 2023,
+      "official_district_code": "682",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2018,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2019,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2020,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2021,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2022,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2023,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Dilinh district",
+      "year": 2024,
+      "official_district_code": "679",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2018,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2019,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2020,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2021,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2022,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2023,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Donduong district",
+      "year": 2024,
+      "official_district_code": "677",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Duc Linh district",
+      "year": 2020,
+      "official_district_code": "600",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Duc Linh district",
+      "year": 2021,
+      "official_district_code": "600",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Duc Linh district",
+      "year": 2022,
+      "official_district_code": "600",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Duc Linh district",
+      "year": 2023,
+      "official_district_code": "600",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Duc Linh district",
+      "year": 2024,
+      "official_district_code": "600",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2018,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2019,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2020,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2021,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2022,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2023,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Ductrong district",
+      "year": 2024,
+      "official_district_code": "678",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2015,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2018,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2019,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2020,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2021,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2022,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2023,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Gia Nghia city",
+      "year": 2024,
+      "official_district_code": "660",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Tan district",
+      "year": 2020,
+      "official_district_code": "601",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Tan district",
+      "year": 2021,
+      "official_district_code": "601",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Tan district",
+      "year": 2022,
+      "official_district_code": "601",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Tan district",
+      "year": 2023,
+      "official_district_code": "601",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Tan district",
+      "year": 2024,
+      "official_district_code": "601",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Bac district",
+      "year": 2020,
+      "official_district_code": "597",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Bac district",
+      "year": 2021,
+      "official_district_code": "597",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Bac district",
+      "year": 2022,
+      "official_district_code": "597",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Bac district",
+      "year": 2023,
+      "official_district_code": "597",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Bac district",
+      "year": 2024,
+      "official_district_code": "597",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Nam district",
+      "year": 2020,
+      "official_district_code": "598",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Nam district",
+      "year": 2021,
+      "official_district_code": "598",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Nam district",
+      "year": 2022,
+      "official_district_code": "598",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Nam district",
+      "year": 2023,
+      "official_district_code": "598",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Ham Thuan Nam district",
+      "year": 2024,
+      "official_district_code": "598",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2018,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2019,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2020,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2021,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2022,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2023,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Buôn Đôn",
+      "year": 2024,
+      "official_district_code": "647",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2018,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2019,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2020,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2021,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2022,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2023,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư Kuin",
+      "year": 2024,
+      "official_district_code": "657",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2018,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2019,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2020,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2021,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2022,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2023,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Cư M'Gar",
+      "year": 2024,
+      "official_district_code": "648",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2018,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2019,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2020,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2021,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2022,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2023,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea H'leo",
+      "year": 2024,
+      "official_district_code": "645",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2018,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2019,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2020,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2021,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2022,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2023,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Kar",
+      "year": 2024,
+      "official_district_code": "651",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2018,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2019,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2020,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2021,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2022,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2023,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Ea Súp",
+      "year": 2024,
+      "official_district_code": "646",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2018,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2019,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2020,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2021,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2022,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2023,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Ana",
+      "year": 2024,
+      "official_district_code": "655",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2018,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2019,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2020,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2021,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2022,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2023,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Bông",
+      "year": 2024,
+      "official_district_code": "653",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2018,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2019,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2020,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2021,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2022,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2023,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Búk",
+      "year": 2024,
+      "official_district_code": "649",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2018,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2019,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2020,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2021,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2022,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2023,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Năng",
+      "year": 2024,
+      "official_district_code": "650",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2018,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2019,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2020,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2021,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2022,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2023,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Krông Pắc",
+      "year": 2024,
+      "official_district_code": "654",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2018,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2019,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2020,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2021,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2022,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2023,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện Lăk",
+      "year": 2024,
+      "official_district_code": "656",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2018,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2019,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2020,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2021,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2022,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2023,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Huyện M'Đrắk",
+      "year": 2024,
+      "official_district_code": "652",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2015,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2018,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2019,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2020,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2021,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2022,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2023,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Krong No district",
+      "year": 2024,
+      "official_district_code": "664",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2018,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2019,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2020,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2021,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2022,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2023,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lacduong district",
+      "year": 2024,
+      "official_district_code": "675",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2018,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2019,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2020,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2021,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2022,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2023,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "68",
+      "raw_name": "Lamha district",
+      "year": 2024,
+      "official_district_code": "676",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phan Thiet city",
+      "year": 2020,
+      "official_district_code": "593",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phan Thiet city",
+      "year": 2021,
+      "official_district_code": "593",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phan Thiet city",
+      "year": 2022,
+      "official_district_code": "593",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phan Thiet city",
+      "year": 2023,
+      "official_district_code": "593",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phan Thiet city",
+      "year": 2024,
+      "official_district_code": "593",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phu Quy district",
+      "year": 2020,
+      "official_district_code": "602",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phu Quy district",
+      "year": 2021,
+      "official_district_code": "602",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phu Quy district",
+      "year": 2022,
+      "official_district_code": "602",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phu Quy district",
+      "year": 2023,
+      "official_district_code": "602",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Phu Quy district",
+      "year": 2024,
+      "official_district_code": "602",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2018,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2019,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2020,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2021,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2022,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2023,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "TP. Buôn Ma Thuột",
+      "year": 2024,
+      "official_district_code": "643",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tanh Linh district",
+      "year": 2020,
+      "official_district_code": "599",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tanh Linh district",
+      "year": 2021,
+      "official_district_code": "599",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tanh Linh district",
+      "year": 2022,
+      "official_district_code": "599",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tanh Linh district",
+      "year": 2023,
+      "official_district_code": "599",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tanh Linh district",
+      "year": 2024,
+      "official_district_code": "599",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2018,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2019,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2020,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2021,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2022,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2023,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "66",
+      "raw_name": "Thị xã Buôn Hồ",
+      "year": 2024,
+      "official_district_code": "644",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2015,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2018,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2019,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2020,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2021,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2022,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2023,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "67",
+      "raw_name": "Tuy Duc district",
+      "year": 2024,
+      "official_district_code": "667",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tuy Phong district",
+      "year": 2020,
+      "official_district_code": "595",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tuy Phong district",
+      "year": 2021,
+      "official_district_code": "595",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tuy Phong district",
+      "year": 2022,
+      "official_district_code": "595",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tuy Phong district",
+      "year": 2023,
+      "official_district_code": "595",
+      "mapping_status": "VERIFIED"
+    },
+    {
+      "province_code": "60",
+      "raw_name": "Tuy Phong district",
+      "year": 2024,
+      "official_district_code": "595",
+      "mapping_status": "VERIFIED"
+    }
+  ]
+}

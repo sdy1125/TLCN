@@ -115,6 +115,13 @@ def main():
         record("silver_core.weather_daily", "VALID_MEASURE_COUNT", weather.count(), bad_weather)
         sentinel = weather.filter(" OR ".join(f"{name}=-999" for name in names)).count()
         record("silver_core.weather_daily", "NO_SENTINEL_IN_MEASURES", weather.count(), sentinel)
+        solar_mismatch = weather.filter(
+            "dataset_id='nasa_power_weather_daily_63' AND ("
+            "NOT (solar_native_unit <=> 'MJ/m^2/day') OR "
+            "NOT (solar_radiation_mj_m2_day <=> solar_native_value))"
+        ).count()
+        record("silver_core.weather_daily", "SOLAR_UNIT_VALUE_PARITY",
+               weather.count(), solar_mismatch)
         macro = spark.table("lakehouse.silver_core.macro_indicator_observation")
         null_mismatch = macro.filter(
             (F.col("value_status").eqNullSafe(F.lit("MISSING")) !=

@@ -111,6 +111,22 @@ def build(spark, context, namespace):
         hashed('classification_system', 'classification_version', 'product_code').alias('trade_product_key'),
         'classification_system', 'classification_version', 'product_code', 'product_name',
         'aggregation_level', 'is_leaf', lit(True).alias('is_active'))
+    # National reported trade has a source-native product absent from the
+    # partner-matrix reference. Preserve its own classification and grain.
+    total_products = pinned(
+        spark, 'lakehouse.silver_core.trade_total_observation', snapshots
+    ).select('classification_system', 'classification_version',
+             'product_code').distinct().select(
+        hashed('classification_system', 'classification_version',
+               'product_code').alias('trade_product_key'),
+        'classification_system', 'classification_version', 'product_code',
+        F.col('product_code').alias('product_name'),
+        lit(None).cast('int').alias('aggregation_level'),
+        lit(None).cast('boolean').alias('is_leaf'),
+        lit(True).alias('is_active'))
+    product = product.unionByName(
+        total_products.join(product.select('trade_product_key'),
+                            'trade_product_key', 'left_anti'))
     indicator = ref('macro_indicator').select(
         hashed('indicator_code').alias('macro_indicator_key'), 'indicator_code', 'indicator_name',
         lit(None).cast('string').alias('indicator_group'), 'unit_code', 'scale_factor',

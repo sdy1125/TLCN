@@ -64,9 +64,7 @@
         "world_bank_pink_sheet",
         "provincial_coffee_average_price"
       ],
-      "approved_exclusions": {
-        "provincial_coffee_average_price": "LOCAL_PRICE_GEOGRAPHY_VERSION_UNVERIFIED"
-      },
+      "approved_exclusions": {},
       "grain": "series × commodity × country or geography × source period × source observation set",
       "metrics": [
         "price_amount_native",
@@ -77,7 +75,7 @@
         "MONTH",
         "YEAR"
       ],
-      "geography": "M49 country or verified source geography",
+      "geography": "M49 country or source published province code; source boundary version is retained separately",
       "units": [
         "native currency/native unit",
         "canonical currency/unit",
@@ -93,23 +91,22 @@
         "faostat_tcl_trade_pepper",
         "provincial_coffee_export_volume_value"
       ],
-      "approved_exclusions": {
-        "provincial_coffee_export_volume_value": "NATIONAL_REPORTED_NOT_EQUIVALENT_TO_SOURCE_TOTAL"
-      },
+      "approved_exclusions": {},
       "grain": "reporter country × product × flow × year × source observation set",
       "metrics": [
         "trade_quantity_tonnes",
         "trade_value_usd"
       ],
       "periods": [
-        "YEAR"
+        "YEAR",
+        "MONTH"
       ],
       "geography": "M49 reporter country",
       "units": [
         "tonne",
         "USD"
       ],
-      "analysis_scope": "SOURCE_TOTAL only; NATIONAL_REPORTED separate pending equivalence"
+      "analysis_scope": "SOURCE_TOTAL and NATIONAL_REPORTED in one Fact with explicit statistical scope and separate serving views"
     },
     "trade_partner_observation": {
       "fact": "fact_trade_partner",
@@ -126,14 +123,15 @@
         "trade_value_usd"
       ],
       "periods": [
-        "YEAR"
+        "YEAR",
+        "MONTH"
       ],
       "geography": "M49 reporter and partner",
       "units": [
         "tonne",
         "USD"
       ],
-      "analysis_scope": "approved FAOSTAT partner matrix only; Comtrade inactive"
+      "analysis_scope": "FAOSTAT partner matrix and source-native Comtrade HS in one Fact with explicit classification, customs, transport and valuation scope"
     },
     "weather_daily": {
       "fact": "fact_weather_daily",

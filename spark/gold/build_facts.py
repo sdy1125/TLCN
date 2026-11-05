@@ -21,7 +21,7 @@ SPECS = {
 }
 
 
-def _pivot(frame, grain, metrics):
+def _pivot(frame, grain, metrics, estimated=False):
     if frame.groupBy(*(grain + ['metric_code'])).count().filter('count > 1').limit(1).count():
         raise ValueError('Silver winner rows collapse at target Fact grain')
     exprs = []
@@ -30,6 +30,13 @@ def _pivot(frame, grain, metrics):
                                   F.col('value_canonical'))).alias(target))
         exprs.append(F.max(F.when(F.col('metric_code') == metric,
                                   F.col('quality_flag_source'))).alias(target + '_flag'))
+        if estimated:
+            exprs.append(F.max(F.when(
+                F.col('metric_code') == metric,
+                (F.col('value_status') == 'ESTIMATED').cast('int')
+            )).cast('boolean').alias(
+                'quantity_estimated_flag' if metric == 'TRADE_QUANTITY'
+                else 'value_estimated_flag'))
     return frame.groupBy(*grain).agg(*exprs)
 
 
@@ -83,7 +90,9 @@ def build(spark, context, namespace):
         if domain == 'price_observation':
             source = source.withColumn(
                 'country_m49_code', F.when(F.col('market_scope') == 'GLOBAL',
-                                           F.lit('001')).otherwise(F.col('country_m49_code')))
+                                           F.lit('001')).when(
+                    F.col('dataset_id') == 'provincial_coffee_average_price',
+                    F.lit('704')).otherwise(F.col('country_m49_code')))
             source = attach_key(
                 source, spark.table(f'lakehouse.{dimension_namespace}.dim_price_series'),
                 'series_code', 'series_code', 'price_series_key')
@@ -147,7 +156,8 @@ def build(spark, context, namespace):
             base = _commodity(_period(source))
             base = _country(base, 'country_m49_code', 'country_key')
             base = base.withColumn('geography_key', F.when(
-                F.col('geography_code').isNotNull(), hashed('geography_code', F.lit(None))))
+                F.col('geography_code').isNotNull(),
+                hashed('geography_code', F.lit('as_published'))))
             base = _key(base, grain, key).select(
                 key, 'period_key', 'commodity_key', 'country_key', 'geography_key',
                 'price_series_key', 'price_amount_native', 'price_amount_canonical',
@@ -159,26 +169,49 @@ def build(spark, context, namespace):
                 'classification_system', 'classification_version', 'product_code',
                 'commodity_code', 'trade_flow_code', 'period_type', 'period_code',
                 'observation_set_id', 'dataset_id']
-            base = _pivot(source, grain, {'TRADE_QUANTITY': 'trade_quantity_tonnes',
-                                          'TRADE_VALUE': 'trade_value_usd'})
             if partner:
-                estimated = source.groupBy(*grain).agg(
-                    F.max(F.when(F.col('metric_code') == 'TRADE_QUANTITY',
-                                 (F.col('value_status') == 'ESTIMATED').cast('int')))
-                     .cast('boolean').alias('quantity_estimated_flag'),
-                    F.max(F.when(F.col('metric_code') == 'TRADE_VALUE',
-                                 (F.col('value_status') == 'ESTIMATED').cast('int')))
-                     .cast('boolean').alias('value_estimated_flag'))
-                base = base.join(estimated, grain)
+                grain += ['partner2_code', 'customs_code',
+                          'mode_of_transport_code', 'statistical_scope_code']
+                source = source.withColumn(
+                    'value_canonical', F.when(
+                        (F.col('classification_system') == 'HS') &
+                        (F.col('metric_code') == 'TRADE_VALUE'),
+                                              F.col('value_native'))
+                    .otherwise(F.col('value_canonical')))
+            else:
+                grain += ['statistical_scope_code']
+            base = _pivot(source, grain, {'TRADE_QUANTITY': 'trade_quantity_tonnes',
+                                          'TRADE_VALUE': 'trade_value_usd'},
+                          estimated=partner)
             base = _product(_commodity(_period(base)))
             base = _country(base, 'reporter_m49_code', 'reporter_country_key')
             if partner:
                 base = _country(base, 'partner_m49_code', 'partner_country_key')
+                known = spark.table(
+                    f'lakehouse.{dimension_namespace}.dim_country'
+                ).select(F.col('m49_code').alias('_known_partner_code'))
+                base = base.join(
+                    F.broadcast(known),
+                    F.col('partner_m49_code') == F.col('_known_partner_code'),
+                    'left').withColumn(
+                        'partner_country_key',
+                        F.when(F.col('_known_partner_code').isNotNull(),
+                               F.col('partner_country_key'))
+                    ).drop('_known_partner_code')
             base = _key(base, grain, key)
             columns = [key, 'period_key', 'reporter_country_key'] + (
                 ['partner_country_key'] if partner else []) + [
                 'commodity_key', 'trade_product_key', 'trade_flow_code',
                 'trade_quantity_tonnes', 'trade_value_usd']
+            if partner:
+                columns += ['partner_m49_code', 'partner2_code', 'customs_code',
+                            'mode_of_transport_code', 'statistical_scope_code',
+                            F.when(F.col('classification_system') == 'HS',
+                                   F.lit('PRIMARY_VALUE_USD'))
+                            .otherwise(F.lit('AS_PUBLISHED'))
+                            .alias('valuation_basis_code')]
+            else:
+                columns += ['statistical_scope_code']
             if partner:
                 columns += ['quantity_estimated_flag', 'value_estimated_flag']
             else:

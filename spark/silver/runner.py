@@ -74,7 +74,8 @@ def execute(job, request):
         stage = request["stage"]
         scripts = {
             "foundation": "foundation.py", "backfill": "backfill.py",
-            "repair_metadata": "repair_metadata.py", "refs": "refs.py",
+            "repair_metadata": "repair_metadata.py",
+            "reconcile_weather_units": "reconcile_weather_units.py", "refs": "refs.py",
             "policy": "policy.py", "canonical": "canonical.py",
             "validate": "validate.py", "gold_smoke": "gold_contract_smoke.py",
             "prepare": "prepare_publish.py", "activate": "activate.py",
@@ -175,6 +176,7 @@ class Handler(BaseHTTPRequestHandler):
             elif pipeline == "silver_release":
                 stage = request.get("stage")
                 if stage not in {"foundation", "backfill", "repair_metadata",
+                                 "reconcile_weather_units",
                                  "refs", "policy", "canonical", "validate",
                                  "gold_smoke", "prepare", "activate"}:
                     raise ValueError()

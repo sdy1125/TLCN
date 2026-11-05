@@ -28,16 +28,16 @@ class ScopeRuntimeTest(unittest.TestCase):
 
     def test_price_included_excluded_and_blocked(self):
         rows = [
-            ("world_bank_pink_sheet", None),
-            ("provincial_coffee_average_price", "66"),
-            ("provincial_coffee_average_price", None),
-            ("unknown_price_file", "66"),
+            ("world_bank_pink_sheet", None, "GLOBAL"),
+            ("provincial_coffee_average_price", "66", "PROVINCE"),
+            ("provincial_coffee_average_price", None, "PROVINCE"),
+            ("unknown_price_file", "66", "PROVINCE"),
         ]
         result = self.classify_rows(
             "price_observation", rows,
-            "dataset_id string, geography_code string")
+            "dataset_id string, geography_code string, market_scope string")
         self.assertEqual([r["_scope_status"] for r in result],
-                         ["INCLUDED", "EXCLUDED_APPROVED",
+                         ["INCLUDED", "INCLUDED",
                           "BLOCKED_UNMAPPED", "BLOCKED_UNMAPPED"])
         self.assertTrue(result[1]["_scope_reason"])
 
@@ -51,7 +51,7 @@ class ScopeRuntimeTest(unittest.TestCase):
             "trade_total_observation", rows,
             "dataset_id string, statistical_scope_code string")
         self.assertEqual([r["_scope_status"] for r in result],
-                         ["INCLUDED", "EXCLUDED_APPROVED", "BLOCKED_UNMAPPED"])
+                         ["INCLUDED", "INCLUDED", "BLOCKED_UNMAPPED"])
 
     def test_stock_unverified_country_is_blocked(self):
         rows = [

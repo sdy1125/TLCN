@@ -119,8 +119,10 @@ def main():
             for code, commodity in [("0901", "COFFEE"), ("0904", "PEPPER")]:
                 bridges.append(dict(classification_system="HS", classification_version=version,
                                     product_code=code, commodity_code=commodity,
-                                    mapping_type="CANDIDATE", allocation_weight=None,
-                                    mapping_status="PENDING", mapping_rule="NO_AUTO_ALLOCATION"))
+                                    mapping_type="HS_HEADING_BROADER_THAN_COMMODITY",
+                                    allocation_weight=None,
+                                    mapping_status="NOT_EQUIVALENT",
+                                    mapping_rule="UNSD_HS_HEADING_SCOPE_NO_ALLOCATION"))
         _upsert(spark, "lakehouse.silver_ref.trade_product_commodity_bridge", bridges,
                 ["classification_system", "classification_version", "product_code", "commodity_code"])
 

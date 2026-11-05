@@ -13,6 +13,7 @@ CROSS_RULES = {
     ("silver_core.coffee_stock_observation", "BAG_CONVERSION"),
     ("silver_core.weather_daily", "VALID_MEASURE_COUNT"),
     ("silver_core.weather_daily", "NO_SENTINEL_IN_MEASURES"),
+    ("silver_core.weather_daily", "SOLAR_UNIT_VALUE_PARITY"),
     ("silver_core.macro_indicator_observation", "SOURCE_NULLS_RETAINED"),
     ("silver_meta.canonical_decision", "ONE_WINNER_MAX"),
     ("silver_meta.canonical_conflict", "OPEN_PRICE_CONFLICTS"),

@@ -12,7 +12,7 @@ from airflow.sdk import dag, task, get_current_context
 from airflow.sdk.exceptions import AirflowFailException
 
 
-STAGES = ("foundation", "backfill", "repair_metadata", "refs", "policy",
+STAGES = ("foundation", "backfill", "repair_metadata", "reconcile_weather_units", "refs", "policy",
           "canonical", "validate", "gold_smoke", "prepare", "activate")
 
 

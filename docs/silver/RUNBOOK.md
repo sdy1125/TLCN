@@ -9,6 +9,13 @@ before deploying Airflow to change the cadence. Drive download remains an
 independent handoff. Its in-progress marker blocks Bronze during download;
 after completion Bronze verifies all source SHA256 values from
 `data/raw/.drive-handoff.json` before ingestion.
+New Airflow installations create scheduled DAGs unpaused. Existing metadata
+retains its prior paused state: check `airflow dags list` and unpause
+`lakehouse_release`, `bronze_ingestion`, `silver_release`, `gold_build` and
+`lakehouse_healthcheck` if needed. Paused child DAGs leave E2E triggers queued
+indefinitely. Bronze, Silver and Gold child DAGs have no independent schedule.
+The healthcheck runs hourly
+and checks MinIO, catalog, runner and Trino from the Airflow network.
 
 ```bash
 docker compose exec -T airflow-apiserver airflow dags trigger lakehouse_release
@@ -94,13 +101,13 @@ set.
 
 ## Known source limitations
 
-- Six Đắk Lắk 2022 local price groups contain conflicting source values. All 12 candidate rows remain in core and the six groups have zero canonical winners. Resolve them through reviewed source evidence before adding a winner.
+- Six Đắk Lắk 2022 local price groups contain values differing by exactly 1 VND/kg in duplicate workbook blocks. The versioned policy selects the higher source value within that strict tolerance, retains both rows and marks six conflict records RESOLVED. Wider differences remain OPEN with no winner.
 - The Bronze files lack official district codes for 2,142 observations. Silver uses stable source-scoped geography keys, retains the raw names and marks 44 aliases pending official mapping. The keys preserve district grain; they are not official administrative codes.
-- The consolidated NASA CSV lacks the original API community and unit request. Native solar values are retained; canonical `solar_radiation_mj_m2_day` remains NULL pending source verification.
-- Comtrade variants are retained atomically. Their canonical policy remains inactive until classification, partner scope, transport/customs, quantity and valuation rules are approved. FAOSTAT matrix observations have source-local decisions.
+- The original NASA request is absent from the consolidated CSV. Five independent coordinate/date comparisons with the official NASA POWER API exactly match community AG and UTC. Solar has unit MJ/m²/day and is copied into the canonical field; source NULLs remain NULL. See `docs/silver/NASA_POWER_UNIT_VERIFICATION_20261105.md`.
+- Comtrade variants are retained atomically. Source-local canonical decisions select nonmissing HS observations. Gold keeps HS version, partner, partner2, customs and transport mode, and uses source primary value in USD. The safe total-mode country view excludes aggregate/unmapped partners and transport breakdowns; HS headings are not mapped to agricultural commodities.
 - Source aggregate FAO code 159 is preserved as a source code and excluded from canonical Fact keys because it is not an M49 country code.
 
-The recovered release has 52 PASS and two WARN DQ results. The two WARN counts are six open price conflicts and 2,142 source-scoped district rows. The 21 Gold input smoke checks passed. These exceptions are explicit in the active batch, not silently filled.
+The historical recovered release had 52 PASS and two WARN DQ results. The 2026-11-05 release resolves the price conflicts and verifies solar units; district identities remain source-scoped until an official dated crosswalk is available.
 
 ## Backup, recovery and deployment
 
@@ -115,3 +122,18 @@ The failed Airflow run at 2026-10-22 13:21 UTC reported `Location does not exist
 In the MinIO Console, refresh `warehouse` to see only `silver/` and `gold/` at the bucket root. The obsolete top-level `silver_*` prefixes were removed after the 2026-10-30 layered rebuild passed publication checks. In Airflow, trigger `silver_backfill` with no configuration to check all 26 latest Bronze releases, or provide `{"dataset_id":"world_bank_wdi"}` to check one source. Existing releases return `SKIPPED` by design. When a new Bronze release exists, follow the ordered policy, canonical, DQ and activation steps above after backfill.
 
 The Iceberg REST fixture uses a persistent SQLite volume with WAL and a busy timeout. Keep the `iceberg-catalog` and MinIO named volumes when recreating containers. Compose publishes MinIO, Trino, Iceberg REST and Airflow only on localhost. `.env` currently holds development credentials; rotate MinIO, PostgreSQL, Airflow JWT/admin and runner token before exposing the stack beyond the local host. PostgreSQL rotation must update the initialized database role and matching Compose value together. A production deployment should replace the single-node SQLite REST fixture with a supported durable catalog and protect its credentials and backups.
+
+For a consistent local backup, use `bash scripts/backup_lakehouse.sh
+/absolute/path/to/new-backup-directory` from the repository root during a
+maintenance window. It refuses active release DAGs and an in-progress Drive
+handoff, stops running Compose services, archives MinIO, catalog, PostgreSQL and
+local raw files, verifies SHA256 and tar readability, then restarts exactly the
+services that were running. Copy the complete backup directory to independent
+storage and verify it there with `sha256sum -c SHA256SUMS`. This archive is not
+an independently deployed application restore. Run
+`python3 scripts/verify_backup_restore.py /absolute/path/to/backup` to restore
+all four archives into disposable Docker volumes and compare every file's
+checksum with its archive member. Before deployment, restore the three volumes
+and raw files into a separate Compose project and verify Bronze manifest,
+Silver/Gold pointers, snapshot reads and KPI totals. Never overwrite the live
+volumes to perform a drill.

@@ -48,12 +48,13 @@ def classify(domain, winners):
 
     if domain == "price_observation":
         local = F.col("dataset_id") == "provincial_coffee_average_price"
-        excluded = local & F.col("geography_code").isNotNull()
-        invalid = local & F.col("geography_code").isNull()
+        invalid = local & (F.col("geography_code").isNull() |
+                           ~F.col("geography_code").isin("66", "68") |
+                           (F.col("market_scope") != "PROVINCE"))
         status = status.when(invalid, "BLOCKED_UNMAPPED").when(
-            excluded, "EXCLUDED_APPROVED")
+            local, "INCLUDED")
         reason = reason.when(invalid, "LOCAL_PRICE_GEOGRAPHY_MISSING").when(
-            excluded, rule["approved_exclusions"]["provincial_coffee_average_price"])
+            local, "SOURCE_PUBLISHED_PROVINCE_CODE")
     elif domain == "trade_total_observation":
         local_trade = F.col("dataset_id") == "provincial_coffee_export_volume_value"
         reported = local_trade & F.col("statistical_scope_code").eqNullSafe(
@@ -61,16 +62,21 @@ def classify(domain, winners):
         invalid = ((local_trade & ~reported) |
                    (~local_trade & ~F.col("statistical_scope_code").eqNullSafe(
                        F.lit("SOURCE_TOTAL"))))
-        status = status.when(invalid, "BLOCKED_UNMAPPED").when(
-            reported, "EXCLUDED_APPROVED")
+        status = status.when(invalid, "BLOCKED_UNMAPPED")
         reason = reason.when(invalid, "UNREVIEWED_TRADE_SCOPE").when(
-            reported, rule["approved_exclusions"]["provincial_coffee_export_volume_value"])
+            reported, "SOURCE_NATIVE_NATIONAL_REPORTED")
     elif domain == "trade_partner_observation":
-        eligible = F.coalesce(((F.col("classification_system") == "FAOSTAT") &
+        faostat = ((F.col("classification_system") == "FAOSTAT") &
                     (F.col("statistical_scope_code") == "PARTNER_MATRIX") &
                     F.col("partner2_code").isNull() &
                     F.col("customs_code").isNull() &
-                    F.col("mode_of_transport_code").isNull()), F.lit(False))
+                    F.col("mode_of_transport_code").isNull())
+        hs = ((F.col("classification_system") == "HS") &
+              F.col("dataset_id").startswith("un_comtrade_") &
+              (F.col("partner2_code") == "0") &
+              (F.col("customs_code") == "C00") &
+              F.col("mode_of_transport_code").isNotNull())
+        eligible = F.coalesce(faostat | hs, F.lit(False))
         status = status.when(~eligible, "BLOCKED_UNMAPPED")
         reason = reason.when(~eligible, "TRADE_PARTNER_POLICY_UNAPPROVED")
     elif domain == "coffee_stock_observation":
