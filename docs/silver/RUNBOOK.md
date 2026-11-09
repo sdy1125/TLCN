@@ -17,6 +17,17 @@ indefinitely. Bronze, Silver and Gold child DAGs have no independent schedule.
 The healthcheck runs hourly
 and checks MinIO, catalog, runner and Trino from the Airflow network.
 
+For targeted repair, trigger the same `silver_release` DAG with a verified full
+Bronze release ID and `dataset_id`. Its backfill stage selects that dataset, while
+all publication gates still run. Follow it with `gold_build` to publish a Gold
+candidate from the new Silver release. The retired `silver_backfill` DAG remains
+in historical Airflow run records but has no active DAG file.
+
+```bash
+docker compose exec -T airflow-apiserver airflow dags trigger silver_release \
+  --conf '{"bronze_release_id":"bronze-REPLACE_WITH_VERIFIED_RELEASE","dataset_id":"world_bank_wdi"}'
+```
+
 ```bash
 docker compose exec -T airflow-apiserver airflow dags trigger lakehouse_release
 docker compose exec -T airflow-apiserver airflow dags list-runs lakehouse_release -o plain
@@ -47,7 +58,7 @@ acceptance criteria.
 
 ## Contract and migration status
 
-The [migration plan](SILVER_V2_IMPLEMENTATION_CONTRACT.md) defines the Silver handoff. The code uses `silver_backfill` and a catalog whose tables reside under `warehouse/silver/`. On 2026-10-30 all 26 Bronze releases were rebuilt into eight atomic `silver_core` tables with matching `silver_stage` rows.
+The [migration plan](SILVER_V2_IMPLEMENTATION_CONTRACT.md) defines the Silver handoff. The code uses `silver_release` and a catalog whose tables reside under `warehouse/silver/`. On 2026-10-30 all 26 Bronze releases were rebuilt into eight atomic `silver_core` tables with matching `silver_stage` rows.
 
 The historical October batch `silver-layered-20261030-1650` was
 `ACTIVE_WITH_EXCEPTIONS`, with eight core snapshot IDs and policy
@@ -70,8 +81,7 @@ Run from the repository root. Keep Bronze read-only.
 ```bash
 docker compose config --quiet
 docker compose up -d --no-build
-docker compose exec -T airflow-apiserver airflow dags trigger silver_backfill --conf '{"dataset_id":"world_bank_wdi"}'
-docker compose exec -T airflow-apiserver airflow dags list-runs silver_backfill -o json
+docker compose exec -T airflow-apiserver airflow dags list-runs silver_release -o json
 docker compose exec -T airflow-apiserver airflow dags list-import-errors
 docker compose exec -T trino trino --execute 'SHOW SCHEMAS FROM iceberg'
 docker compose exec -T trino trino --execute "SELECT batch_id,status,policy_version FROM iceberg.silver_meta.publish_batch WHERE status LIKE 'ACTIVE%'"
@@ -119,21 +129,13 @@ The rebuilt `warehouse` bucket has versioning enabled, and Compose enables it at
 
 The failed Airflow run at 2026-10-22 13:21 UTC reported `Location does not exist` for `s3://warehouse/silver_meta/dataset_registry/metadata/...metadata.json`; the entire warehouse was empty. Recovery loaded all 26 Bronze releases, rebuilt canonical and references, passed 54 DQ checks (52 PASS, two known WARN) and 21 Gold input checks, and activated `silver-recovered-20261022`. A WDI-only DAG run and a full 26-dataset DAG run without configuration both finished `success` after recovery.
 
-In the MinIO Console, refresh `warehouse` to see only `silver/` and `gold/` at the bucket root. The obsolete top-level `silver_*` prefixes were removed after the 2026-10-30 layered rebuild passed publication checks. In Airflow, trigger `silver_backfill` with no configuration to check all 26 latest Bronze releases, or provide `{"dataset_id":"world_bank_wdi"}` to check one source. Existing releases return `SKIPPED` by design. When a new Bronze release exists, follow the ordered policy, canonical, DQ and activation steps above after backfill.
+In the MinIO Console, refresh `warehouse` to see only `silver/` and `gold/` at the bucket root. The obsolete top-level `silver_*` prefixes were removed after the 2026-10-30 layered rebuild passed publication checks. Use `silver_release` for a complete Silver publication, with optional `dataset_id` for targeted backfill. Existing observations return `SKIPPED` by design.
 
-The Iceberg REST fixture uses a persistent SQLite volume with WAL and a busy timeout. Keep the `iceberg-catalog` and MinIO named volumes when recreating containers. Compose publishes MinIO, Trino, Iceberg REST and Airflow only on localhost. `.env` currently holds development credentials; rotate MinIO, PostgreSQL, Airflow JWT/admin and runner token before exposing the stack beyond the local host. PostgreSQL rotation must update the initialized database role and matching Compose value together. A production deployment should replace the single-node SQLite REST fixture with a supported durable catalog and protect its credentials and backups.
+The Iceberg REST fixture uses a persistent SQLite volume with WAL, a 60-second busy timeout, and `transaction_mode=IMMEDIATE`. This reserves the SQLite writer before a JDBC catalog metadata read, avoiding the observed read-to-write `SQLITE_BUSY_SNAPSHOT` upgrade failure. Keep the `iceberg-catalog` and MinIO named volumes when recreating containers. Compose publishes MinIO, Trino, Iceberg REST and Airflow only on localhost. A production deployment should replace the single-node SQLite REST fixture with a supported durable catalog and protect its credentials and backups.
 
-For a consistent local backup, use `bash scripts/backup_lakehouse.sh
-/absolute/path/to/new-backup-directory` from the repository root during a
-maintenance window. It refuses active release DAGs and an in-progress Drive
-handoff, stops running Compose services, archives MinIO, catalog, PostgreSQL and
-local raw files, verifies SHA256 and tar readability, then restarts exactly the
-services that were running. Copy the complete backup directory to independent
-storage and verify it there with `sha256sum -c SHA256SUMS`. This archive is not
-an independently deployed application restore. Run
-`python3 scripts/verify_backup_restore.py /absolute/path/to/backup` to restore
-all four archives into disposable Docker volumes and compare every file's
-checksum with its archive member. Before deployment, restore the three volumes
-and raw files into a separate Compose project and verify Bronze manifest,
-Silver/Gold pointers, snapshot reads and KPI totals. Never overwrite the live
-volumes to perform a drill.
+The backup and restore commands described in the 2026-11-05 historical audit
+are not present in this checkout. Before a catalog migration or production
+deployment, take a consistent independent backup of MinIO, the catalog,
+PostgreSQL and raw files, then verify a restore in a separate Compose project.
+Never overwrite live volumes for a restore drill. The SQLite transaction-mode
+change above keeps the same catalog file and table registrations.

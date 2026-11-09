@@ -1,4 +1,4 @@
-"""Week 7 local ``data/raw`` to MinIO Bronze ingestion DAG."""
+"""Local ``data/raw`` to MinIO Bronze ingestion DAG."""
 
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ SCHEDULE = os.environ.get("BRONZE_DAG_SCHEDULE") or None
         "retry_delay": timedelta(minutes=2),
         "retry_exponential_backoff": True,
     },
-    tags=["tlcn", "bronze", "local-raw", "week-7"],
+    tags=["tlcn", "bronze", "local-raw"],
 )
 def bronze_ingestion():
     @task

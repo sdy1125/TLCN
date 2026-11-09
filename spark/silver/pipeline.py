@@ -81,7 +81,7 @@ def run_dataset(spark, dataset, run_id):
         spark.sql(f"UPDATE lakehouse.silver_meta.observation_set SET status='PUBLISHED', "
                   f"updated_at=current_timestamp() WHERE observation_set_id='{set_id}'")
         _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
+            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_release",
             task_id=dataset, started_at=now, finished_at=now,
             environment="docker-compose", run_status="SKIPPED",
             rows_read=0, rows_valid=existing, rows_quarantined=0,
@@ -90,7 +90,7 @@ def run_dataset(spark, dataset, run_id):
                 "observation_set_id": set_id}
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-        ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
+        ingestion_run_id=run_id + ":" + dataset, dag_id="silver_release",
         task_id=dataset, started_at=now, environment="docker-compose",
         run_status="RUNNING")], ["ingestion_run_id"])
     transformed = None
@@ -173,7 +173,7 @@ def run_dataset(spark, dataset, run_id):
                 status="PASS", sample_ref=json.dumps(result), checked_at=now)],
                 ["dq_result_id"])
             _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-                ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
+                ingestion_run_id=run_id + ":" + dataset, dag_id="silver_release",
                 task_id=dataset, started_at=now, finished_at=datetime.utcnow(),
                 environment="docker-compose", run_status="SUCCESS",
                 rows_read=counts["input_rows"], rows_valid=valid_count,
@@ -182,7 +182,7 @@ def run_dataset(spark, dataset, run_id):
             return result
     except Exception as exc:
         _upsert_records(spark, "lakehouse.silver_meta.ingestion_run", [dict(
-            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_backfill",
+            ingestion_run_id=run_id + ":" + dataset, dag_id="silver_release",
             task_id=dataset, started_at=now, finished_at=datetime.utcnow(),
             environment="docker-compose", run_status="FAILED", error_summary=str(exc)[:500])],
             ["ingestion_run_id"])

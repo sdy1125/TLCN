@@ -1,4 +1,5 @@
 .env
+.metabase-data/
 .docx_work/
 airflow/logs/
 dbt/logs/

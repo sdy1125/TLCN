@@ -102,7 +102,7 @@ configured raw root.
 
 ## Full and incremental loading
 
-The complete file is always the ingestion unit; Week 7 does not implement
+The complete file is always the ingestion unit; this pipeline does not implement
 row-level CDC.
 
 | State | Detection | Result |
@@ -194,7 +194,8 @@ docker compose exec airflow-scheduler airflow dags list-import-errors
 
 Local endpoints include Airflow at <http://localhost:8083>, MinIO API at
 <http://localhost:9000>, MinIO Console at <http://localhost:9001>, and Trino at
-<http://localhost:8082>.
+<http://localhost:8082>. Metabase is at <http://localhost:3000>; its account,
+connection, and dashboard data are stored in the `metabase-data` Docker volume.
 
 ## Run the Bronze DAG
 
@@ -256,8 +257,9 @@ Silver reads the 26 immutable Bronze releases with verified SHA-256 and
 physical source-row lineage. It writes eight atomic Iceberg domains in
 `silver_core`, along with `silver_meta`, `silver_ref`, and `silver_stage`.
 Source-local canonical decisions are audited; unresolved conflicts have no
-winner. `silver_backfill` is the only Silver DAG and `silver_core` is the
-active Silver namespace. The `gold_build` DAG creates an isolated Gold candidate,
+winner. `silver_release` is the single Silver DAG; it runs backfill, policy,
+canonical selection, DQ, and activation. `silver_core` holds the observations.
+The `gold_build` DAG creates an isolated Gold candidate,
 validates its complete Silver WINNER coverage, and publishes it through a
 release pointer. Analytics reads the `iceberg.gold_semantic` views.
 

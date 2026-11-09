@@ -47,6 +47,34 @@ def gold_input_matches(log_path, expected_batch_id):
             records[0].get("silver_batch_id") == expected_batch_id)
 
 
+def normalize_silver_release_request(request):
+    """Validate one Silver stage and retain its requested backfill subset."""
+    stage = request.get("stage")
+    if stage not in {"foundation", "backfill", "repair_metadata",
+                     "reconcile_weather_units", "refs", "policy", "canonical",
+                     "validate", "gold_smoke", "prepare", "activate"}:
+        raise ValueError("Invalid Silver stage")
+    release_id = request.get("bronze_release_id")
+    batch_id = request.get("batch_id")
+    dq_run_id = request.get("dq_run_id")
+    if (not isinstance(release_id, str) or
+            not re.fullmatch(r"bronze-[a-z0-9][a-z0-9_-]{2,95}", release_id) or
+            not isinstance(batch_id, str) or
+            not re.fullmatch(r"silver-[a-z0-9][a-z0-9_-]{2,95}", batch_id) or
+            not isinstance(dq_run_id, str) or
+            not re.fullmatch(r"silver-dq-[a-z0-9][a-z0-9_-]{2,95}", dq_run_id)):
+        raise ValueError("Invalid Silver release identity")
+    normalized = {"pipeline": "silver_release", "stage": stage,
+                  "run_id": request["run_id"],
+                  "bronze_release_id": release_id,
+                  "batch_id": batch_id, "dq_run_id": dq_run_id}
+    if stage == "backfill":
+        normalized["datasets"] = select_datasets(request.get("dataset_id"))
+    elif request.get("dataset_id") is not None:
+        raise ValueError("dataset_id is only valid for Silver backfill")
+    return normalized
+
+
 def execute(job, request):
     directory = ROOT / job
     directory.mkdir(parents=True, exist_ok=True)
@@ -85,6 +113,8 @@ def execute(job, request):
         if stage == "backfill":
             cmd += ["--run-id", request["run_id"],
                     "--result-file", str(directory / "results.json")]
+            for dataset in request["datasets"]:
+                cmd += ["--dataset-id", dataset]
         elif stage == "validate":
             cmd += ["--run-id", request["dq_run_id"]]
         elif stage == "prepare":
@@ -174,26 +204,7 @@ class Handler(BaseHTTPRequestHandler):
                            "manifest_id": manifest_id, "pipeline": "gold",
                            "expected_silver_batch_id": expected}
             elif pipeline == "silver_release":
-                stage = request.get("stage")
-                if stage not in {"foundation", "backfill", "repair_metadata",
-                                 "reconcile_weather_units",
-                                 "refs", "policy", "canonical", "validate",
-                                 "gold_smoke", "prepare", "activate"}:
-                    raise ValueError()
-                release_id = request.get("bronze_release_id")
-                batch_id = request.get("batch_id")
-                dq_run_id = request.get("dq_run_id")
-                if (not isinstance(release_id, str) or
-                        not re.fullmatch(r"bronze-[a-z0-9][a-z0-9_-]{2,95}", release_id) or
-                        not isinstance(batch_id, str) or
-                        not re.fullmatch(r"silver-[a-z0-9][a-z0-9_-]{2,95}", batch_id) or
-                        not isinstance(dq_run_id, str) or
-                        not re.fullmatch(r"silver-dq-[a-z0-9][a-z0-9_-]{2,95}", dq_run_id)):
-                    raise ValueError()
-                request = {"pipeline": "silver_release", "stage": stage,
-                           "run_id": request["run_id"],
-                           "bronze_release_id": release_id,
-                           "batch_id": batch_id, "dq_run_id": dq_run_id}
+                request = normalize_silver_release_request(request)
             else:
                 request = {
                     "run_id": request["run_id"],

@@ -52,6 +52,8 @@ def silver_release():
                    "bronze_release_id": bronze_release,
                    "batch_id": "silver-" + identity,
                    "dq_run_id": "silver-dq-" + identity}
+        if stage == "backfill" and conf.get("dataset_id") is not None:
+            request["dataset_id"] = conf["dataset_id"]
         job_id = _request("/jobs", request)["job_id"]
         deadline = time.monotonic() + 7500
         while time.monotonic() < deadline:
